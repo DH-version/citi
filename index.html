@@ -8,37 +8,183 @@
 body {
   font-family: -apple-system, Arial;
   background: linear-gradient(135deg, #0f172a, #111827);
-  padding: 10px;
+  padding: 6px;
   color: #fff;
   max-width: 430px;
   margin: auto;
 }
-h2 { text-align: center; margin-bottom: 12px; font-size: 18px; }
-input, select { width: 100%; padding: 14px; margin: 6px 0; font-size: 16px; border-radius: 10px; border: none; box-sizing: border-box; }
-select { background: #2563eb; color: #fff; cursor: pointer; }
-input:disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
-button { padding: 12px; margin: 5px 3px; font-size: 15px; border-radius: 10px; border: none; background: #2563eb; color: #fff; font-weight: bold; cursor: pointer; }
-button:disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; }
-.glow { background: #facc15 !important; color: #000 !important; box-shadow: 0 0 10px #facc15; }
-.section { margin-top: 10px; }
-h3 { margin: 6px 0; }
-.row { display: flex; gap: 6px; flex-wrap: wrap; }
-.row button { flex: 1; }
-.twoCol { display: flex; gap: 8px; }
-.twoCol input { flex: 1; }
-.threeCol { display: flex; gap: 6px; }
-.threeCol input { flex: 1; }
-.threeCol button { flex: 0.6; }
-.priceBox { display:flex; align-items:center; background:#fff; border-radius:10px; padding:0 10px; }
-.priceBox span { color:#000; font-weight:bold; }
-.priceBox input { border:none; outline:none; padding:12px; }
-.autocomplete-container { position: relative; width: 100%; }
-.autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; margin-top: -6px; }
-.autocomplete-list.active { display: block; }
-.autocomplete-item { padding: 12px 14px; cursor: pointer; border-bottom: 1px solid #eee; color: #333; font-size: 14px; transition: background 0.2s; }
-.autocomplete-item:hover { background: #f0f0f0; }
-.autocomplete-item:last-child { border-bottom: none; }
-.pac-icon { display: inline-block; width: 16px; height: 16px; margin-right: 8px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z"/></svg>'); background-size: contain; }
+
+/* HEADER */
+h2 {
+  text-align: center;
+  margin-bottom: 6px;
+  font-size: 18px;
+}
+
+/* INPUTS (UNCHANGED SIZE, LESS GAP) */
+input, select {
+  width: 100%;
+  padding: 14px;
+  margin: 3px 0;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  box-sizing: border-box;
+}
+
+select {
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}
+
+input:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* BUTTONS (SAME SIZE, CLOSER) */
+button {
+  padding: 12px;
+  margin: 2px;
+  font-size: 15px;
+  border-radius: 10px;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* ACTIVE BUTTON */
+.glow {
+  background: #facc15 !important;
+  color: #000 !important;
+  box-shadow: 0 0 8px #facc15;
+}
+
+/* SECTIONS TIGHTER */
+.section {
+  margin-top: 6px;
+}
+
+/* SECTION HEADINGS */
+h3 {
+  margin: 3px 0;
+  font-size: 14px;
+}
+
+/* ROW BUTTON GROUP */
+.row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.row button {
+  flex: 1;
+}
+
+/* COLUMNS */
+.twoCol {
+  display: flex;
+  gap: 6px;
+}
+
+.twoCol input {
+  flex: 1;
+}
+
+.threeCol {
+  display: flex;
+  gap: 4px;
+}
+
+.threeCol input {
+  flex: 1;
+}
+
+.threeCol button {
+  flex: 0.6;
+}
+
+/* PRICE BOX */
+.priceBox {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 10px;
+  padding: 0 8px;
+}
+
+.priceBox span {
+  color: #000;
+  font-weight: bold;
+}
+
+.priceBox input {
+  border: none;
+  outline: none;
+  padding: 12px;
+}
+
+/* AUTOCOMPLETE */
+.autocomplete-container {
+  position: relative;
+  width: 100%;
+}
+
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+  margin-top: -4px;
+}
+
+.autocomplete-list.active {
+  display: block;
+}
+
+.autocomplete-item {
+  padding: 12px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+
+.autocomplete-item:hover {
+  background: #f0f0f0;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.pac-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z"/></svg>');
+  background-size: contain;
+}
 </style>
 </head>
 <body>
@@ -50,22 +196,26 @@ h3 { margin: 6px 0; }
   <input id="name" placeholder="Passenger Name">
   <input id="phone" type="tel" inputmode="numeric" placeholder="Phone Number">
 </div>
+
 <!-- PICKUP ADDRESS - FULL ROW -->
 <div class="autocomplete-container">
   <input id="pickup" placeholder="Pickup Location" autocomplete="off">
   <div id="pickupList" class="autocomplete-list"></div>
 </div>
+
 <!-- DROP ADDRESS - FULL ROW -->
 <div class="autocomplete-container">
   <input id="drop" placeholder="Drop Location" autocomplete="off">
   <div id="dropList" class="autocomplete-list"></div>
 </div>
+
 <!-- PASSENGERS: Adults, Kids, Luggage -->
 <div class="threeCol">
   <input id="adults" type="tel" inputmode="numeric" placeholder="Adults">
   <input id="kids" type="tel" inputmode="numeric" placeholder="Kids">
   <input id="luggage" type="tel" inputmode="numeric" placeholder="Luggage">
 </div>
+
 <!-- PICKUP TIME -->
 <div class="section">
 <h3>Pickup Time</h3>
@@ -82,6 +232,7 @@ h3 { margin: 6px 0; }
 </div>
 <div id="timeSelected">Selected: None</div>
 </div>
+
 <!-- VEHICLE -->
 <div class="section">
 <h3>Vehicle</h3>
@@ -93,6 +244,7 @@ h3 { margin: 6px 0; }
 </div>
 <div id="vehicleSelected">Selected: None</div>
 </div>
+
 <!-- PAYMENT -->
 <div class="section">
 <h3>Payment</h3>
@@ -104,6 +256,7 @@ h3 { margin: 6px 0; }
 </div>
 <div id="paymentSelected">Selected: None</div>
 </div>
+
 <!-- PRICE -->
 <div class="section">
 <h3>Price</h3>
@@ -117,6 +270,7 @@ h3 { margin: 6px 0; }
 </div>
 <div id="priceSelected">Selected: None</div>
 </div>
+
 <!-- ACTIONS -->
 <div class="section">
 <button style="width:100%; background:#10b981;" onclick="dispatch()">DISPATCH</button>
@@ -125,6 +279,7 @@ h3 { margin: 6px 0; }
   <button style="flex:1; background:#8b5cf6;" onclick="sendFollowUp()">Follow Up</button>
 </div>
 </div>
+
 <!-- JOB HISTORY DROPDOWN - AT BOTTOM -->
 <div class="section">
 <h3>Recent Jobs</h3>
@@ -165,7 +320,6 @@ function setupAutocomplete(inputId, listId) {
           item.className = 'autocomplete-item';
           item.innerHTML = `<span class="pac-icon">📍</span>${prediction.description}`;
           item.addEventListener('click', () => {
-            // Remove "Australia" and trailing comma/whitespace
             let formatted = prediction.description.replace(/\s*,?\s*Australia\s*$/i, '').replace(/\s*,?\s*$/, '');
             inputElement.value = formatted;
             listElement.classList.remove('active');
@@ -193,7 +347,6 @@ function getPlacePredictions(input, callback) {
   });
 }
 
-/* --- Everything below unchanged from your logic --- */
 function titleCase(str){return str.toLowerCase().split(' ').filter(w=>w).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');}
 function getTodayDate() {const today = new Date();const year = today.getFullYear();const month = String(today.getMonth() + 1).padStart(2, '0');const day = String(today.getDate()).padStart(2, '0');return `${year}-${month}-${day}`;}
 function formatDateDisplay(dateStr) {if(!dateStr) return "Today";const today = new Date();const todayStr = getTodayDate();if(dateStr === todayStr) return "Today";const date = new Date(dateStr + 'T00:00:00');const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };return date.toLocaleDateString('en-AU', options);}
