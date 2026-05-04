@@ -3,6 +3,7 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Geelong Premium Network</title>
+
 <style>
 body {
   font-family: -apple-system, Arial;
@@ -13,56 +14,64 @@ body {
   margin: auto;
 }
 h2 { text-align: center; margin-bottom: 12px; font-size: 18px; }
-input, select { width:100%;padding:14px;margin:6px 0;font-size:16px;border-radius:10px;border:none;box-sizing:border-box;}
-select { background:#2563eb; color:#fff; cursor:pointer; }
-input:disabled { background:#e5e7eb;color:#9ca3af;cursor:not-allowed; }
-button {padding:12px;margin:5px 3px;font-size:15px;border-radius:10px;border:none;background:#2563eb;color:#fff;font-weight:bold;cursor:pointer;}
-button:disabled {background:#d1d5db;color:#9ca3af;cursor:not-allowed;}
-.glow {background: #facc15 !important;color: #000 !important;box-shadow: 0 0 10px #facc15;}
+input, select { width: 100%; padding: 14px; margin: 6px 0; font-size: 16px; border-radius: 10px; border: none; box-sizing: border-box; }
+select { background: #2563eb; color: #fff; cursor: pointer; }
+input:disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
+button { padding: 12px; margin: 5px 3px; font-size: 15px; border-radius: 10px; border: none; background: #2563eb; color: #fff; font-weight: bold; cursor: pointer; }
+button:disabled { background: #d1d5db; color: #9ca3af; cursor: not-allowed; }
+.glow { background: #facc15 !important; color: #000 !important; box-shadow: 0 0 10px #facc15; }
 .section { margin-top: 10px; }
 h3 { margin: 6px 0; }
 .row { display: flex; gap: 6px; flex-wrap: wrap; }
 .row button { flex: 1; }
-.twoCol {display: flex;gap: 8px;}
+.twoCol { display: flex; gap: 8px; }
 .twoCol input { flex: 1; }
-.threeCol {display: flex;gap: 6px;}
+.threeCol { display: flex; gap: 6px; }
 .threeCol input { flex: 1; }
 .threeCol button { flex: 0.6; }
-.priceBox {display:flex;align-items:center;background:#fff;border-radius:10px;padding:0 10px;}
-.priceBox span {color:#000;font-weight:bold;}
-.priceBox input {border:none;outline:none;padding:12px;}
-.autocomplete-container { position: relative;width: 100%; }
-.autocomplete-list {position: absolute;top: 100%;left: 0;right: 0;background: #fff;border: 1px solid #ddd;border-radius: 8px;max-height: 250px;overflow-y: auto;z-index: 1000;display: none; margin-top: -6px;}
-.autocomplete-list.active {display: block;}
-.autocomplete-item {padding: 12px 14px;cursor: pointer;border-bottom: 1px solid #eee;color: #333;font-size: 14px;transition: background 0.2s;}
-.autocomplete-item:hover {background: #f0f0f0;}
-.autocomplete-item:last-child {border-bottom: none;}
-.pac-icon {display:inline-block;width:16px;height:16px;margin-right:8px;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z"/></svg>');background-size: contain;}
+.priceBox { display:flex; align-items:center; background:#fff; border-radius:10px; padding:0 10px; }
+.priceBox span { color:#000; font-weight:bold; }
+.priceBox input { border:none; outline:none; padding:12px; }
+/* Google Maps Autocomplete Styles */
+.autocomplete-container { position: relative; width: 100%; }
+.autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; margin-top: -6px; }
+.autocomplete-list.active { display: block; }
+.autocomplete-item { padding: 12px 14px; cursor: pointer; border-bottom: 1px solid #eee; color: #333; font-size: 14px; transition: background 0.2s; }
+.autocomplete-item:hover { background: #f0f0f0; }
+.autocomplete-item:last-child { border-bottom: none; }
+.pac-icon { display: inline-block; width: 16px; height: 16px; margin-right: 8px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z"/></svg>'); background-size: contain; }
 </style>
 </head>
+
 <body>
+
 <h2>GEELONG PREMIUM NETWORK</h2>
+
 <!-- NAME + PHONE -->
 <div class="twoCol">
   <input id="name" placeholder="Passenger Name">
   <input id="phone" type="tel" inputmode="numeric" placeholder="Phone Number">
 </div>
+
 <!-- PICKUP ADDRESS - FULL ROW -->
 <div class="autocomplete-container">
   <input id="pickup" placeholder="Pickup Location" autocomplete="off">
   <div id="pickupList" class="autocomplete-list"></div>
 </div>
+
 <!-- DROP ADDRESS - FULL ROW -->
 <div class="autocomplete-container">
   <input id="drop" placeholder="Drop Location" autocomplete="off">
   <div id="dropList" class="autocomplete-list"></div>
 </div>
+
 <!-- PASSENGERS: Adults, Kids, Luggage -->
 <div class="threeCol">
   <input id="adults" type="tel" inputmode="numeric" placeholder="Adults">
   <input id="kids" type="tel" inputmode="numeric" placeholder="Kids">
   <input id="luggage" type="tel" inputmode="numeric" placeholder="Luggage">
 </div>
+
 <!-- PICKUP TIME -->
 <div class="section">
 <h3>Pickup Time</h3>
@@ -71,14 +80,17 @@ h3 { margin: 6px 0; }
   <button id="readyBtn" onclick="setTime('Ready Now')">Ready Now</button>
   <button id="laterBtn" onclick="setTime('Later')">Later</button>
 </div>
+
 <div class="threeCol">
   <input id="date" type="date" disabled>
   <input id="time" type="text" inputmode="numeric" placeholder="HH:MM" maxlength="5" disabled>
   <button id="amBtn" onclick="setAMPM('AM')" disabled>AM</button>
   <button id="pmBtn" onclick="setAMPM('PM')" disabled>PM</button>
 </div>
+
 <div id="timeSelected">Selected: None</div>
 </div>
+
 <!-- VEHICLE -->
 <div class="section">
 <h3>Vehicle</h3>
@@ -90,6 +102,7 @@ h3 { margin: 6px 0; }
 </div>
 <div id="vehicleSelected">Selected: None</div>
 </div>
+
 <!-- PAYMENT -->
 <div class="section">
 <h3>Payment</h3>
@@ -101,6 +114,7 @@ h3 { margin: 6px 0; }
 </div>
 <div id="paymentSelected">Selected: None</div>
 </div>
+
 <!-- PRICE -->
 <div class="section">
 <h3>Price</h3>
@@ -114,6 +128,7 @@ h3 { margin: 6px 0; }
 </div>
 <div id="priceSelected">Selected: None</div>
 </div>
+
 <!-- ACTIONS -->
 <div class="section">
 <button style="width:100%; background:#10b981;" onclick="dispatch()">DISPATCH</button>
@@ -122,6 +137,7 @@ h3 { margin: 6px 0; }
   <button style="flex:1; background:#8b5cf6;" onclick="sendFollowUp()">Follow Up</button>
 </div>
 </div>
+
 <!-- JOB HISTORY DROPDOWN - AT BOTTOM -->
 <div class="section">
 <h3>Recent Jobs</h3>
@@ -129,8 +145,10 @@ h3 { margin: 6px 0; }
   <option value="">-- Select Previous Job --</option>
 </select>
 </div>
+
 <script>
-const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY_HERE"; // <-- Replace here
+// ⚠️ REPLACE WITH YOUR GOOGLE MAPS API KEY
+const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY_HERE";
 
 let jobCount = localStorage.getItem("jobCount");
 jobCount = jobCount ? parseInt(jobCount) : 1000;
@@ -145,11 +163,13 @@ let autocompleteService;
 let placesService;
 let map;
 
+/* INITIALIZE GOOGLE MAPS AUTOCOMPLETE */
 function initializeGoogleMaps() {
   if (!window.google) {
     console.error("Google Maps API not loaded");
     return;
   }
+
   autocompleteService = new google.maps.places.AutocompleteService();
   map = new google.maps.Map(document.createElement('div'));
   placesService = new google.maps.places.PlacesService(map);
@@ -157,114 +177,142 @@ function initializeGoogleMaps() {
   setupAutocomplete('drop', 'dropList');
 }
 
-function getPlacePredictions(input, callback) {
-  const geelong = { lat: -38.14711, lng: 144.36069 };
-  const request = {
-    input: input,
-    componentRestrictions: { country: 'au' },
-    location: new google.maps.LatLng(geelong.lat, geelong.lng),
-    radius: 60000,
-    types: ['geocode', 'establishment']
-  };
-  autocompleteService.getPlacePredictions(request, (predictions = [], status) => {
-    if(status !== google.maps.places.PlacesServiceStatus.OK) {
-      callback([]);
-      return;
-    }
-    const suburbPriority = pred => {
-      const desc = pred.description.toLowerCase();
-      if(desc.includes('geelong')) return 1;
-      if(desc.includes('melbourne')) return 2;
-      if(desc.includes('vic')) return 3;
-      return 4;
-    };
-    predictions.sort((a,b) => suburbPriority(a) - suburbPriority(b));
-    callback(predictions.slice(0, 5));
-  });
-}
-
+/* SETUP AUTOCOMPLETE FOR INPUT FIELD */
 function setupAutocomplete(inputId, listId) {
   const inputElement = document.getElementById(inputId);
   const listElement = document.getElementById(listId);
   let debounceTimer;
+  let currentPredictions = [];
 
   inputElement.addEventListener('input', function() {
     clearTimeout(debounceTimer);
     const value = this.value.trim();
+
     if (value.length < 2) {
       listElement.classList.remove('active');
       return;
     }
+
     debounceTimer = setTimeout(() => {
       getPlacePredictions(value, (predictions) => {
-        listElement.innerHTML = '';
-        predictions.forEach((prediction) => {
-          const item = document.createElement('div');
-          item.className = 'autocomplete-item';
-          item.innerHTML = `<span class="pac-icon"></span>${prediction.description}`;
-          item.addEventListener('click', () => {
-            handleAddressSelected(prediction.place_id, inputId);
-            listElement.classList.remove('active');
-          });
-          listElement.appendChild(item);
-        });
-        if (predictions.length > 0) listElement.classList.add('active');
-        else listElement.classList.remove('active');
+        currentPredictions = predictions;
+        displayPredictions(predictions, listElement, inputId);
       });
     }, 300);
   });
 
   inputElement.addEventListener('blur', function() {
-    setTimeout(() => listElement.classList.remove('active'), 200);
+    setTimeout(() => {
+      listElement.classList.remove('active');
+    }, 200);
   });
 }
 
-// THE ADDRESS FORMAT LOGIC
-function handleAddressSelected(placeId, inputId){
-  placesService.getDetails({ placeId: placeId }, (place, status) => {
-    if (
-      status !== google.maps.places.PlacesServiceStatus.OK ||
-      !place ||
-      !place.address_components
-    ) {
-      return;
+/* GET PLACE PREDICTIONS FROM GOOGLE MAPS API */
+function getPlacePredictions(input, callback) {
+  const request = {
+    input: input,
+    componentRestrictions: { country: 'au' }, // Australia only
+    types: ['geocode', 'establishment']
+  };
+
+  autocompleteService.getPlacePredictions(request, (predictions, status) => {
+    if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+      callback(predictions.slice(0, 5)); // Limit to 5 suggestions
+    } else {
+      callback([]);
     }
-    let street_number="", route="", suburb="", postcode="", town="", locality="", short_state="";
-    place.address_components.forEach(comp => {
-      if (comp.types.includes('street_number')) street_number = comp.long_name;
-      if (comp.types.includes('route')) route = comp.long_name;
-      if (comp.types.includes('locality')) suburb = comp.long_name;
-      if (comp.types.includes('postal_town')) town = comp.long_name;
-      if (comp.types.includes('administrative_area_level_2')) locality = comp.long_name;
-      if (comp.types.includes('postal_code')) postcode = comp.long_name;
-      if (comp.types.includes('administrative_area_level_1')) short_state = comp.short_name; // Always "VIC"
+  });
+}
+
+/* SMART DISPLAY PREDICTIONS FUNCTION */
+function displayPredictions(predictions, listElement, inputId) {
+  listElement.innerHTML = '';
+
+  if (predictions.length === 0) {
+    listElement.classList.remove('active');
+    return;
+  }
+
+  predictions.forEach((prediction) => {
+    const item = document.createElement('div');
+    item.className = 'autocomplete-item';
+    item.innerHTML = `<span class="pac-icon">📍</span>${prediction.description}`;
+
+    item.addEventListener('click', () => {
+      placesService.getDetails({ placeId: prediction.place_id }, (place, status) => {
+        if (
+          status !== google.maps.places.PlacesServiceStatus.OK ||
+          !place ||
+          !place.address_components
+        ) {
+          // fallback to business name only (no street) with VIC if possible
+          let desc = prediction.description.replace(/\s*,\s*Australia$/i, "");
+          document.getElementById(inputId).value = prediction.main_text || desc;
+          return;
+        }
+        // COMPONENT extraction
+        let business_name = place.name || '';
+        let street_number="", route="", suburb="", postcode="", town="", locality="", short_state="";
+        place.address_components.forEach(comp => {
+          if (comp.types.includes('street_number')) street_number = comp.long_name;
+          if (comp.types.includes('route')) route = comp.long_name;
+          if (comp.types.includes('locality')) suburb = comp.long_name;
+          if (comp.types.includes('postal_town')) town = comp.long_name;
+          if (comp.types.includes('administrative_area_level_2')) locality = comp.long_name;
+          if (comp.types.includes('postal_code')) postcode = comp.long_name;
+          if (comp.types.includes('administrative_area_level_1')) short_state = comp.short_name; // Should be 'VIC'
+        });
+
+        // Decision logic
+        let address = "";
+
+        // If it's a business/establishment, Google puts 'establishment' in types array
+        const isBusiness = Array.isArray(place.types) && (
+            place.types.includes('establishment')
+            || (prediction.types && prediction.types.includes('establishment'))
+        );
+
+        if (isBusiness) {
+          // Only put business name + VIC + postcode.
+          if (business_name && short_state && postcode)
+            address = `${business_name} ${short_state} ${postcode}`;
+          else if (business_name && postcode)
+            address = `${business_name} VIC ${postcode}`;
+          else
+            address = business_name;
+        } else {
+          // For regular addresses, format as before
+          if (street_number && route) {
+            address = `${street_number} ${route}`;
+            if (suburb) address += `, ${suburb}`;
+            else if (town) address += `, ${town}`;
+            else if (locality) address += `, ${locality}`;
+          } else {
+            address = suburb || town || locality || place.name || "";
+          }
+          address = address.trim();
+          if (address && short_state && postcode) {
+            address += ` ${short_state} ${postcode}`;
+          } else if (address && postcode) {
+            address += ` VIC ${postcode}`;
+          } else if (address && short_state) {
+            address += ` ${short_state}`;
+          }
+        }
+
+        document.getElementById(inputId).value = address.trim();
+      });
+      listElement.classList.remove('active');
     });
 
-    let address = "";
-    // Compose street and suburb, or just suburb/town/locality
-    if (street_number && route) {
-      address = `${street_number} ${route}`;
-      if (suburb) address += `, ${suburb}`;
-      else if (town) address += `, ${town}`;
-      else if (locality) address += `, ${locality}`;
-    } else {
-      address = suburb || town || locality || place.name || "";
-    }
-    address = address.trim();
-    // Now add VIC and postcode if available
-    if (address && short_state && postcode) {
-      address += ` ${short_state} ${postcode}`;
-    } else if (address && postcode) {
-      address += ` VIC ${postcode}`;
-    } else if (address && short_state) {
-      address += ` ${short_state}`;
-    }
-    document.getElementById(inputId).value = address.trim();
+    listElement.appendChild(item);
   });
+
+  listElement.classList.add('active');
 }
 
-/* The rest of your logic (unchanged for brevity), paste your existing or original: */
-// -- snip: from original input above --
+/* The following functions remain unchanged from your previous code */
 function titleCase(str){
   return str
     .toLowerCase()
@@ -282,26 +330,22 @@ function getTodayDate() {
 }
 function formatDateDisplay(dateStr) {
   if(!dateStr) return "Today";
-  const today = new Date();
-  const todayStr = getTodayDate();
+  const today = new Date(); const todayStr = getTodayDate();
   if(dateStr === todayStr) return "Today";
   const date = new Date(dateStr + 'T00:00:00');
   const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
   return date.toLocaleDateString('en-AU', options);
 }
-function pluralize(count, singular, plural) { count=parseInt(count);if(count===1)return `${count} ${singular}`;return `${count} ${plural}`;}
+function pluralize(count, singular, plural) { count = parseInt(count); if(count === 1) return `${count} ${singular}`; return `${count} ${plural}`; }
 document.getElementById("time").addEventListener("input", function(e){
   let value = e.target.value.replace(/[^0-9]/g, "");
   if(value.length > 4) value = value.slice(0, 4);
-  if(value.length <= 2){
-    e.target.value = value;
-  } else {
-    e.target.value = value.slice(0, 2) + ":" + value.slice(2);
-  }
+  if(value.length <= 2){ e.target.value = value; }
+  else { e.target.value = value.slice(0, 2) + ":" + value.slice(2); }
   updateTimeDisplay();
 });
 function setTime(t){
-  selectedTime=t;["quickBtn","readyBtn","laterBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
+  selectedTime=t; ["quickBtn","readyBtn","laterBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
   if(t==="Quick") quickBtn.classList.add("glow");
   if(t==="Ready Now") readyBtn.classList.add("glow");
   if(t==="Later") laterBtn.classList.add("glow");
@@ -320,9 +364,7 @@ function setTime(t){
   timeSelected.innerText="Selected: "+t;
 }
 function setAMPM(period){
-  selectedAMPM=period;
-  amBtn.classList.remove("glow");
-  pmBtn.classList.remove("glow");
+  selectedAMPM=period; amBtn.classList.remove("glow"); pmBtn.classList.remove("glow");
   if(period==="AM") amBtn.classList.add("glow");
   if(period==="PM") pmBtn.classList.add("glow");
   updateTimeDisplay();
@@ -340,9 +382,7 @@ document.getElementById("date").addEventListener("change", updateTimeDisplay);
 document.getElementById("time").addEventListener("change", updateTimeDisplay);
 function setVehicle(v){
   selectedVehicle=v;
-  ["sedanBtn","suvBtn","luxBtn","maxiBtn"].forEach(id=>{
-    document.getElementById(id).classList.remove("glow");
-  });
+  ["sedanBtn","suvBtn","luxBtn","maxiBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
   if(v==="Sedan") sedanBtn.classList.add("glow");
   if(v==="SUV") suvBtn.classList.add("glow");
   if(v==="Luxury") luxBtn.classList.add("glow");
@@ -403,9 +443,7 @@ function saveJobToHistory(){
     timestamp: new Date().toLocaleString()
   };
   let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];
-  jobs.unshift(job);
-  jobs = jobs.slice(0, 5);
-  localStorage.setItem("jobHistory", JSON.stringify(jobs));
+  jobs.unshift(job); jobs = jobs.slice(0, 5); localStorage.setItem("jobHistory", JSON.stringify(jobs));
   updateJobHistoryDropdown();
 }
 function updateJobHistoryDropdown(){
@@ -479,12 +517,15 @@ function dispatch(){
 🆔 JOB-${jobCount}
 ⏰ ${new Date().toLocaleString()}
 ${timeSection}
+
 👤 ${name}
 📞 ${phone}
+
 🚗 ${selectedVehicle}
 💳 ${paymentArray.join(", ")}
 💲 ${priceType} ${price ? "$"+price : ""}
 ${passengersSection}
+
 📍 Pickup: ${pickup}
 📍 Drop: ${drop}`;
   navigator.clipboard.writeText(message);
@@ -579,6 +620,7 @@ www.geelongcitytaxicab.com.au`;
 }
 window.addEventListener("DOMContentLoaded", function(){
   updateJobHistoryDropdown();
+  // Load Google Maps API script
   const script = document.createElement('script');
   script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDMA_Frd6ut6hv4s0YnoWoYdI4hRoEWZs4&libraries=places`;
   script.async = true;
