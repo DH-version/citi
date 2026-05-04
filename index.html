@@ -32,7 +32,6 @@ h3 { margin: 6px 0; }
 .priceBox { display:flex; align-items:center; background:#fff; border-radius:10px; padding:0 10px; }
 .priceBox span { color:#000; font-weight:bold; }
 .priceBox input { border:none; outline:none; padding:12px; }
-/* Google Maps Autocomplete Styles */
 .autocomplete-container { position: relative; width: 100%; }
 .autocomplete-list { position: absolute; top: 100%; left: 0; right: 0; background: #fff; border: 1px solid #ddd; border-radius: 8px; max-height: 250px; overflow-y: auto; z-index: 1000; display: none; margin-top: -6px; }
 .autocomplete-list.active { display: block; }
@@ -42,7 +41,6 @@ h3 { margin: 6px 0; }
 .pac-icon { display: inline-block; width: 16px; height: 16px; margin-right: 8px; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z"/></svg>'); background-size: contain; }
 </style>
 </head>
-
 <body>
 
 <h2>GEELONG PREMIUM NETWORK</h2>
@@ -52,26 +50,22 @@ h3 { margin: 6px 0; }
   <input id="name" placeholder="Passenger Name">
   <input id="phone" type="tel" inputmode="numeric" placeholder="Phone Number">
 </div>
-
 <!-- PICKUP ADDRESS - FULL ROW -->
 <div class="autocomplete-container">
   <input id="pickup" placeholder="Pickup Location" autocomplete="off">
   <div id="pickupList" class="autocomplete-list"></div>
 </div>
-
 <!-- DROP ADDRESS - FULL ROW -->
 <div class="autocomplete-container">
   <input id="drop" placeholder="Drop Location" autocomplete="off">
   <div id="dropList" class="autocomplete-list"></div>
 </div>
-
 <!-- PASSENGERS: Adults, Kids, Luggage -->
 <div class="threeCol">
   <input id="adults" type="tel" inputmode="numeric" placeholder="Adults">
   <input id="kids" type="tel" inputmode="numeric" placeholder="Kids">
   <input id="luggage" type="tel" inputmode="numeric" placeholder="Luggage">
 </div>
-
 <!-- PICKUP TIME -->
 <div class="section">
 <h3>Pickup Time</h3>
@@ -80,17 +74,14 @@ h3 { margin: 6px 0; }
   <button id="readyBtn" onclick="setTime('Ready Now')">Ready Now</button>
   <button id="laterBtn" onclick="setTime('Later')">Later</button>
 </div>
-
 <div class="threeCol">
   <input id="date" type="date" disabled>
   <input id="time" type="text" inputmode="numeric" placeholder="HH:MM" maxlength="5" disabled>
   <button id="amBtn" onclick="setAMPM('AM')" disabled>AM</button>
   <button id="pmBtn" onclick="setAMPM('PM')" disabled>PM</button>
 </div>
-
 <div id="timeSelected">Selected: None</div>
 </div>
-
 <!-- VEHICLE -->
 <div class="section">
 <h3>Vehicle</h3>
@@ -102,7 +93,6 @@ h3 { margin: 6px 0; }
 </div>
 <div id="vehicleSelected">Selected: None</div>
 </div>
-
 <!-- PAYMENT -->
 <div class="section">
 <h3>Payment</h3>
@@ -114,7 +104,6 @@ h3 { margin: 6px 0; }
 </div>
 <div id="paymentSelected">Selected: None</div>
 </div>
-
 <!-- PRICE -->
 <div class="section">
 <h3>Price</h3>
@@ -128,7 +117,6 @@ h3 { margin: 6px 0; }
 </div>
 <div id="priceSelected">Selected: None</div>
 </div>
-
 <!-- ACTIONS -->
 <div class="section">
 <button style="width:100%; background:#10b981;" onclick="dispatch()">DISPATCH</button>
@@ -137,7 +125,6 @@ h3 { margin: 6px 0; }
   <button style="flex:1; background:#8b5cf6;" onclick="sendFollowUp()">Follow Up</button>
 </div>
 </div>
-
 <!-- JOB HISTORY DROPDOWN - AT BOTTOM -->
 <div class="section">
 <h3>Recent Jobs</h3>
@@ -147,480 +134,87 @@ h3 { margin: 6px 0; }
 </div>
 
 <script>
-// ⚠️ REPLACE WITH YOUR GOOGLE MAPS API KEY
 const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY_HERE";
 
 let jobCount = localStorage.getItem("jobCount");
 jobCount = jobCount ? parseInt(jobCount) : 1000;
+let selectedVehicle="None", selectedTime="None", selectedAMPM="None", paymentArray=[], priceType="None";
+let autocompleteService, placesService, map;
 
-let selectedVehicle="None";
-let selectedTime="None";
-let selectedAMPM="None";
-let paymentArray=[];
-let priceType="None";
-
-let autocompleteService;
-let placesService;
-let map;
-
-/* INITIALIZE GOOGLE MAPS AUTOCOMPLETE */
 function initializeGoogleMaps() {
-  if (!window.google) {
-    console.error("Google Maps API not loaded");
-    return;
-  }
-
+  if (!window.google) { console.error("Google Maps API not loaded"); return;}
   autocompleteService = new google.maps.places.AutocompleteService();
   map = new google.maps.Map(document.createElement('div'));
   placesService = new google.maps.places.PlacesService(map);
-  setupAutocomplete('pickup', 'pickupList');
-  setupAutocomplete('drop', 'dropList');
+  setupAutocomplete('pickup', 'pickupList'); setupAutocomplete('drop', 'dropList');
 }
 
-/* SETUP AUTOCOMPLETE FOR INPUT FIELD */
 function setupAutocomplete(inputId, listId) {
   const inputElement = document.getElementById(inputId);
   const listElement = document.getElementById(listId);
   let debounceTimer;
-  let currentPredictions = [];
-
   inputElement.addEventListener('input', function() {
     clearTimeout(debounceTimer);
     const value = this.value.trim();
-
-    if (value.length < 2) {
-      listElement.classList.remove('active');
-      return;
-    }
-
+    if (value.length < 2) { listElement.classList.remove('active'); return; }
     debounceTimer = setTimeout(() => {
       getPlacePredictions(value, (predictions) => {
-        currentPredictions = predictions;
-        displayPredictions(predictions, listElement, inputId);
+        listElement.innerHTML = '';
+        predictions.forEach((prediction) => {
+          const item = document.createElement('div');
+          item.className = 'autocomplete-item';
+          item.innerHTML = `<span class="pac-icon">📍</span>${prediction.description}`;
+          item.addEventListener('click', () => {
+            // Remove "Australia" and trailing comma/whitespace
+            let formatted = prediction.description.replace(/\s*,?\s*Australia\s*$/i, '').replace(/\s*,?\s*$/, '');
+            inputElement.value = formatted;
+            listElement.classList.remove('active');
+          });
+          listElement.appendChild(item);
+        });
+        if (predictions.length > 0) listElement.classList.add('active');
+        else listElement.classList.remove('active');
       });
     }, 300);
   });
-
   inputElement.addEventListener('blur', function() {
-    setTimeout(() => {
-      listElement.classList.remove('active');
-    }, 200);
+    setTimeout(() => {listElement.classList.remove('active');}, 200);
   });
 }
 
-/* GET PLACE PREDICTIONS FROM GOOGLE MAPS API */
 function getPlacePredictions(input, callback) {
-  const request = {
-    input: input,
-    componentRestrictions: { country: 'au' }, // Australia only
+  autocompleteService.getPlacePredictions({
+    input,
+    componentRestrictions: { country: 'au' },
     types: ['geocode', 'establishment']
-  };
-
-  autocompleteService.getPlacePredictions(request, (predictions, status) => {
-    if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
-      callback(predictions.slice(0, 5)); // Limit to 5 suggestions
-    } else {
-      callback([]);
-    }
+  }, (predictions, status) => {
+    if (status === google.maps.places.PlacesServiceStatus.OK && predictions) callback(predictions.slice(0, 5));
+    else callback([]);
   });
 }
 
-/* SMART DISPLAY PREDICTIONS FUNCTION */
-function displayPredictions(predictions, listElement, inputId) {
-  listElement.innerHTML = '';
-
-  if (predictions.length === 0) {
-    listElement.classList.remove('active');
-    return;
-  }
-
-  predictions.forEach((prediction) => {
-    const item = document.createElement('div');
-    item.className = 'autocomplete-item';
-    item.innerHTML = `<span class="pac-icon">📍</span>${prediction.description}`;
-
-    item.addEventListener('click', () => {
-      placesService.getDetails({ placeId: prediction.place_id }, (place, status) => {
-        if (
-          status !== google.maps.places.PlacesServiceStatus.OK ||
-          !place ||
-          !place.address_components
-        ) {
-          // fallback to business name only (no street) with VIC if possible
-          let desc = prediction.description.replace(/\s*,\s*Australia$/i, "");
-          document.getElementById(inputId).value = prediction.main_text || desc;
-          return;
-        }
-        // COMPONENT extraction
-        let business_name = place.name || '';
-        let street_number="", route="", suburb="", postcode="", town="", locality="", short_state="";
-        place.address_components.forEach(comp => {
-          if (comp.types.includes('street_number')) street_number = comp.long_name;
-          if (comp.types.includes('route')) route = comp.long_name;
-          if (comp.types.includes('locality')) suburb = comp.long_name;
-          if (comp.types.includes('postal_town')) town = comp.long_name;
-          if (comp.types.includes('administrative_area_level_2')) locality = comp.long_name;
-          if (comp.types.includes('postal_code')) postcode = comp.long_name;
-          if (comp.types.includes('administrative_area_level_1')) short_state = comp.short_name; // Should be 'VIC'
-        });
-
-        // Decision logic
-        let address = "";
-
-        // If it's a business/establishment, Google puts 'establishment' in types array
-        const isBusiness = Array.isArray(place.types) && (
-            place.types.includes('establishment')
-            || (prediction.types && prediction.types.includes('establishment'))
-        );
-
-        if (isBusiness) {
-          // Only put business name + VIC + postcode.
-          if (business_name && short_state && postcode)
-            address = `${business_name} ${short_state} ${postcode}`;
-          else if (business_name && postcode)
-            address = `${business_name} VIC ${postcode}`;
-          else
-            address = business_name;
-        } else {
-          // For regular addresses, format as before
-          if (street_number && route) {
-            address = `${street_number} ${route}`;
-            if (suburb) address += `, ${suburb}`;
-            else if (town) address += `, ${town}`;
-            else if (locality) address += `, ${locality}`;
-          } else {
-            address = suburb || town || locality || place.name || "";
-          }
-          address = address.trim();
-          if (address && short_state && postcode) {
-            address += ` ${short_state} ${postcode}`;
-          } else if (address && postcode) {
-            address += ` VIC ${postcode}`;
-          } else if (address && short_state) {
-            address += ` ${short_state}`;
-          }
-        }
-
-        document.getElementById(inputId).value = address.trim();
-      });
-      listElement.classList.remove('active');
-    });
-
-    listElement.appendChild(item);
-  });
-
-  listElement.classList.add('active');
-}
-
-/* The following functions remain unchanged from your previous code */
-function titleCase(str){
-  return str
-    .toLowerCase()
-    .split(' ')
-    .filter(w=>w)
-    .map(w=>w.charAt(0).toUpperCase()+w.slice(1))
-    .join(' ');
-}
-function getTodayDate() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-function formatDateDisplay(dateStr) {
-  if(!dateStr) return "Today";
-  const today = new Date(); const todayStr = getTodayDate();
-  if(dateStr === todayStr) return "Today";
-  const date = new Date(dateStr + 'T00:00:00');
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-  return date.toLocaleDateString('en-AU', options);
-}
+/* --- Everything below unchanged from your logic --- */
+function titleCase(str){return str.toLowerCase().split(' ').filter(w=>w).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');}
+function getTodayDate() {const today = new Date();const year = today.getFullYear();const month = String(today.getMonth() + 1).padStart(2, '0');const day = String(today.getDate()).padStart(2, '0');return `${year}-${month}-${day}`;}
+function formatDateDisplay(dateStr) {if(!dateStr) return "Today";const today = new Date();const todayStr = getTodayDate();if(dateStr === todayStr) return "Today";const date = new Date(dateStr + 'T00:00:00');const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };return date.toLocaleDateString('en-AU', options);}
 function pluralize(count, singular, plural) { count = parseInt(count); if(count === 1) return `${count} ${singular}`; return `${count} ${plural}`; }
-document.getElementById("time").addEventListener("input", function(e){
-  let value = e.target.value.replace(/[^0-9]/g, "");
-  if(value.length > 4) value = value.slice(0, 4);
-  if(value.length <= 2){ e.target.value = value; }
-  else { e.target.value = value.slice(0, 2) + ":" + value.slice(2); }
-  updateTimeDisplay();
-});
-function setTime(t){
-  selectedTime=t; ["quickBtn","readyBtn","laterBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
-  if(t==="Quick") quickBtn.classList.add("glow");
-  if(t==="Ready Now") readyBtn.classList.add("glow");
-  if(t==="Later") laterBtn.classList.add("glow");
-  let isLater = t === "Later";
-  document.getElementById("date").disabled = !isLater;
-  document.getElementById("time").disabled = !isLater;
-  document.getElementById("amBtn").disabled = !isLater;
-  document.getElementById("pmBtn").disabled = !isLater;
-  if(!isLater){
-    document.getElementById("date").value = "";
-    document.getElementById("time").value = "";
-    selectedAMPM = "None";
-    document.getElementById("amBtn").classList.remove("glow");
-    document.getElementById("pmBtn").classList.remove("glow");
-  }
-  timeSelected.innerText="Selected: "+t;
-}
-function setAMPM(period){
-  selectedAMPM=period; amBtn.classList.remove("glow"); pmBtn.classList.remove("glow");
-  if(period==="AM") amBtn.classList.add("glow");
-  if(period==="PM") pmBtn.classList.add("glow");
-  updateTimeDisplay();
-}
-function updateTimeDisplay(){
-  let date=document.getElementById("date").value;
-  let time=document.getElementById("time").value;
-  let display="Selected: "+selectedTime;
-  if(date) display+=" | Date: "+date;
-  if(time) display+=" | Time: "+time;
-  if(selectedAMPM!=="None") display+=" "+selectedAMPM;
-  timeSelected.innerText=display;
-}
+document.getElementById("time").addEventListener("input", function(e){let value = e.target.value.replace(/[^0-9]/g, ""); if(value.length > 4) value = value.slice(0, 4); if(value.length <= 2){ e.target.value = value; } else { e.target.value = value.slice(0, 2) + ":" + value.slice(2);} updateTimeDisplay();});
+function setTime(t){selectedTime=t;["quickBtn","readyBtn","laterBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});if(t==="Quick") quickBtn.classList.add("glow");if(t==="Ready Now") readyBtn.classList.add("glow");if(t==="Later") laterBtn.classList.add("glow");let isLater = t === "Later";document.getElementById("date").disabled = !isLater;document.getElementById("time").disabled = !isLater;document.getElementById("amBtn").disabled = !isLater;document.getElementById("pmBtn").disabled = !isLater;if(!isLater){document.getElementById("date").value = "";document.getElementById("time").value = "";selectedAMPM = "None";document.getElementById("amBtn").classList.remove("glow");document.getElementById("pmBtn").classList.remove("glow");}timeSelected.innerText="Selected: "+t;}
+function setAMPM(period){selectedAMPM=period;amBtn.classList.remove("glow");pmBtn.classList.remove("glow");if(period==="AM") amBtn.classList.add("glow");if(period==="PM") pmBtn.classList.add("glow");updateTimeDisplay();}
+function updateTimeDisplay(){let date=document.getElementById("date").value;let time=document.getElementById("time").value;let display="Selected: "+selectedTime;if(date) display+=" | Date: "+date;if(time) display+=" | Time: "+time;if(selectedAMPM!=="None") display+=" "+selectedAMPM;timeSelected.innerText=display;}
 document.getElementById("date").addEventListener("change", updateTimeDisplay);
 document.getElementById("time").addEventListener("change", updateTimeDisplay);
-function setVehicle(v){
-  selectedVehicle=v;
-  ["sedanBtn","suvBtn","luxBtn","maxiBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
-  if(v==="Sedan") sedanBtn.classList.add("glow");
-  if(v==="SUV") suvBtn.classList.add("glow");
-  if(v==="Luxury") luxBtn.classList.add("glow");
-  if(v==="MAXI") maxiBtn.classList.add("glow");
-  vehicleSelected.innerText="Selected: "+v;
-}
-function togglePayment(p){
-  let map={
-    "Cabcharge":"cabBtn",
-    "Debit/Credit":"cardBtn",
-    "MPTP":"mptpBtn",
-    "Cash":"cashBtn"
-  };
-  let btn=document.getElementById(map[p]);
-  if(paymentArray.includes(p)){
-    paymentArray=paymentArray.filter(x=>x!==p);
-    btn.classList.remove("glow");
-  } else {
-    if(paymentArray.length<2){
-      paymentArray.push(p);
-      btn.classList.add("glow");
-    } else {
-      alert("Max 2 payments");
-    }
-  }
-  paymentSelected.innerText=paymentArray.join(", ")||"None";
-}
-function setPriceType(p){
-  priceType=p;
-  meterBtn.classList.remove("glow");
-  setBtn.classList.remove("glow");
-  if(p==="Meter Fare") meterBtn.classList.add("glow");
-  if(p==="Set Price") setBtn.classList.add("glow");
-  priceSelected.innerText="Selected: "+p;
-}
-function saveJobToHistory(){
-  let name = titleCase(document.getElementById("name").value);
-  let phone=document.getElementById("phone").value;
-  let pickup=titleCase(document.getElementById("pickup").value);
-  let drop=titleCase(document.getElementById("drop").value);
-  let adults=document.getElementById("adults").value;
-  let kids=document.getElementById("kids").value;
-  let luggage=document.getElementById("luggage").value;
-  let date=document.getElementById("date").value;
-  let time=document.getElementById("time").value;
-  let price=document.getElementById("price").value;
-  let job = {
-    id: jobCount,
-    name, phone, pickup, drop, adults, kids, luggage,
-    vehicle:selectedVehicle,
-    payment:paymentArray.slice(),
-    time:selectedTime,
-    date,
-    timeInput:time,
-    ampm:selectedAMPM,
-    priceType,
-    price,
-    timestamp: new Date().toLocaleString()
-  };
-  let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];
-  jobs.unshift(job); jobs = jobs.slice(0, 5); localStorage.setItem("jobHistory", JSON.stringify(jobs));
-  updateJobHistoryDropdown();
-}
-function updateJobHistoryDropdown(){
-  let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];
-  let select = document.getElementById("jobHistory");
-  select.innerHTML = '<option value="">-- Select Previous Job --</option>';
-  jobs.forEach((job, index) => {
-    let option = document.createElement("option");
-    option.value = index;
-    option.textContent = `${job.name} - ${job.pickup} to ${job.drop}`;
-    select.appendChild(option);
-  });
-}
-function loadSelectedJob(){
-  let select = document.getElementById("jobHistory");
-  let index = select.value;
-  if(index === "") return;
-  let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];
-  let job = jobs[index];
-  if(!job) return;
-  document.getElementById("name").value = job.name || "";
-  document.getElementById("phone").value = job.phone || "";
-  document.getElementById("pickup").value = job.pickup || "";
-  document.getElementById("drop").value = job.drop || "";
-  document.getElementById("adults").value = job.adults || "";
-  document.getElementById("kids").value = job.kids || "";
-  document.getElementById("luggage").value = job.luggage || "";
-  document.getElementById("date").value = job.date || "";
-  document.getElementById("time").value = job.timeInput || "";
-  document.getElementById("price").value = job.price || "";
-  setVehicle(job.vehicle || "None");
-  setTime(job.time || "None");
-  setAMPM(job.ampm || "None");
-  setPriceType(job.priceType || "None");
-  paymentArray = job.payment || [];
-  ["cabBtn","cardBtn","mptpBtn","cashBtn"].forEach(id=>{
-    document.getElementById(id).classList.remove("glow");
-  });
-  paymentArray.forEach(p=>{
-    if(p==="Cabcharge") cabBtn.classList.add("glow");
-    if(p==="Debit/Credit") cardBtn.classList.add("glow");
-    if(p==="MPTP") mptpBtn.classList.add("glow");
-    if(p==="Cash") cashBtn.classList.add("glow");
-  });
-  paymentSelected.innerText=paymentArray.join(", ")||"None";
-  select.value = "";
-}
-function dispatch(){
-  let name = titleCase(document.getElementById("name").value);
-  let phone=document.getElementById("phone").value;
-  let pickup=titleCase(document.getElementById("pickup").value);
-  let drop=titleCase(document.getElementById("drop").value);
-  let adults=document.getElementById("adults").value;
-  let kids=document.getElementById("kids").value;
-  let luggage=document.getElementById("luggage").value;
-  let date=document.getElementById("date").value;
-  let time=document.getElementById("time").value;
-  let price=document.getElementById("price").value;
-  if(selectedTime === "Later" && !date && time) {
-    date = getTodayDate();
-  }
-  let dateFormatted = formatDateDisplay(date);
-  let timeSection = selectedTime === "Later" && date && time
-    ? `🪧 *Pickup Time - ${selectedTime}*\n📅 *Date: ${dateFormatted}*\n⏱️ *Time: ${time} ${selectedAMPM}*`
-    : `🪧 *Pickup Time - ${selectedTime}*`;
-  let passengersSection = `👥 Adults: ${adults || "None"}`;
-  if(kids) passengersSection += `\n👥 Kids: ${kids}`;
-  if(luggage) passengersSection += `\n👜 Luggage: ${luggage}`;
-  let message=
-`🚖 TAXI DISPATCH
-🆔 JOB-${jobCount}
-⏰ ${new Date().toLocaleString()}
-${timeSection}
-
-👤 ${name}
-📞 ${phone}
-
-🚗 ${selectedVehicle}
-💳 ${paymentArray.join(", ")}
-💲 ${priceType} ${price ? "$"+price : ""}
-${passengersSection}
-
-📍 Pickup: ${pickup}
-📍 Drop: ${drop}`;
-  navigator.clipboard.writeText(message);
-  saveJobToHistory();
-  alert("Copied ✔");
-  jobCount++;
-  localStorage.setItem("jobCount", jobCount);
-  window.open("https://chat.whatsapp.com/Fiu6m7Uvlcz0TN49jkV30D?mode=gi_t","_blank");
-}
-function sendConfirmation(){
-  let name = titleCase(document.getElementById("name").value);
-  let phone = document.getElementById("phone").value.replace(/\s+/g,'');
-  let pickup = titleCase(document.getElementById("pickup").value);
-  let drop = titleCase(document.getElementById("drop").value);
-  let date = document.getElementById("date").value;
-  let time = document.getElementById("time").value;
-  let adults = document.getElementById("adults").value;
-  let kids = document.getElementById("kids").value;
-  let luggage = document.getElementById("luggage").value;
-  if(selectedTime === "Later" && !date && time) {
-    date = getTodayDate();
-  }
-  let msg;
-  if(selectedTime === "Later" && date && time) {
-    let dateDisplay = formatDateDisplay(date);
-    let passengerInfo = "";
-    let passengerArray = [];
-    if(adults) {passengerArray.push(pluralize(adults, "Adult", "Adults"));}
-    if(kids) {passengerArray.push(pluralize(kids, "Kid", "Kids"));}
-    passengerInfo = passengerArray.join(", ");
-    let luggageInfo = "";
-    if(luggage) {
-      luggageInfo = "\nLuggage: " + pluralize(luggage, "Bag", "Bags");
-    }
-    msg =
-`Hi ${name},
-
-Your taxi booking has been Confirmed.
-
-Date & Time: ${dateDisplay}, ${time} ${selectedAMPM}
-Pickup Address: ${pickup}
-Drop-off Address: ${drop}
-Passengers: ${passengerInfo}${luggageInfo}
-Vehicle: ${selectedVehicle}
-
-Please contact us immediately if any changes are required.
-
-Thank you for choosing our service.
-
-For Bookings & Inquiries:
-0420 303 581
-0450 678 194
-www.geelongcitytaxicab.com.au`;
-  } else {
-    msg =
-`Hi ${name},
-
-Your Taxi booking is Confirmed.
-
-Pickup Address: ${pickup}
-Drop-off Address: ${drop}
-
-Your driver will be there shortly.
-
-Thank you for choosing our service.
-
-For Bookings & Inquiries:
-0420 303 581
-0450 678 194
-www.geelongcitytaxicab.com.au`;
-  }
-  window.location.href="sms:"+phone+"&body="+encodeURIComponent(msg);
-}
-function sendFollowUp(){
-  let name = titleCase(document.getElementById("name").value);
-  let phone = document.getElementById("phone").value.replace(/\s+/g,'');
-  if(!name || !phone) {
-    alert("Please enter Passenger Name and Phone Number");
-    return;
-  }
-  let msg =
-`Hi ${name},
-
-Thanks for riding with Geelong City Cabs today.
-We're here 24/7 for all your travel needs.
-
-For Bookings & Inquiries:
-0420 303 581
-0450 678 194
-www.geelongcitytaxicab.com.au`;
-  window.location.href="sms:"+phone+"&body="+encodeURIComponent(msg);
-}
+function setVehicle(v){selectedVehicle=v;["sedanBtn","suvBtn","luxBtn","maxiBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});if(v==="Sedan") sedanBtn.classList.add("glow");if(v==="SUV") suvBtn.classList.add("glow");if(v==="Luxury") luxBtn.classList.add("glow");if(v==="MAXI") maxiBtn.classList.add("glow");vehicleSelected.innerText="Selected: "+v;}
+function togglePayment(p){let map={"Cabcharge":"cabBtn","Debit/Credit":"cardBtn","MPTP":"mptpBtn","Cash":"cashBtn"};let btn=document.getElementById(map[p]);if(paymentArray.includes(p)){paymentArray=paymentArray.filter(x=>x!==p);btn.classList.remove("glow");}else{if(paymentArray.length<2){paymentArray.push(p);btn.classList.add("glow");}else{alert("Max 2 payments");}}paymentSelected.innerText=paymentArray.join(", ")||"None";}
+function setPriceType(p){priceType=p;meterBtn.classList.remove("glow");setBtn.classList.remove("glow");if(p==="Meter Fare") meterBtn.classList.add("glow");if(p==="Set Price") setBtn.classList.add("glow");priceSelected.innerText="Selected: "+p;}
+function saveJobToHistory(){let name = titleCase(document.getElementById("name").value);let phone=document.getElementById("phone").value;let pickup=titleCase(document.getElementById("pickup").value);let drop=titleCase(document.getElementById("drop").value);let adults=document.getElementById("adults").value;let kids=document.getElementById("kids").value;let luggage=document.getElementById("luggage").value;let date=document.getElementById("date").value;let time=document.getElementById("time").value;let price=document.getElementById("price").value;let job = {id: jobCount,name, phone, pickup, drop, adults, kids, luggage,vehicle:selectedVehicle,payment:paymentArray.slice(),time:selectedTime,date,timeInput:time,ampm:selectedAMPM,priceType,price,timestamp: new Date().toLocaleString()};let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];jobs.unshift(job); jobs = jobs.slice(0, 5); localStorage.setItem("jobHistory", JSON.stringify(jobs));updateJobHistoryDropdown();}
+function updateJobHistoryDropdown(){let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];let select = document.getElementById("jobHistory");select.innerHTML = '<option value="">-- Select Previous Job --</option>';jobs.forEach((job, index) => {let option = document.createElement("option");option.value = index;option.textContent = `${job.name} - ${job.pickup} to ${job.drop}`;select.appendChild(option);});}
+function loadSelectedJob(){let select = document.getElementById("jobHistory");let index = select.value;if(index === "") return;let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];let job = jobs[index];if(!job) return;document.getElementById("name").value = job.name || "";document.getElementById("phone").value = job.phone || "";document.getElementById("pickup").value = job.pickup || "";document.getElementById("drop").value = job.drop || "";document.getElementById("adults").value = job.adults || "";document.getElementById("kids").value = job.kids || "";document.getElementById("luggage").value = job.luggage || "";document.getElementById("date").value = job.date || "";document.getElementById("time").value = job.timeInput || "";document.getElementById("price").value = job.price || "";setVehicle(job.vehicle || "None");setTime(job.time || "None");setAMPM(job.ampm || "None");setPriceType(job.priceType || "None");paymentArray = job.payment || [];["cabBtn","cardBtn","mptpBtn","cashBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});paymentArray.forEach(p=>{if(p==="Cabcharge") cabBtn.classList.add("glow");if(p==="Debit/Credit") cardBtn.classList.add("glow");if(p==="MPTP") mptpBtn.classList.add("glow");if(p==="Cash") cashBtn.classList.add("glow");});paymentSelected.innerText=paymentArray.join(", ")||"None";select.value = "";}
+function dispatch(){let name = titleCase(document.getElementById("name").value);let phone=document.getElementById("phone").value;let pickup=titleCase(document.getElementById("pickup").value);let drop=titleCase(document.getElementById("drop").value);let adults=document.getElementById("adults").value;let kids=document.getElementById("kids").value;let luggage=document.getElementById("luggage").value;let date=document.getElementById("date").value;let time=document.getElementById("time").value;let price=document.getElementById("price").value;if(selectedTime === "Later" && !date && time) {date = getTodayDate();}let dateFormatted = formatDateDisplay(date);let timeSection = selectedTime === "Later" && date && time? `🪧 *Pickup Time - ${selectedTime}*\n📅 *Date: ${dateFormatted}*\n⏱️ *Time: ${time} ${selectedAMPM}*`: `🪧 *Pickup Time - ${selectedTime}*`;let passengersSection = `👥 Adults: ${adults || "None"}`;if(kids) passengersSection += `\n👥 Kids: ${kids}`;if(luggage) passengersSection += `\n👜 Luggage: ${luggage}`;let message=`🚖 TAXI DISPATCH\n🆔 JOB-${jobCount}\n⏰ ${new Date().toLocaleString()}\n${timeSection}\n\n👤 ${name}\n📞 ${phone}\n\n🚗 ${selectedVehicle}\n💳 ${paymentArray.join(", ")}\n💲 ${priceType} ${price ? "$"+price : ""}\n${passengersSection}\n\n📍 Pickup: ${pickup}\n📍 Drop: ${drop}`;navigator.clipboard.writeText(message);saveJobToHistory();alert("Copied ✔");jobCount++;localStorage.setItem("jobCount", jobCount);window.open("https://chat.whatsapp.com/Fiu6m7Uvlcz0TN49jkV30D?mode=gi_t","_blank");}
+function sendConfirmation(){let name = titleCase(document.getElementById("name").value);let phone = document.getElementById("phone").value.replace(/\s+/g,'');let pickup = titleCase(document.getElementById("pickup").value);let drop = titleCase(document.getElementById("drop").value);let date = document.getElementById("date").value;let time = document.getElementById("time").value;let adults = document.getElementById("adults").value;let kids = document.getElementById("kids").value;let luggage = document.getElementById("luggage").value;if(selectedTime === "Later" && !date && time) {date = getTodayDate();}let msg;if(selectedTime === "Later" && date && time) {let dateDisplay = formatDateDisplay(date);let passengerInfo = "";let passengerArray = [];if(adults) {passengerArray.push(pluralize(adults, "Adult", "Adults"));}if(kids) {passengerArray.push(pluralize(kids, "Kid", "Kids"));}passengerInfo = passengerArray.join(", ");let luggageInfo = "";if(luggage) {luggageInfo = "\nLuggage: " + pluralize(luggage, "Bag", "Bags");}msg =`Hi ${name},\n\nYour taxi booking has been Confirmed.\n\nDate & Time: ${dateDisplay}, ${time} ${selectedAMPM}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}${luggageInfo}\nVehicle: ${selectedVehicle}\n\nPlease contact us immediately if any changes are required.\n\nThank you for choosing our service.\n\nFor Bookings & Inquiries:\n0420 303 581\n0450 678 194\nwww.geelongcitytaxicab.com.au`;} else {msg =`Hi ${name},\n\nYour Taxi booking is Confirmed.\n\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\n\nYour driver will be there shortly.\n\nThank you for choosing our service.\n\nFor Bookings & Inquiries:\n0420 303 581\n0450 678 194\nwww.geelongcitytaxicab.com.au`;}window.location.href="sms:"+phone+"&body="+encodeURIComponent(msg);}
+function sendFollowUp(){let name = titleCase(document.getElementById("name").value);let phone = document.getElementById("phone").value.replace(/\s+/g,'');if(!name || !phone) {alert("Please enter Passenger Name and Phone Number");return;}let msg =`Hi ${name},\n\nThanks for riding with Geelong City Cabs today.\nWe're here 24/7 for all your travel needs.\n\nFor Bookings & Inquiries:\n0420 303 581\n0450 678 194\nwww.geelongcitytaxicab.com.au`;window.location.href="sms:"+phone+"&body="+encodeURIComponent(msg);}
 window.addEventListener("DOMContentLoaded", function(){
   updateJobHistoryDropdown();
-  // Load Google Maps API script
   const script = document.createElement('script');
   script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDMA_Frd6ut6hv4s0YnoWoYdI4hRoEWZs4&libraries=places`;
   script.async = true;
