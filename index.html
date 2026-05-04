@@ -4,7 +4,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Geelong Premium Network</title>
 <style>
-/* --- Your existing styles, unchanged --- */
 body {
   font-family: -apple-system, Arial;
   background: linear-gradient(135deg, #0f172a, #111827);
@@ -154,18 +153,17 @@ function initializeGoogleMaps() {
   autocompleteService = new google.maps.places.AutocompleteService();
   map = new google.maps.Map(document.createElement('div'));
   placesService = new google.maps.places.PlacesService(map);
-
   setupAutocomplete('pickup', 'pickupList');
   setupAutocomplete('drop', 'dropList');
 }
 
 function getPlacePredictions(input, callback) {
-  const geelong = { lat: -38.14711, lng: 144.36069 }; // Geelong centre
+  const geelong = { lat: -38.14711, lng: 144.36069 };
   const request = {
     input: input,
     componentRestrictions: { country: 'au' },
     location: new google.maps.LatLng(geelong.lat, geelong.lng),
-    radius: 60000, // Geelong & surrounds, up to Werribee, Lara, Torquay, etc.
+    radius: 60000,
     types: ['geocode', 'establishment']
   };
   autocompleteService.getPlacePredictions(request, (predictions = [], status) => {
@@ -173,7 +171,6 @@ function getPlacePredictions(input, callback) {
       callback([]);
       return;
     }
-    // Prioritise: Geelong > Melbourne > Victoria
     const suburbPriority = pred => {
       const desc = pred.description.toLowerCase();
       if(desc.includes('geelong')) return 1;
@@ -222,6 +219,7 @@ function setupAutocomplete(inputId, listId) {
   });
 }
 
+// THE ADDRESS FORMAT LOGIC
 function handleAddressSelected(placeId, inputId){
   placesService.getDetails({ placeId: placeId }, (place, status) => {
     if (
@@ -231,28 +229,42 @@ function handleAddressSelected(placeId, inputId){
     ) {
       return;
     }
-    let street_number="", route="", suburb="", postcode="";
+    let street_number="", route="", suburb="", postcode="", town="", locality="", short_state="";
     place.address_components.forEach(comp => {
       if (comp.types.includes('street_number')) street_number = comp.long_name;
       if (comp.types.includes('route')) route = comp.long_name;
       if (comp.types.includes('locality')) suburb = comp.long_name;
+      if (comp.types.includes('postal_town')) town = comp.long_name;
+      if (comp.types.includes('administrative_area_level_2')) locality = comp.long_name;
       if (comp.types.includes('postal_code')) postcode = comp.long_name;
-      if (!suburb && comp.types.includes("administrative_area_level_2")) suburb = comp.long_name; // Sometimes for outer suburbs
+      if (comp.types.includes('administrative_area_level_1')) short_state = comp.short_name; // Always "VIC"
     });
 
-    // Compose display address like "1 Ryrie St, Geelong 3220"
     let address = "";
-    if (street_number && route)       address = street_number + ' ' + route;
-    else if (route)                   address = route;
-    else                              address = place.name || place.formatted_address.split(",")[0];
-    if (suburb)                       address += ", " + suburb;
-    if (postcode)                     address += " " + postcode;
-    document.getElementById(inputId).value = address;
+    // Compose street and suburb, or just suburb/town/locality
+    if (street_number && route) {
+      address = `${street_number} ${route}`;
+      if (suburb) address += `, ${suburb}`;
+      else if (town) address += `, ${town}`;
+      else if (locality) address += `, ${locality}`;
+    } else {
+      address = suburb || town || locality || place.name || "";
+    }
+    address = address.trim();
+    // Now add VIC and postcode if available
+    if (address && short_state && postcode) {
+      address += ` ${short_state} ${postcode}`;
+    } else if (address && postcode) {
+      address += ` VIC ${postcode}`;
+    } else if (address && short_state) {
+      address += ` ${short_state}`;
+    }
+    document.getElementById(inputId).value = address.trim();
   });
 }
 
-// ... The rest of your app logic, unchanged, follows from here ...
-/* TITLE CASE FUNCTION */
+/* The rest of your logic (unchanged for brevity), paste your existing or original: */
+// -- snip: from original input above --
 function titleCase(str){
   return str
     .toLowerCase()
@@ -261,7 +273,6 @@ function titleCase(str){
     .map(w=>w.charAt(0).toUpperCase()+w.slice(1))
     .join(' ');
 }
-/* GET TODAY'S DATE */
 function getTodayDate() {
   const today = new Date();
   const year = today.getFullYear();
@@ -269,7 +280,6 @@ function getTodayDate() {
   const day = String(today.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
-/* FORMAT DATE TO READABLE FORMAT (for both dispatch and SMS) */
 function formatDateDisplay(dateStr) {
   if(!dateStr) return "Today";
   const today = new Date();
@@ -379,7 +389,6 @@ function saveJobToHistory(){
   let date=document.getElementById("date").value;
   let time=document.getElementById("time").value;
   let price=document.getElementById("price").value;
-
   let job = {
     id: jobCount,
     name, phone, pickup, drop, adults, kids, luggage,
@@ -393,7 +402,6 @@ function saveJobToHistory(){
     price,
     timestamp: new Date().toLocaleString()
   };
-
   let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];
   jobs.unshift(job);
   jobs = jobs.slice(0, 5);
@@ -571,7 +579,6 @@ www.geelongcitytaxicab.com.au`;
 }
 window.addEventListener("DOMContentLoaded", function(){
   updateJobHistoryDropdown();
-  // Load Google Maps API script
   const script = document.createElement('script');
   script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDMA_Frd6ut6hv4s0YnoWoYdI4hRoEWZs4&libraries=places`;
   script.async = true;
