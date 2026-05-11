@@ -390,6 +390,7 @@ DISPATCH
 
 <script>
 const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY_HERE";
+const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 678 194\n🌎 www.geelongcitytaxicab.com.au";
 
 let jobCount = localStorage.getItem("jobCount");
 jobCount = jobCount ? parseInt(jobCount) : 1000;
@@ -749,7 +750,10 @@ function sendQuote(){
   if(kids) {passengerArray.push(pluralize(kids, "Kid", "Kids"));}
   passengerInfo = passengerArray.join(", ");
 
-  let msg = `Hi ${name},\n\nThank you for your inquiry.\n\nDate & Time: ${timeDisplay}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}\nVehicle: ${selectedVehicle}\nEstimated Fare: $${price} GST Inclusive\n\nTo confirm your booking or discuss price, simply reply to this message or give us a call.\n\nFor Bookings & Inquiries:\n📞 0420 303 581\n📞 0450 678 194\n🌎 www.geelongcitytaxicab.com.au`;
+  let luggageInfo = "";
+  if(luggage) {luggageInfo = `\nLuggage: ${pluralize(luggage, "Bag", "Bags")}`;}
+
+  let msg = `Hi ${name},\n\nThank you for your inquiry.\n\nTrip Details:\nDate & Time: ${timeDisplay}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}${luggageInfo}\nVehicle: ${selectedVehicle}\nEstimated Fare: $${price} GST Inclusive\n\nTo confirm your booking or discuss price, simply reply to this message or give us a call.${SIGNATURE}`;
 
   navigator.clipboard.writeText(msg);
   saveJobToHistory();
@@ -801,7 +805,10 @@ function sendConfirmation(){
     if(kids) {passengerArray.push(pluralize(kids, "Kid", "Kids"));}
     passengerInfo = passengerArray.join(", ");
 
-    msg =`Hi ${name},\n\nYour taxi booking has been confirmed.\n\nDate & Time: ${dateDisplay}, ${time} ${selectedAMPM}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}\nVehicle: ${selectedVehicle}\n\nPlease use the link below to make the upfront payment of *$${depositAmount}*.\n\n${depositLink}\n\nPlease contact us immediately if any changes are required.\n\nFor Bookings & Inquiries:\n📞 0420 303 581\n📞 0450 678 194\n🌎 www.geelongcitytaxicab.com.au`;
+    let luggageInfo = "";
+    if(luggage) {luggageInfo = `\nLuggage: ${pluralize(luggage, "Bag", "Bags")}`;}
+
+    msg =`Hi ${name},\n\nYour taxi booking has been confirmed.\n\nDate & Time: ${dateDisplay}, ${time} ${selectedAMPM}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}${luggageInfo}\nVehicle: ${selectedVehicle}\n\nPlease use the link below to make the upfront payment of $${depositAmount}.\n\n${depositLink}\n\nPlease contact us immediately if any changes are required.${SIGNATURE}`;
   }
   else if(selectedTime === "Later" && date && time) {
     let dateDisplay = formatDateDisplay(date);
@@ -811,11 +818,11 @@ function sendConfirmation(){
     if(kids) {passengerArray.push(pluralize(kids, "Kid", "Kids"));}
     passengerInfo = passengerArray.join(", ");
     let luggageInfo = "";
-    if(luggage) {luggageInfo = "\nLuggage: " + pluralize(luggage, "Bag", "Bags");}
+    if(luggage) {luggageInfo = `\nLuggage: ${pluralize(luggage, "Bag", "Bags")}`;}
 
-    msg =`Hi ${name},\n\nYour taxi booking has been Confirmed.\n\nDate & Time: ${dateDisplay}, ${time} ${selectedAMPM}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}${luggageInfo}\nVehicle: ${selectedVehicle}\n\nPlease contact us immediately if any changes are required.\n\nThank you for choosing our service.\n\nFor Bookings & Inquiries:\n📞 0420 303 581\n📞 0450 678 194\n🌎 www.geelongcitytaxicab.com.au`;
+    msg =`Hi ${name},\n\nYour taxi booking has been Confirmed.\n\nDate & Time: ${dateDisplay}, ${time} ${selectedAMPM}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}${luggageInfo}\nVehicle: ${selectedVehicle}\n\nPlease contact us immediately if any changes are required.\n\nThank you for choosing our service.${SIGNATURE}`;
   } else {
-    msg =`Hi ${name},\n\nYour Taxi booking is Confirmed.\n\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\n\nYour driver will be there shortly.\n\nThank you for choosing our service.\n\nFor Bookings & Inquiries:\n📞 0420 303 581\n📞 0450 678 194\n🌎 www.geelongcitytaxicab.com.au`;
+    msg =`Hi ${name},\n\nYour Taxi booking is Confirmed.\n\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\n\nYour driver will be there shortly.\n\nThank you for choosing our service.${SIGNATURE}`;
   }
 
   window.location.href="sms:"+phone+"&body="+encodeURIComponent(msg);
@@ -826,7 +833,7 @@ function sendFollowUp(){
   let phone = document.getElementById("phone").value.replace(/\s+/g,'');
   if(!name || !phone) {alert("Please enter Passenger Name and Phone Number");return;}
 
-  let msg =`Hi ${name},\n\nThanks for riding with Geelong City Cabs today.\nWe're here 24/7 for all your travel needs.\n\nFor Bookings & Inquiries:\n📞 0420 303 581\n📞 0450 678 194\n🌎 www.geelongcitytaxicab.com.au`;
+  let msg =`Hi ${name},\n\nThanks for riding with Geelong City Cabs today.\nWe're here 24/7 for all your travel needs.${SIGNATURE}`;
 
   window.location.href="sms:"+phone+"&body="+encodeURIComponent(msg);
 }
