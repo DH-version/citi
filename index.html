@@ -233,6 +233,16 @@ h3{
   border-bottom:none;
 }
 
+.autocomplete-item.geelong-highlight{
+  background:#e0f2fe;
+  font-weight:bold;
+  color:#000;
+}
+
+.autocomplete-item.geelong-highlight:hover{
+  background:#bfdbfe;
+}
+
 .pac-icon{
   display:inline-block;
   width:16px;
@@ -390,7 +400,7 @@ DISPATCH
 
 <script>
 const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY_HERE";
-const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 678 194\n🌎 www.geelongcitytaxicab.com.au";
+const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 330 596\n🌎 www.geelongcitytaxicab.com.au";
 
 let jobCount = localStorage.getItem("jobCount");
 jobCount = jobCount ? parseInt(jobCount) : 1000;
@@ -417,7 +427,26 @@ function setupAutocomplete(inputId, listId) {
     debounceTimer = setTimeout(() => {
       getPlacePredictions(value, (predictions) => {
         listElement.innerHTML = '';
-        predictions.forEach((prediction) => {
+        
+        // Separate Geelong addresses from others
+        const geelongPredictions = predictions.filter(p => p.description.toLowerCase().includes('geelong'));
+        const otherPredictions = predictions.filter(p => !p.description.toLowerCase().includes('geelong'));
+        
+        // Add Geelong predictions first with highlight
+        geelongPredictions.forEach((prediction) => {
+          const item = document.createElement('div');
+          item.className = 'autocomplete-item geelong-highlight';
+          item.innerHTML = `<span class="pac-icon">📍</span>${prediction.description}`;
+          item.addEventListener('click', () => {
+            let formatted = prediction.description.replace(/\s*,?\s*Australia\s*$/i, '').replace(/\s*,?\s*$/, '');
+            inputElement.value = formatted;
+            listElement.classList.remove('active');
+          });
+          listElement.appendChild(item);
+        });
+        
+        // Add other predictions
+        otherPredictions.forEach((prediction) => {
           const item = document.createElement('div');
           item.className = 'autocomplete-item';
           item.innerHTML = `<span class="pac-icon">📍</span>${prediction.description}`;
@@ -428,6 +457,7 @@ function setupAutocomplete(inputId, listId) {
           });
           listElement.appendChild(item);
         });
+        
         if (predictions.length > 0) listElement.classList.add('active');
         else listElement.classList.remove('active');
       });
