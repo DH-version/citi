@@ -1,46 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>Geelong Premium Network</title>
-
 <style>
+*{box-sizing:border-box;margin:0;padding:0}
+
 body{
-  font-family:-apple-system,Arial;
+  font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;
   background:linear-gradient(135deg,#0f172a,#111827);
   padding:6px;
   color:#fff;
   max-width:430px;
-  margin:auto;
+  margin:0 auto;
+  min-height:100dvh;
+  padding-bottom:62px;
 }
 
 h2{
   text-align:center;
-  margin-bottom:6px;
-  font-size:18px;
+  margin-bottom:4px;
+  font-size:17px;
+  font-weight:700;
 }
+
+h3{
+  margin:3px 0;
+  font-size:14px;
+  font-weight:600;
+}
+
+.syncStatus{
+  text-align:center;
+  font-size:11px;
+  margin-bottom:4px;
+  color:#94a3b8;
+}
+.syncStatus.online{color:#34d399}
+.syncStatus.error{color:#f87171}
+
+.tabPanel{display:none}
+.tabPanel.active{display:block}
+
+.section{margin-top:6px}
 
 input,select{
   width:100%;
-  padding:14px;
+  padding:12px;
   margin:3px 0;
   font-size:16px;
   border-radius:10px;
   border:none;
   box-sizing:border-box;
 }
-
 select{
   background:#2563eb;
   color:#fff;
   cursor:pointer;
+  font-weight:700;
 }
-
 input:disabled{
   background:#e5e7eb;
   color:#9ca3af;
   cursor:not-allowed;
 }
+input::placeholder{color:#9ca3af}
 
 button{
   padding:12px;
@@ -53,7 +78,6 @@ button{
   font-weight:bold;
   cursor:pointer;
 }
-
 button:disabled{
   background:#d1d5db;
   color:#9ca3af;
@@ -66,619 +90,793 @@ button:disabled{
   box-shadow:0 0 8px #facc15;
 }
 
-.section{
-  margin-top:6px;
-}
+.row{display:flex;gap:4px}
+.row button{flex:1}
 
-h3{
-  margin:3px 0;
-  font-size:14px;
-}
+.twoCol{display:flex;gap:6px}
+.twoCol input{flex:1}
 
-.row{
-  display:flex;
-  gap:4px;
-}
+.threeCol{display:flex;gap:4px}
+.threeCol input{flex:1}
+.threeCol button{flex:1}
 
-.row button{
-  flex:1;
-}
+.fourCol{display:flex;gap:4px}
+.fourCol button{flex:1}
 
-.twoCol{
-  display:flex;
-  gap:6px;
-}
-
-.twoCol input{
-  flex:1;
-}
-
-.threeCol{
-  display:flex;
-  gap:4px;
-}
-
-.threeCol input{
-  flex:1;
-}
-
-.threeCol button{
-  flex:1;
-}
-
-.fourCol{
-  display:flex;
-  gap:4px;
-}
-
-.fourCol button{
-  flex:1;
-}
-
-.depositRow{
-  display:flex;
-  gap:4px;
-  margin-top:3px;
-}
-
-.depositRow button{
-  flex:1;
-}
+.depositRow{display:flex;gap:4px;margin-top:3px}
+.depositRow button{flex:1}
 
 .depositAmountBox{
-  display:flex;
-  align-items:center;
-  background:#fff;
-  border-radius:10px;
-  padding:0 8px;
-  flex:1;
+  display:flex;align-items:center;
+  background:#fff;border-radius:10px;padding:0 8px;flex:1;
 }
-
-.depositAmountBox span{
-  color:#000;
-  font-weight:bold;
-  margin-right:4px;
-}
-
+.depositAmountBox span{color:#000;font-weight:bold;margin-right:4px}
 .depositAmountBox input{
-  border:none;
-  outline:none;
-  padding:12px;
-  margin:0;
-  flex:1;
+  border:none;outline:none;padding:12px;margin:0;flex:1;
+  background:transparent;color:#000;
 }
+.depositAmountBox input:disabled{background:transparent;color:#9ca3af}
 
-.paymentLinkRow{
-  display:flex;
-  gap:4px;
-  margin-top:3px;
-}
-
-.paymentLinkRow input{
-  flex:1;
-}
+.paymentLinkRow{display:flex;gap:4px;margin-top:3px}
+.paymentLinkRow input{flex:1}
 
 .priceRow{
-  display:flex;
-  gap:4px;
-  margin-top:3px;
-  align-items:center;
+  display:flex;gap:4px;margin-top:3px;align-items:center;
 }
-
-.priceRow button{
-  flex:0.8;
-}
+.priceRow button{flex:0.8}
 
 .priceBox{
-  display:flex;
-  align-items:center;
-  background:#fff;
-  border-radius:10px;
-  padding:0 8px;
-  flex:1;
+  display:flex;align-items:center;
+  background:#fff;border-radius:10px;padding:0 8px;flex:1;
 }
-
-.priceBox span{
-  color:#000;
-  font-weight:bold;
-  margin-right:4px;
-}
-
+.priceBox span{color:#000;font-weight:bold;margin-right:4px}
 .priceBox input{
-  border:none;
-  outline:none;
-  padding:12px;
-  margin:0;
-  flex:1;
+  border:none;outline:none;padding:12px;margin:0;flex:1;
+  background:transparent;color:#000;
+}
+.priceBox input:disabled{background:transparent;color:#9ca3af}
+
+#timeSelected,#vehicleSelected,#paymentSelected,#priceSelected{
+  font-size:12px;color:#94a3b8;margin-top:2px;
 }
 
-.autocomplete-container{
-  position:relative;
-  width:100%;
-}
+.phoneHint{font-size:11px;color:#34d399;margin-top:2px;display:none}
+.phoneHint.show{display:block}
 
+.operatorRow{margin-bottom:3px}
+.operatorRow input{padding:10px;font-size:14px}
+
+.autocomplete-container{position:relative;width:100%}
 .autocomplete-list{
-  position:absolute;
-  top:100%;
-  left:0;
-  right:0;
-  background:#fff;
-  border:1px solid #ddd;
-  border-radius:8px;
-  max-height:250px;
-  overflow-y:auto;
-  z-index:1000;
-  display:none;
-  margin-top:-4px;
+  position:absolute;top:100%;left:0;right:0;
+  background:#fff;border:1px solid #ddd;border-radius:8px;
+  max-height:250px;overflow-y:auto;z-index:1000;
+  display:none;margin-top:-4px;
 }
-
-.autocomplete-list.active{
-  display:block;
-}
-
+.autocomplete-list.active{display:block}
 .autocomplete-item{
-  padding:12px 14px;
-  cursor:pointer;
-  border-bottom:1px solid #eee;
-  color:#333;
-  font-size:14px;
-  transition:background 0.2s;
+  padding:12px 14px;cursor:pointer;border-bottom:1px solid #eee;
+  color:#333;font-size:14px;
+}
+.autocomplete-item:hover{background:#f0f0f0}
+.autocomplete-item.geelong-highlight{background:#e0f2fe;font-weight:bold;color:#000}
+.pac-icon{display:inline-block;margin-right:8px}
+
+.bottomNav{
+  position:fixed;bottom:0;left:0;right:0;
+  max-width:430px;margin:0 auto;
+  display:flex;
+  background:#111827;
+  border-top:1px solid #334155;
+  z-index:200;
+  padding-bottom:env(safe-area-inset-bottom,0);
+}
+.navTab{
+  flex:1;padding:8px 4px 6px;
+  background:transparent;color:#94a3b8;
+  border-radius:0;font-size:10px;font-weight:700;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  margin:0;
+}
+.navTab .icon{font-size:18px;line-height:1}
+.navTab.active{color:#facc15;background:#ffffff08}
+.navTab .badge{
+  background:#ef4444;color:#fff;font-size:10px;
+  padding:1px 6px;border-radius:10px;min-width:18px;
 }
 
-.autocomplete-item:hover{
-  background:#f0f0f0;
+.jobList{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.jobCard{
+  background:#1e293b;border:1px solid #334155;border-radius:10px;
+  padding:10px;cursor:pointer;
 }
+.jobCardTop{display:flex;justify-content:space-between;gap:8px}
+.jobId{font-weight:700;color:#facc15;font-size:13px}
+.jobTime{font-size:11px;color:#94a3b8;text-align:right}
+.jobName{font-size:14px;font-weight:600;margin:4px 0 2px}
+.jobRoute{font-size:12px;color:#94a3b8;line-height:1.4}
+.jobMeta{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.jobTag{font-size:10px;padding:2px 8px;border-radius:6px;background:#334155;color:#cbd5e1}
+.jobTag.asap{background:#10b98133;color:#34d399}
+.jobTag.dispatched{background:#3b82f633;color:#93c5fd}
+.jobPhone{
+  display:inline-block;margin:4px 0 2px;
+  color:#38bdf8;font-size:13px;font-weight:700;
+  text-decoration:none;padding:4px 0;
+}
+.jobPhone:active{opacity:.8}
+.returnTripBtn{
+  width:100%;background:#0ea5e9!important;
+  margin:3px 0 2px;padding:10px;
+}
+.detailPhone{color:#38bdf8;font-weight:700;text-decoration:none}
+.emptyState{text-align:center;padding:30px 16px;color:#94a3b8;font-size:13px}
+.listHeader{font-size:14px;color:#94a3b8;margin-bottom:4px}
 
-.autocomplete-item:last-child{
-  border-bottom:none;
+.modalOverlay{
+  display:none;position:fixed;inset:0;
+  background:#000000cc;z-index:300;
+  align-items:flex-end;justify-content:center;
 }
+.modalOverlay.open{display:flex}
+.modalSheet{
+  background:#1e293b;border-radius:16px 16px 0 0;
+  width:100%;max-width:430px;max-height:90vh;overflow-y:auto;
+  padding:16px;animation:slideUp .25s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modalHandle{width:40px;height:4px;background:#475569;border-radius:2px;margin:0 auto 12px}
+.modalHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.modalHeader h2{font-size:18px;color:#facc15}
+.modalClose{background:#334155;padding:8px 14px;font-size:13px}
+.detailGrid{display:grid;gap:8px}
+.detailRow{background:#0f172a;border-radius:8px;padding:10px 12px}
+.detailLabel{font-size:11px;color:#94a3b8;text-transform:uppercase;margin-bottom:2px}
+.detailValue{font-size:14px;line-height:1.4}
+.modalActions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.modalActions button{flex:1;min-width:100px}
 
-.autocomplete-item.geelong-highlight{
-  background:#e0f2fe;
-  font-weight:bold;
-  color:#000;
+.alertToast{
+  display:none;position:fixed;top:10px;left:10px;right:10px;
+  max-width:410px;margin:0 auto;
+  background:linear-gradient(135deg,#059669,#047857);
+  border:1px solid #34d399;border-radius:10px;
+  padding:14px 16px;z-index:400;
+  box-shadow:0 8px 32px #0008;
+  animation:popIn .3s ease;cursor:pointer;
 }
-
-.autocomplete-item.geelong-highlight:hover{
-  background:#bfdbfe;
-}
-
-.pac-icon{
-  display:inline-block;
-  width:16px;
-  height:16px;
-  margin-right:8px;
-  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%232563eb"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 14 8.67 14 9.5s.67 1.5 1.5 1.5z"/></svg>');
-  background-size:contain;
-}
+.alertToast.show{display:block}
+@keyframes popIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.alertToast h4{font-size:15px;margin-bottom:4px}
+.alertToast p{font-size:13px;opacity:.9}
 </style>
 </head>
-
 <body>
 
 <h2>GEELONG PREMIUM NETWORK</h2>
+<div id="syncStatus" class="syncStatus">Connecting…</div>
 
-<!-- NAME + PHONE -->
-<div class="twoCol">
-  <input id="name" placeholder="Passenger Name">
-  <input id="phone" type="tel" inputmode="numeric" placeholder="Phone Number">
+<div id="alertToast" class="alertToast" onclick="dismissAlert()">
+  <h4>🚖 New Job Arrived!</h4>
+  <p id="alertText">Tap to view</p>
 </div>
 
-<!-- PICKUP -->
-<div class="autocomplete-container">
-  <input id="pickup" placeholder="Pickup Location" autocomplete="off">
-  <div id="pickupList" class="autocomplete-list"></div>
-</div>
+<!-- TAB 1: NEW BOOKING -->
+<div id="tabNew" class="tabPanel active">
 
-<!-- DROP -->
-<div class="autocomplete-container">
-  <input id="drop" placeholder="Drop Location" autocomplete="off">
-  <div id="dropList" class="autocomplete-list"></div>
-</div>
-
-<!-- PICKUP TIME -->
-<div class="section">
-
-<h3>Pickup Time</h3>
-
-<div class="row">
-  <button id="quickBtn" onclick="setTime('Quick')">Quick</button>
-  <button id="readyBtn" onclick="setTime('Ready Now')">Ready Now</button>
-  <button id="laterBtn" onclick="setTime('Later')">Later</button>
-</div>
-
-<div class="threeCol">
-  <input id="date" type="date" disabled>
-  <input id="time" type="text" inputmode="numeric" placeholder="HH:MM" maxlength="5" disabled>
-  <button id="amBtn" onclick="setAMPM('AM')" disabled>AM</button>
-  <button id="pmBtn" onclick="setAMPM('PM')" disabled>PM</button>
-</div>
-
-<div id="timeSelected">Selected: None</div>
-
-</div>
-
-<!-- PASSENGERS -->
-<div class="section">
-
-<h3>Passengers & Vehicle</h3>
-
-<div class="threeCol">
-  <input id="adults" type="tel" inputmode="numeric" placeholder="Adults">
-  <input id="kids" type="tel" inputmode="numeric" placeholder="Kids">
-  <input id="luggage" type="tel" inputmode="numeric" placeholder="Luggage">
-</div>
-
-<div class="fourCol" style="margin-top:3px;">
-  <button id="sedanBtn" onclick="setVehicle('Sedan')">Sedan</button>
-  <button id="suvBtn" onclick="setVehicle('SUV')">SUV</button>
-  <button id="luxBtn" onclick="setVehicle('Luxury')">Luxury</button>
-  <button id="maxiBtn" onclick="setVehicle('MAXI')">MAXI</button>
-</div>
-
-<div id="vehicleSelected">Selected: None</div>
-
-</div>
-
-<!-- PAYMENT -->
-<div class="section">
-
-<h3>Payment & Price</h3>
-
-<div class="fourCol">
-  <button id="cabBtn" onclick="togglePayment('Cabcharge')">Cabcharge</button>
-  <button id="mptpBtn" onclick="togglePayment('MPTP')">MPTP</button>
-  <button id="cardBtn" onclick="togglePayment('Debit/Credit')">Debit/Credit</button>
-  <button id="cashBtn" onclick="togglePayment('Cash')">Cash</button>
-</div>
-
-<div class="depositRow">
-
-  <button id="depositBtn" onclick="togglePayment('Deposit')">Deposit</button>
-
-  <div class="depositAmountBox">
-    <span>$</span>
-    <input id="depositAmount" type="tel" inputmode="numeric" placeholder="Amount" disabled>
+  <div class="operatorRow">
+    <input id="operator" placeholder="Operator Name" list="operatorList">
+    <datalist id="operatorList"></datalist>
   </div>
 
-</div>
+  <div class="twoCol">
+    <input id="name" placeholder="Passenger Name">
+    <input id="phone" type="tel" inputmode="numeric" placeholder="Phone Number">
+  </div>
+  <div id="phoneHint" class="phoneHint">Customer found — details filled</div>
 
-<div class="paymentLinkRow">
-  <input id="depositLink" placeholder="Deposit Payment Link" disabled>
-</div>
-
-<div id="paymentSelected">Selected: None</div>
-
-<div class="priceRow">
-
-  <button id="meterBtn" onclick="setPriceType('Meter Fare')">Meter Fare</button>
-  <button id="setBtn" onclick="setPriceType('Set Price')">Set Price</button>
-
-  <div class="priceBox">
-    <span>$</span>
-    <input id="price" type="tel" inputmode="numeric" placeholder="Enter amount" disabled>
+  <div class="autocomplete-container">
+    <input id="pickup" placeholder="Pickup Location" autocomplete="off">
+    <div id="pickupList" class="autocomplete-list"></div>
   </div>
 
+  <div class="autocomplete-container">
+    <input id="drop" placeholder="Drop Location" autocomplete="off">
+    <div id="dropList" class="autocomplete-list"></div>
+  </div>
+
+  <button id="returnTripBtn" type="button" class="returnTripBtn" style="display:none" onclick="loadReturnTrip()">↩ Return Trip (swap pickup &amp; drop)</button>
+
+  <div class="section">
+    <h3>Pickup Time</h3>
+    <div class="row">
+      <button id="quickBtn" onclick="setTime('Quick')">Quick</button>
+      <button id="readyBtn" onclick="setTime('Ready Now')">Ready Now</button>
+      <button id="laterBtn" onclick="setTime('Later')">Later</button>
+    </div>
+    <div class="threeCol">
+      <input id="date" type="date" disabled>
+      <input id="time" type="text" inputmode="numeric" placeholder="HH:MM" maxlength="5" disabled>
+      <button id="amBtn" onclick="setAMPM('AM')" disabled>AM</button>
+      <button id="pmBtn" onclick="setAMPM('PM')" disabled>PM</button>
+    </div>
+    <div id="timeSelected">Selected: None</div>
+  </div>
+
+  <div class="section">
+    <h3>Passengers &amp; Vehicle</h3>
+    <div class="threeCol">
+      <input id="adults" type="tel" inputmode="numeric" placeholder="Adults">
+      <input id="kids" type="tel" inputmode="numeric" placeholder="Kids">
+      <input id="luggage" type="tel" inputmode="numeric" placeholder="Luggage">
+    </div>
+    <div class="fourCol" style="margin-top:3px">
+      <button id="sedanBtn" onclick="setVehicle('Sedan')">Sedan</button>
+      <button id="suvBtn" onclick="setVehicle('SUV')">SUV</button>
+      <button id="luxBtn" onclick="setVehicle('Luxury')">Luxury</button>
+      <button id="maxiBtn" onclick="setVehicle('MAXI')">MAXI</button>
+    </div>
+    <div id="vehicleSelected">Selected: None</div>
+  </div>
+
+  <div class="section">
+    <h3>Payment &amp; Price</h3>
+    <div class="fourCol">
+      <button id="cabBtn" onclick="togglePayment('Cabcharge')">Cabcharge</button>
+      <button id="mptpBtn" onclick="togglePayment('MPTP')">MPTP</button>
+      <button id="cardBtn" onclick="togglePayment('Debit/Credit')">Debit/Credit</button>
+      <button id="cashBtn" onclick="togglePayment('Cash')">Cash</button>
+    </div>
+    <div class="depositRow">
+      <button id="depositBtn" onclick="togglePayment('Deposit')">Deposit</button>
+      <div class="depositAmountBox">
+        <span>$</span>
+        <input id="depositAmount" type="tel" inputmode="numeric" placeholder="Amount" disabled>
+      </div>
+    </div>
+    <div class="paymentLinkRow">
+      <input id="depositLink" placeholder="Deposit Payment Link" disabled>
+    </div>
+    <div id="paymentSelected">Selected: None</div>
+    <div class="priceRow">
+      <button id="meterBtn" onclick="setPriceType('Meter Fare')">Meter Fare</button>
+      <button id="setBtn" onclick="setPriceType('Set Price')">Set Price</button>
+      <div class="priceBox">
+        <span>$</span>
+        <input id="price" type="tel" inputmode="numeric" placeholder="Enter amount" disabled>
+      </div>
+    </div>
+    <div id="priceSelected">Selected: None</div>
+  </div>
+
+  <div class="section">
+    <button id="dispatchBtn" style="width:100%;background:#10b981;" onclick="dispatch()">DISPATCH</button>
+    <div style="display:flex;gap:8px;">
+      <button style="flex:1;" onclick="sendQuote()">Send Quote</button>
+      <button style="flex:1;" onclick="sendConfirmation()">Send Confirmation</button>
+      <button style="flex:1;background:#8b5cf6;" onclick="sendFollowUp()">Follow Up</button>
+    </div>
+    <button style="width:100%;background:#64748b;margin-top:4px;" onclick="clearFormRefresh()">Clear Form</button>
+  </div>
 </div>
 
-<div id="priceSelected">Selected: None</div>
-
+<!-- TAB 2: AVAILABLE BOOKINGS -->
+<div id="tabAvailable" class="tabPanel">
+  <h3>Available Bookings</h3>
+  <div class="listHeader">Sorted by pickup date &amp; time</div>
+  <div id="availableList" class="jobList"></div>
 </div>
 
-<!-- ACTION BUTTONS -->
-<div class="section">
+<!-- TAB 3: PREVIOUS JOBS -->
+<div id="tabPrevious" class="tabPanel">
+  <h3>Previous Jobs</h3>
+  <div class="listHeader">Tap to view or reload into New Booking</div>
+  <div id="previousList" class="jobList"></div>
+</div>
 
-<button style="width:100%; background:#10b981;" onclick="dispatch()">
-DISPATCH
-</button>
+<!-- JOB DETAIL MODAL -->
+<div id="jobModal" class="modalOverlay" onclick="if(event.target===this)closeJobModal()">
+  <div class="modalSheet">
+    <div class="modalHandle"></div>
+    <div class="modalHeader">
+      <h2 id="modalJobTitle">JOB-0000</h2>
+      <button class="modalClose" onclick="closeJobModal()">Close</button>
+    </div>
+    <div id="modalJobBody" class="detailGrid"></div>
+    <div id="modalJobActions" class="modalActions"></div>
+  </div>
+</div>
 
-<div style="display:flex; gap:8px;">
-
-  <button style="flex:1;" onclick="sendQuote()">
-  Send Quote
+<!-- BOTTOM NAV -->
+<nav class="bottomNav">
+  <button class="navTab active" data-tab="tabNew" onclick="switchTab('tabNew',this)">
+    <span class="icon">📝</span>New Booking
   </button>
-
-  <button style="flex:1;" onclick="sendConfirmation()">
-  Send Confirmation
+  <button class="navTab" data-tab="tabAvailable" onclick="switchTab('tabAvailable',this)">
+    <span class="icon">🚖</span>Available
+    <span id="availableBadge" class="badge" style="display:none">0</span>
   </button>
-
-  <button style="flex:1; background:#8b5cf6;" onclick="sendFollowUp()">
-  Follow Up
+  <button class="navTab" data-tab="tabPrevious" onclick="switchTab('tabPrevious',this)">
+    <span class="icon">📋</span>Previous
   </button>
+</nav>
 
-</div>
-
-</div>
-
-<!-- JOB HISTORY -->
-<div class="section">
-<h3>Recent Jobs</h3>
-<select id="jobHistory" onchange="loadSelectedJob()">
-  <option value="">-- Select Previous Job --</option>
-</select>
-</div>
-
+<script src="firebase-config.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-const GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY_HERE";
+const GOOGLE_MAPS_API_KEY = "AIzaSyDMA_Frd6ut6hv4s0YnoWoYdI4hRoEWZs4";
+const GEELONG_CENTER = { lat: -38.1499, lng: 144.3617 };
+const GEELONG_BIAS_RADIUS = 55000;
+const GEELONG_SUBURBS = [
+  "geelong", "newtown", "belmont", "highton", "grovedale", "waurn ponds", "marshall",
+  "lara", "corio", "norlane", "north geelong", "south geelong", "geelong west", "geelong east",
+  "leopold", "drysdale", "clifton springs", "portarlington", "st leonards", "Indented Head",
+  "curlewis", "ocean grove", "barwon heads", "queenscliff", "point lonsdale",
+  "torquay", "anglesea", "jan juc", "bells beach", "aireys inlet", "fairhaven",
+  "armstrong creek", "charlemont", "fyansford", "breakwater", "whittington", "moolap",
+  "lovely banks", "bell post hill", "hamlyn heights", "manifold heights", "herne hill",
+  "mount duneed", "wandana heights", "st albans park", "rippleside", "drumcondra",
+  "east geelong", "thomson", "ceres", "bannockburn", "inverleigh", "little river"
+].map(function(s) { return s.trim().toLowerCase(); });
 const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 330 596\n🌎 www.geelongcitytaxicab.com.au";
 
-let jobCount = localStorage.getItem("jobCount");
-jobCount = jobCount ? parseInt(jobCount) : 1000;
-let selectedVehicle="None", selectedTime="None", selectedAMPM="None", paymentArray=[], priceType="None";
-let autocompleteService, placesService, map;
+let selectedVehicle = "None", selectedTime = "None", selectedAMPM = "None";
+let paymentArray = [], priceType = "None";
+let autocompleteService, map;
+let db, firebaseReady = false;
+let availableJobs = [], previousJobs = [];
+let availableUnsub = null, previousUnsub = null;
+let sessionId = localStorage.getItem("sessionId") || ("s_" + Date.now() + "_" + Math.random().toString(36).slice(2));
+localStorage.setItem("sessionId", sessionId);
+let jobsListenerReady = false;
+let alertTimeout = null;
+let audioCtx = null;
 
-function initializeGoogleMaps() {
-  if (!window.google) { console.error("Google Maps API not loaded"); return;}
-  autocompleteService = new google.maps.places.AutocompleteService();
-  map = new google.maps.Map(document.createElement('div'));
-  placesService = new google.maps.places.PlacesService(map);
-  setupAutocomplete('pickup', 'pickupList');
-  setupAutocomplete('drop', 'dropList');
+function switchTab(tabId, btn) {
+  document.querySelectorAll(".tabPanel").forEach(function(p) { p.classList.remove("active"); });
+  document.querySelectorAll(".navTab").forEach(function(t) { t.classList.remove("active"); });
+  document.getElementById(tabId).classList.add("active");
+  btn.classList.add("active");
 }
 
-function setupAutocomplete(inputId, listId) {
-  const inputElement = document.getElementById(inputId);
-  const listElement = document.getElementById(listId);
-  let debounceTimer;
-  inputElement.addEventListener('input', function() {
-    clearTimeout(debounceTimer);
-    const value = this.value.trim();
-    if (value.length < 2) { listElement.classList.remove('active'); return; }
-    debounceTimer = setTimeout(() => {
-      getPlacePredictions(value, (predictions) => {
-        listElement.innerHTML = '';
-        
-        // Separate Geelong addresses from others
-        const geelongPredictions = predictions.filter(p => p.description.toLowerCase().includes('geelong'));
-        const otherPredictions = predictions.filter(p => !p.description.toLowerCase().includes('geelong'));
-        
-        // Add Geelong predictions first with highlight
-        geelongPredictions.forEach((prediction) => {
-          const item = document.createElement('div');
-          item.className = 'autocomplete-item geelong-highlight';
-          item.innerHTML = `<span class="pac-icon">📍</span>${prediction.description}`;
-          item.addEventListener('click', () => {
-            let formatted = prediction.description.replace(/\s*,?\s*Australia\s*$/i, '').replace(/\s*,?\s*$/, '');
-            inputElement.value = formatted;
-            listElement.classList.remove('active');
-          });
-          listElement.appendChild(item);
-        });
-        
-        // Add other predictions
-        otherPredictions.forEach((prediction) => {
-          const item = document.createElement('div');
-          item.className = 'autocomplete-item';
-          item.innerHTML = `<span class="pac-icon">📍</span>${prediction.description}`;
-          item.addEventListener('click', () => {
-            let formatted = prediction.description.replace(/\s*,?\s*Australia\s*$/i, '').replace(/\s*,?\s*$/, '');
-            inputElement.value = formatted;
-            listElement.classList.remove('active');
-          });
-          listElement.appendChild(item);
-        });
-        
-        if (predictions.length > 0) listElement.classList.add('active');
-        else listElement.classList.remove('active');
-      });
-    }, 300);
+function initializeFirebase() {
+  try {
+    if (!firebaseConfig.projectId || firebaseConfig.projectId === "YOUR_PROJECT_ID") {
+      setSyncStatus("Add Firebase config in firebase-config.js", true);
+      return;
+    }
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    firebaseReady = true;
+    setSyncStatus("Connected — live sync active", false);
+    subscribeAvailableJobs();
+    subscribePreviousJobs();
+    loadOperatorName();
+  } catch (err) {
+    console.error(err);
+    setSyncStatus("Firebase error — check config", true);
+  }
+}
+
+function setSyncStatus(msg, isError) {
+  const el = document.getElementById("syncStatus");
+  el.textContent = msg;
+  el.className = "syncStatus" + (isError ? " error" : " online");
+}
+
+function normalizePhone(phone) {
+  return (phone || "").replace(/\D/g, "").replace(/^61/, "0");
+}
+
+function formatPhoneDisplay(value) {
+  let d = normalizePhone(value);
+  if (d.length > 10) d = d.slice(0, 10);
+  if (d.length <= 4) return d;
+  if (d.length <= 7) return d.slice(0, 4) + " " + d.slice(4);
+  return d.slice(0, 4) + " " + d.slice(4, 7) + " " + d.slice(7);
+}
+
+function formatDispatchedAt(job) {
+  if (!job.dispatchedAt) return "";
+  let d;
+  if (job.dispatchedAt.toDate) d = job.dispatchedAt.toDate();
+  else if (job.dispatchedAt.seconds) d = new Date(job.dispatchedAt.seconds * 1000);
+  else return "";
+  return "Dispatched " + d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function saveLastTrip(job) {
+  if (!job.pickup && !job.drop) return;
+  sessionStorage.setItem("lastTrip", JSON.stringify({
+    name: job.name || "",
+    phone: job.phone || "",
+    pickup: job.pickup || "",
+    drop: job.drop || ""
+  }));
+  const btn = document.getElementById("returnTripBtn");
+  if (btn) btn.style.display = "block";
+}
+
+function loadReturnTrip() {
+  const raw = sessionStorage.getItem("lastTrip");
+  if (!raw) return;
+  const t = JSON.parse(raw);
+  document.getElementById("name").value = t.name || "";
+  document.getElementById("phone").value = formatPhoneDisplay(t.phone || "");
+  document.getElementById("pickup").value = t.drop || "";
+  document.getElementById("drop").value = t.pickup || "";
+  switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
+}
+
+function loadOperatorName() {
+  const saved = localStorage.getItem("operatorName");
+  if (saved) document.getElementById("operator").value = saved;
+  document.getElementById("operator").addEventListener("change", function() {
+    localStorage.setItem("operatorName", this.value.trim());
+    rememberOperator(this.value.trim());
   });
-  inputElement.addEventListener('blur', function() {
-    setTimeout(() => {listElement.classList.remove('active');}, 200);
+  document.getElementById("phone").addEventListener("input", onPhoneInput);
+  document.getElementById("phone").addEventListener("blur", lookupCustomerByPhone);
+}
+
+function onPhoneInput(e) {
+  const el = e.target;
+  const formatted = formatPhoneDisplay(el.value);
+  if (el.value !== formatted) el.value = formatted;
+  document.getElementById("phoneHint").classList.remove("show");
+}
+
+async function lookupCustomerByPhone() {
+  if (!firebaseReady) return;
+  const phone = normalizePhone(document.getElementById("phone").value);
+  if (phone.length < 8) return;
+  try {
+    const doc = await db.collection("customers").doc(phone).get();
+    if (doc.exists) {
+      const c = doc.data();
+      if (c.name) document.getElementById("name").value = c.name;
+      if (c.pickup) document.getElementById("pickup").value = c.pickup;
+      if (c.drop) document.getElementById("drop").value = c.drop;
+      if (c.phone) document.getElementById("phone").value = formatPhoneDisplay(c.phone);
+      else document.getElementById("phone").value = formatPhoneDisplay(phone);
+      document.getElementById("phoneHint").classList.add("show");
+    }
+  } catch (e) { console.error(e); }
+}
+
+async function saveCustomerRecord(job) {
+  if (!firebaseReady || !job.phone) return;
+  const phone = normalizePhone(job.phone);
+  if (phone.length < 8) return;
+  await db.collection("customers").doc(phone).set({
+    phone: phone,
+    name: job.name || "",
+    pickup: job.pickup || "",
+    drop: job.drop || "",
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+}
+
+function rememberOperator(name) {
+  if (!name) return;
+  const list = JSON.parse(localStorage.getItem("operatorList") || "[]");
+  if (!list.includes(name)) {
+    list.unshift(name);
+    localStorage.setItem("operatorList", JSON.stringify(list.slice(0, 12)));
+  }
+  updateOperatorDatalist();
+}
+
+function updateOperatorDatalist() {
+  const list = JSON.parse(localStorage.getItem("operatorList") || "[]");
+  const dl = document.getElementById("operatorList");
+  dl.innerHTML = "";
+  list.forEach(function(n) {
+    const o = document.createElement("option");
+    o.value = n;
+    dl.appendChild(o);
   });
 }
 
-function getPlacePredictions(input, callback) {
-  autocompleteService.getPlacePredictions({
-    input,
-    componentRestrictions: { country: 'au' },
-    types: ['geocode', 'establishment']
-  }, (predictions, status) => {
-    if (status === google.maps.places.PlacesServiceStatus.OK && predictions) callback(predictions.slice(0, 5));
-    else callback([]);
+async function getNextJobId() {
+  const ref = db.collection("counters").doc("jobs");
+  return db.runTransaction(async function(tx) {
+    const doc = await tx.get(ref);
+    const cur = doc.exists ? doc.data().count : 999;
+    const next = cur + 1;
+    tx.set(ref, { count: next }, { merge: true });
+    return next;
   });
 }
 
-function titleCase(str){return str.toLowerCase().split(' ').filter(w=>w).map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ');}
-function getTodayDate() {const today = new Date();const year = today.getFullYear();const month = String(today.getMonth() + 1).padStart(2, '0');const day = String(today.getDate()).padStart(2, '0');return `${year}-${month}-${day}`;}
-function formatDateDisplay(dateStr) {if(!dateStr) return "Today";const today = new Date();const todayStr = getTodayDate();if(dateStr === todayStr) return "Today";const date = new Date(dateStr + 'T00:00:00');const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };return date.toLocaleDateString('en-AU', options);}
-function pluralize(count, singular, plural) { count = parseInt(count); if(count === 1) return `${count} ${singular}`; return `${count} ${plural}`; }
+function collectJobData(jobId, status) {
+  let date = document.getElementById("date").value;
+  const timeInput = document.getElementById("time").value;
+  if (selectedTime === "Later" && !date && timeInput) date = getTodayDate();
 
-document.getElementById("time").addEventListener("input", function(e){
-  let value = e.target.value.replace(/[^0-9]/g, "");
-  if(value.length > 4) value = value.slice(0, 4);
-  if(value.length <= 2){ e.target.value = value; }
-  else { e.target.value = value.slice(0, 2) + ":" + value.slice(2);}
-  updateTimeDisplay();
-});
-
-function setTime(t){
-  if(selectedTime === t){
-    selectedTime="None";
-    ["quickBtn","readyBtn","laterBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
-  }
-  else{
-    selectedTime=t;
-    ["quickBtn","readyBtn","laterBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
-    if(t==="Quick") quickBtn.classList.add("glow");
-    if(t==="Ready Now") readyBtn.classList.add("glow");
-    if(t==="Later") laterBtn.classList.add("glow");
-  }
-  let isLater = selectedTime === "Later";
-  document.getElementById("date").disabled = !isLater;
-  document.getElementById("time").disabled = !isLater;
-  document.getElementById("amBtn").disabled = !isLater;
-  document.getElementById("pmBtn").disabled = !isLater;
-  if(!isLater){
-    document.getElementById("date").value = "";
-    document.getElementById("time").value = "";
-    selectedAMPM = "None";
-    document.getElementById("amBtn").classList.remove("glow");
-    document.getElementById("pmBtn").classList.remove("glow");
-  }
-  updateTimeDisplay();
-}
-
-function setAMPM(period){
-  if(selectedAMPM === period){
-    selectedAMPM="None";
-    amBtn.classList.remove("glow");
-    pmBtn.classList.remove("glow");
-  }
-  else{
-    selectedAMPM=period;
-    amBtn.classList.remove("glow");
-    pmBtn.classList.remove("glow");
-    if(period==="AM") amBtn.classList.add("glow");
-    if(period==="PM") pmBtn.classList.add("glow");
-  }
-  updateTimeDisplay();
-}
-
-function updateTimeDisplay(){
-  let date=document.getElementById("date").value;
-  let time=document.getElementById("time").value;
-  let display="Selected: "+selectedTime;
-  if(date) display+=" | Date: "+date;
-  if(time) display+=" | Time: "+time;
-  if(selectedAMPM!=="None") display+=" "+selectedAMPM;
-  timeSelected.innerText=display;
-}
-
-document.getElementById("date").addEventListener("change", updateTimeDisplay);
-document.getElementById("time").addEventListener("change", updateTimeDisplay);
-
-function setVehicle(v){
-  if(selectedVehicle === v){
-    selectedVehicle="None";
-    ["sedanBtn","suvBtn","luxBtn","maxiBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
-  }
-  else{
-    selectedVehicle=v;
-    ["sedanBtn","suvBtn","luxBtn","maxiBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
-    if(v==="Sedan") sedanBtn.classList.add("glow");
-    if(v==="SUV") suvBtn.classList.add("glow");
-    if(v==="Luxury") luxBtn.classList.add("glow");
-    if(v==="MAXI") maxiBtn.classList.add("glow");
-  }
-  vehicleSelected.innerText="Selected: "+selectedVehicle;
-}
-
-function togglePayment(p){
-  let map={"Cabcharge":"cabBtn","MPTP":"mptpBtn","Debit/Credit":"cardBtn","Cash":"cashBtn","Deposit":"depositBtn"};
-  let btn=document.getElementById(map[p]);
-  let depositLinkBox=document.getElementById("depositLink");
-  let depositAmountBox=document.getElementById("depositAmount");
-
-  if(paymentArray.includes(p)){
-    paymentArray=paymentArray.filter(x=>x!==p);
-    btn.classList.remove("glow");
-    if(p==="Deposit"){
-      depositLinkBox.disabled=true;
-      depositLinkBox.value="";
-      depositAmountBox.disabled=true;
-      depositAmountBox.value="";
-    }
-  }
-  else{
-    if(paymentArray.length<2){
-      paymentArray.push(p);
-      btn.classList.add("glow");
-      if(p==="Deposit"){
-        depositLinkBox.disabled=false;
-        depositAmountBox.disabled=false;
-      }
-    }else{
-      alert("Max 2 payments");
-    }
-  }
-  paymentSelected.innerText=paymentArray.join(", ")||"None";
-}
-
-function setPriceType(p){
-  if(priceType === p){
-    priceType="None";
-    meterBtn.classList.remove("glow");
-    setBtn.classList.remove("glow");
-    document.getElementById("price").disabled=true;
-    document.getElementById("price").value="";
-  }
-  else{
-    priceType=p;
-    meterBtn.classList.remove("glow");
-    setBtn.classList.remove("glow");
-    if(p==="Meter Fare"){
-      meterBtn.classList.add("glow");
-      document.getElementById("price").disabled=true;
-      document.getElementById("price").value="";
-    }
-    if(p==="Set Price"){
-      setBtn.classList.add("glow");
-      document.getElementById("price").disabled=false;
-    }
-  }
-  priceSelected.innerText="Selected: "+priceType;
-}
-
-function saveJobToHistory(){
-  let name = titleCase(document.getElementById("name").value);
-  let phone=document.getElementById("phone").value;
-  let pickup=titleCase(document.getElementById("pickup").value);
-  let drop=titleCase(document.getElementById("drop").value);
-  let adults=document.getElementById("adults").value;
-  let kids=document.getElementById("kids").value;
-  let luggage=document.getElementById("luggage").value;
-  let date=document.getElementById("date").value;
-  let time=document.getElementById("time").value;
-  let price=document.getElementById("price").value;
-  let depositLink=document.getElementById("depositLink").value;
-  let depositAmount=document.getElementById("depositAmount").value;
-
-  let job = {
-    id: jobCount,
-    name, phone, pickup, drop, adults, kids, luggage,
-    vehicle:selectedVehicle,
-    payment:paymentArray.slice(),
-    time:selectedTime,
-    date,
-    timeInput:time,
-    ampm:selectedAMPM,
-    priceType,
-    price,
-    depositLink,
-    depositAmount,
-    timestamp: new Date().toLocaleString()
+  return {
+    id: jobId,
+    status: status,
+    operator: document.getElementById("operator").value.trim(),
+    name: titleCase(document.getElementById("name").value),
+    phone: formatPhoneDisplay(document.getElementById("phone").value) || document.getElementById("phone").value,
+    pickup: titleCase(document.getElementById("pickup").value),
+    drop: titleCase(document.getElementById("drop").value),
+    adults: document.getElementById("adults").value,
+    kids: document.getElementById("kids").value,
+    luggage: document.getElementById("luggage").value,
+    vehicle: selectedVehicle,
+    payment: paymentArray.slice(),
+    time: selectedTime,
+    date: date,
+    timeInput: timeInput,
+    ampm: selectedAMPM,
+    priceType: priceType,
+    price: document.getElementById("price").value,
+    depositLink: document.getElementById("depositLink").value,
+    depositAmount: document.getElementById("depositAmount").value,
+    sortKey: computeSortKey(selectedTime, date, timeInput, selectedAMPM),
+    sessionId: sessionId,
+    dispatchedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
   };
-
-  let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];
-  jobs.unshift(job);
-  jobs = jobs.slice(0, 5);
-  localStorage.setItem("jobHistory", JSON.stringify(jobs));
-  updateJobHistoryDropdown();
 }
 
-function updateJobHistoryDropdown(){
-  let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];
-  let select = document.getElementById("jobHistory");
-  select.innerHTML = '<option value="">-- Select Previous Job --</option>';
-  jobs.forEach((job, index) => {
-    let option = document.createElement("option");
-    option.value = index;
-    option.textContent = `${job.name} - ${job.pickup} to ${job.drop}`;
-    select.appendChild(option);
+function computeSortKey(timeType, date, timeInput, ampm) {
+  if (timeType !== "Later" || !date) return Date.now();
+  if (!timeInput) return new Date(date + "T23:59:59").getTime();
+  const parts = timeInput.split(":");
+  let h = parseInt(parts[0], 10) || 0;
+  const m = parseInt(parts[1], 10) || 0;
+  if (ampm === "PM" && h < 12) h += 12;
+  if (ampm === "AM" && h === 12) h = 0;
+  return new Date(date + "T" + String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":00").getTime();
+}
+
+function getJobTimeLabel(job) {
+  if (job.time === "Later" && job.date && job.timeInput) {
+    return formatDateDisplay(job.date) + " · " + job.timeInput + " " + (job.ampm !== "None" ? job.ampm : "");
+  }
+  if (job.time && job.time !== "None") return job.time + " · ASAP";
+  return "ASAP";
+}
+
+function subscribeAvailableJobs() {
+  if (availableUnsub) availableUnsub();
+  availableUnsub = db.collection("jobs")
+    .where("status", "==", "available")
+    .onSnapshot(function(snap) {
+      const changes = snap.docChanges();
+      availableJobs = snap.docs.map(function(d) {
+        return Object.assign({ docId: d.id }, d.data());
+      });
+      availableJobs.sort(function(a, b) {
+        return (a.sortKey || 0) - (b.sortKey || 0);
+      });
+      renderAvailableList();
+      document.getElementById("availableBadge").textContent = availableJobs.length;
+      document.getElementById("availableBadge").style.display = availableJobs.length ? "inline" : "none";
+
+      if (jobsListenerReady) {
+        changes.forEach(function(change) {
+          if (change.type === "added") {
+            const job = change.doc.data();
+            if (job.sessionId !== sessionId) {
+              showNewJobAlert(Object.assign({ docId: change.doc.id }, job));
+            }
+          }
+        });
+      }
+      jobsListenerReady = true;
+    }, function(err) {
+      console.error(err);
+      setSyncStatus("Firestore rules error", true);
+    });
+}
+
+function subscribePreviousJobs() {
+  if (previousUnsub) previousUnsub();
+  previousUnsub = db.collection("jobs")
+    .orderBy("dispatchedAt", "desc")
+    .limit(80)
+    .onSnapshot(function(snap) {
+      previousJobs = snap.docs.map(function(d) {
+        return Object.assign({ docId: d.id }, d.data());
+      }).filter(function(j) { return j.status === "completed"; }).slice(0, 40);
+      renderPreviousList();
+    });
+}
+
+function renderAvailableList() {
+  const el = document.getElementById("availableList");
+  if (!availableJobs.length) {
+    el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No available bookings<br><span style="font-size:12px">Dispatched jobs appear here</span></div>';
+    return;
+  }
+  el.innerHTML = availableJobs.map(function(job) {
+    const asap = job.time !== "Later";
+    const dispatched = formatDispatchedAt(job);
+    const phoneHtml = job.phone
+      ? '<a class="jobPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
+      : "";
+    return '<div class="jobCard" onclick="openJobModal(\'' + job.docId + '\',\'available\')">' +
+      '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span><span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div>' +
+      '<div class="jobName">' + escapeHtml(job.name || "Unknown") + '</div>' +
+      phoneHtml +
+      '<div class="jobRoute">📍 ' + escapeHtml(job.pickup || "—") + '<br>→ ' + escapeHtml(job.drop || "—") + '</div>' +
+      '<div class="jobMeta">' +
+        (dispatched ? '<span class="jobTag dispatched">' + escapeHtml(dispatched) + '</span>' : '') +
+        (asap ? '<span class="jobTag asap">' + escapeHtml(job.time || "ASAP") + '</span>' : '') +
+        '<span class="jobTag">' + escapeHtml(job.vehicle || "—") + '</span>' +
+        (job.operator ? '<span class="jobTag">👤 ' + escapeHtml(job.operator) + '</span>' : '') +
+      '</div></div>';
+  }).join("");
+}
+
+function renderPreviousList() {
+  const el = document.getElementById("previousList");
+  if (!previousJobs.length) {
+    el.innerHTML = '<div class="emptyState"><div class="icon">📋</div>No previous jobs yet</div>';
+    return;
+  }
+  el.innerHTML = previousJobs.map(function(job) {
+    const dispatched = formatDispatchedAt(job);
+    const phoneHtml = job.phone
+      ? '<a class="jobPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
+      : "";
+    return '<div class="jobCard" onclick="openJobModal(\'' + job.docId + '\',\'previous\')">' +
+      '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span><span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div>' +
+      '<div class="jobName">' + escapeHtml(job.name || "Unknown") + '</div>' +
+      phoneHtml +
+      '<div class="jobRoute">📍 ' + escapeHtml(job.pickup || "—") + ' → ' + escapeHtml(job.drop || "—") + '</div>' +
+      '<div class="jobMeta">' +
+        (dispatched ? '<span class="jobTag dispatched">' + escapeHtml(dispatched) + '</span>' : '') +
+        '<span class="jobTag">Completed</span>' +
+        (job.operator ? '<span class="jobTag">👤 ' + escapeHtml(job.operator) + '</span>' : '') +
+      '</div></div>';
+  }).join("");
+}
+
+function escapeHtml(str) {
+  return String(str || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function openJobModal(docId, source) {
+  const job = (source === "available" ? availableJobs : previousJobs).find(function(j) { return j.docId === docId; });
+  if (!job) return;
+
+  document.getElementById("modalJobTitle").textContent = "JOB-" + job.id;
+  const phoneDisplay = job.phone ? formatPhoneDisplay(job.phone) : "—";
+  const phoneLink = job.phone
+    ? '<a class="detailPhone" href="tel:' + normalizePhone(job.phone) + '">📞 ' + escapeHtml(phoneDisplay) + ' — Tap to call</a>'
+    : escapeHtml(phoneDisplay);
+  const rows = [
+    ["Passenger", escapeHtml(job.name || "Unknown") + "<br>" + phoneLink],
+    ["Pickup", job.pickup || "—"],
+    ["Drop-off", job.drop || "—"],
+    ["Pickup Time", getJobTimeLabel(job)],
+    ["Vehicle", job.vehicle || "None"],
+    ["Passengers", "Adults: " + (job.adults || "—") + (job.kids ? " · Kids: " + job.kids : "") + (job.luggage ? " · Luggage: " + job.luggage : "")],
+    ["Payment", (job.payment || []).join(", ") || "None"],
+    ["Price", (job.priceType || "None") + (job.price ? " · $" + job.price : "")],
+    ["Operator", job.operator || "—"]
+  ];
+  if ((job.payment || []).includes("Deposit")) {
+    rows.push(["Deposit", "$" + (job.depositAmount || "—") + (job.depositLink ? "\n" + job.depositLink : "")]);
+  }
+  const dispatched = formatDispatchedAt(job);
+  if (dispatched) rows.splice(3, 0, ["Dispatched", dispatched]);
+
+  document.getElementById("modalJobBody").innerHTML = rows.map(function(r) {
+    const val = r[0] === "Passenger" ? r[1] : escapeHtml(r[1]).replace(/\n/g, "<br>");
+    return '<div class="detailRow"><div class="detailLabel">' + r[0] + '</div><div class="detailValue">' + val + '</div></div>';
+  }).join("");
+
+  let actions = '<button onclick="copyJobMessage(\'' + docId + '\')">Copy Dispatch</button>';
+  actions += '<button onclick="loadJobIntoForm(\'' + docId + '\')">Load to Form</button>';
+  if (job.status === "available") {
+    actions += '<button style="background:#475569" onclick="completeJob(\'' + docId + '\')">Mark Complete</button>';
+  }
+  document.getElementById("modalJobActions").innerHTML = actions;
+  document.getElementById("jobModal").classList.add("open");
+}
+
+function closeJobModal() {
+  document.getElementById("jobModal").classList.remove("open");
+}
+
+function buildDispatchMessage(job) {
+  let date = job.date;
+  if (job.time === "Later" && !date && job.timeInput) date = getTodayDate();
+  const dateFormatted = formatDateDisplay(date);
+  const timeSection = job.time === "Later" && date && job.timeInput
+    ? "🪧 *Pickup Time - " + job.time + "*\n📅 *Date: " + dateFormatted + "*\n⏱️ *Time: " + job.timeInput + " " + job.ampm + "*"
+    : "🪧 *Pickup Time - " + job.time + "*";
+  let passengers = "👥 Adults: " + (job.adults || "None");
+  if (job.kids) passengers += "\n👥 Kids: " + job.kids;
+  if (job.luggage) passengers += "\n👜 Luggage: " + job.luggage;
+  let payment = "💳 " + (job.payment || []).join(", ");
+  if ((job.payment || []).includes("Deposit")) payment += "\n💳 *Deposit Required - $" + job.depositAmount + "*";
+  const op = job.operator ? "\n👤 Operator: " + job.operator : "";
+  return "🚖 TAXI DISPATCH\n🆔 JOB-" + job.id + op + "\n⏰ " + new Date().toLocaleString() + "\n" + timeSection +
+    "\n\n👤 " + job.name + "\n📞 " + job.phone + "\n\n🚗 " + job.vehicle + "\n" + payment +
+    "\n💲 " + job.priceType + " " + (job.price ? "$" + job.price : "") + "\n" + passengers +
+    "\n\n📍 Pickup: " + job.pickup + "\n📍 Drop: " + job.drop;
+}
+
+function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text).then(function() { return true; }).catch(function() {
+      return copyToClipboardFallback(text);
+    });
+  }
+  return Promise.resolve(copyToClipboardFallback(text));
+}
+
+function copyToClipboardFallback(text) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "0";
+    ta.style.left = "0";
+    ta.style.width = "1px";
+    ta.style.height = "1px";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+function openWhatsAppGroup() {
+  const url = "https://chat.whatsapp.com/Fiu6m7Uvlcz0TN49jkV30D?mode=gi_t";
+  const a = document.createElement("a");
+  a.href = url;
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function copyJobMessage(docId) {
+  const job = availableJobs.concat(previousJobs).find(function(j) { return j.docId === docId; });
+  if (!job) return;
+  copyToClipboard(buildDispatchMessage(job)).then(function(ok) {
+    alert(ok ? "Copied ✔" : "Could not copy — select text manually");
   });
 }
 
-function loadSelectedJob(){
-  let select = document.getElementById("jobHistory");
-  let index = select.value;
-  if(index === "") return;
-  let jobs = JSON.parse(localStorage.getItem("jobHistory")) || [];
-  let job = jobs[index];
-  if(!job) return;
+function loadJobIntoForm(docId) {
+  const job = availableJobs.concat(previousJobs).find(function(j) { return j.docId === docId; });
+  if (!job) return;
+  closeJobModal();
+  applyJobToForm(job);
+  switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
+}
 
+async function completeJob(docId) {
+  if (!confirm("Mark this job as complete?")) return;
+  await db.collection("jobs").doc(docId).update({
+    status: "completed",
+    completedAt: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  closeJobModal();
+}
+
+function applyJobToForm(job) {
+  document.getElementById("operator").value = job.operator || "";
   document.getElementById("name").value = job.name || "";
-  document.getElementById("phone").value = job.phone || "";
+  document.getElementById("phone").value = formatPhoneDisplay(job.phone || "");
   document.getElementById("pickup").value = job.pickup || "";
   document.getElementById("drop").value = job.drop || "";
   document.getElementById("adults").value = job.adults || "";
@@ -689,193 +887,373 @@ function loadSelectedJob(){
   document.getElementById("price").value = job.price || "";
   document.getElementById("depositLink").value = job.depositLink || "";
   document.getElementById("depositAmount").value = job.depositAmount || "";
-
   setVehicle(job.vehicle || "None");
   setTime(job.time || "None");
   setAMPM(job.ampm || "None");
   setPriceType(job.priceType || "None");
-
   paymentArray = job.payment || [];
-  ["cabBtn","cardBtn","mptpBtn","cashBtn","depositBtn"].forEach(id=>{document.getElementById(id).classList.remove("glow");});
-
-  paymentArray.forEach(p=>{
-    if(p==="Cabcharge") cabBtn.classList.add("glow");
-    if(p==="Debit/Credit") cardBtn.classList.add("glow");
-    if(p==="MPTP") mptpBtn.classList.add("glow");
-    if(p==="Cash") cashBtn.classList.add("glow");
-    if(p==="Deposit"){
-      depositBtn.classList.add("glow");
-      document.getElementById("depositLink").disabled=false;
-      document.getElementById("depositAmount").disabled=false;
+  ["cabBtn","cardBtn","mptpBtn","cashBtn","depositBtn"].forEach(function(id) {
+    document.getElementById(id).classList.remove("glow");
+  });
+  paymentArray.forEach(function(p) {
+    const map = { Cabcharge:"cabBtn", "Debit/Credit":"cardBtn", MPTP:"mptpBtn", Cash:"cashBtn", Deposit:"depositBtn" };
+    if (map[p]) document.getElementById(map[p]).classList.add("glow");
+    if (p === "Deposit") {
+      document.getElementById("depositLink").disabled = false;
+      document.getElementById("depositAmount").disabled = false;
     }
   });
-
-  paymentSelected.innerText=paymentArray.join(", ")||"None";
-  select.value = "";
+  paymentSelected.innerText = paymentArray.join(", ") || "None";
 }
 
-function dispatch(){
-  let name = titleCase(document.getElementById("name").value);
-  let phone=document.getElementById("phone").value;
-  let pickup=titleCase(document.getElementById("pickup").value);
-  let drop=titleCase(document.getElementById("drop").value);
-  let adults=document.getElementById("adults").value;
-  let kids=document.getElementById("kids").value;
-  let luggage=document.getElementById("luggage").value;
-  let date=document.getElementById("date").value;
-  let time=document.getElementById("time").value;
-  let price=document.getElementById("price").value;
-  let depositAmount=document.getElementById("depositAmount").value;
-
-  if(selectedTime === "Later" && !date && time) {date = getTodayDate();}
-
-  let dateFormatted = formatDateDisplay(date);
-  let timeSection = selectedTime === "Later" && date && time? `🪧 *Pickup Time - ${selectedTime}*\n📅 *Date: ${dateFormatted}*\n⏱️ *Time: ${time} ${selectedAMPM}*`: `🪧 *Pickup Time - ${selectedTime}*`;
-
-  let passengersSection = `👥 Adults: ${adults || "None"}`;
-  if(kids) passengersSection += `\n👥 Kids: ${kids}`;
-  if(luggage) passengersSection += `\n👜 Luggage: ${luggage}`;
-
-  let paymentSection = `💳 ${paymentArray.join(", ")}`;
-  if(paymentArray.includes("Deposit")){
-    paymentSection += `\n💳 *Deposit Required - $${depositAmount}*`;
-  }
-
-  let message=`🚖 TAXI DISPATCH\n🆔 JOB-${jobCount}\n⏰ ${new Date().toLocaleString()}\n${timeSection}\n\n👤 ${name}\n📞 ${phone}\n\n🚗 ${selectedVehicle}\n${paymentSection}\n💲 ${priceType} ${price ? "$"+price : ""}\n${passengersSection}\n\n📍 Pickup: ${pickup}\n📍 Drop: ${drop}`;
-
-  navigator.clipboard.writeText(message);
-  saveJobToHistory();
-  alert("Copied ✔");
-  jobCount++;
-  localStorage.setItem("jobCount", jobCount);
-  window.open("https://chat.whatsapp.com/Fiu6m7Uvlcz0TN49jkV30D?mode=gi_t","_blank");
+function playNewJobTune() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const t0 = audioCtx.currentTime;
+    const melody = [
+      { f: 523.25, s: 0.00, d: 0.18, vol: 0.28 },
+      { f: 659.25, s: 0.14, d: 0.18, vol: 0.28 },
+      { f: 783.99, s: 0.28, d: 0.22, vol: 0.30 },
+      { f: 1046.50, s: 0.44, d: 0.35, vol: 0.32 },
+      { f: 880.00, s: 0.72, d: 0.25, vol: 0.26 },
+      { f: 1046.50, s: 0.95, d: 0.55, vol: 0.30 },
+      { f: 1318.51, s: 1.35, d: 0.65, vol: 0.24 }
+    ];
+    melody.forEach(function(n) {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(n.f, t0 + n.s);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const start = t0 + n.s;
+      const end = start + n.d;
+      gain.gain.setValueAtTime(0.001, start);
+      gain.gain.exponentialRampToValueAtTime(n.vol, start + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.001, end);
+      osc.start(start);
+      osc.stop(end + 0.02);
+    });
+  } catch (e) { console.warn("Audio blocked", e); }
 }
 
-function sendQuote(){
-  let name = titleCase(document.getElementById("name").value);
-  let phone = document.getElementById("phone").value.replace(/\s+/g,'');
-  let pickup = titleCase(document.getElementById("pickup").value);
-  let drop = titleCase(document.getElementById("drop").value);
-  let date = document.getElementById("date").value;
-  let time = document.getElementById("time").value;
-  let adults = document.getElementById("adults").value;
-  let kids = document.getElementById("kids").value;
-  let luggage = document.getElementById("luggage").value;
-  let price = document.getElementById("price").value;
-
-  if(!name || !phone) {alert("Please enter Passenger Name and Phone Number");return;}
-  if(!price) {alert("Please enter price for quote");return;}
-
-  if(selectedTime === "Later"){
-    if(!date || !time){
-      alert("Please select date and time for Later pickup");
-      return;
-    }
-  }
-
-  let timeDisplay = selectedTime === "Later" && date && time ? `${formatDateDisplay(date)}, ${time} ${selectedAMPM}` : "ASAP";
-  let passengerInfo = "";
-  let passengerArray = [];
-  if(adults) {passengerArray.push(pluralize(adults, "Adult", "Adults"));}
-  if(kids) {passengerArray.push(pluralize(kids, "Kid", "Kids"));}
-  passengerInfo = passengerArray.join(", ");
-
-  let luggageInfo = "";
-  if(luggage) {luggageInfo = `\nLuggage: ${pluralize(luggage, "Bag", "Bags")}`;}
-
-  let msg = `Hi ${name},\n\nThank you for your inquiry.\n\nTrip Details:\nDate & Time: ${timeDisplay}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}${luggageInfo}\nVehicle: ${selectedVehicle}\nEstimated Fare: $${price} GST Inclusive\n\nTo confirm your booking or discuss price, simply reply to this message or give us a call.${SIGNATURE}`;
-
-  navigator.clipboard.writeText(msg);
-  saveJobToHistory();
-  window.location.href="sms:"+phone+"&body="+encodeURIComponent(msg);
+function showNewJobAlert(job) {
+  playNewJobTune();
+  const toast = document.getElementById("alertToast");
+  document.getElementById("alertText").textContent =
+    "JOB-" + job.id + " · " + (job.name || "New passenger") + " · " + (job.pickup || "");
+  toast.classList.add("show");
+  toast.dataset.docId = job.docId;
+  if (alertTimeout) clearTimeout(alertTimeout);
+  alertTimeout = setTimeout(dismissAlert, 8000);
+  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 }
 
-function sendConfirmation(){
-  let name = titleCase(document.getElementById("name").value);
-  let phone = document.getElementById("phone").value.replace(/\s+/g,'');
-  let pickup = titleCase(document.getElementById("pickup").value);
-  let drop = titleCase(document.getElementById("drop").value);
-  let date = document.getElementById("date").value;
-  let time = document.getElementById("time").value;
-  let adults = document.getElementById("adults").value;
-  let kids = document.getElementById("kids").value;
-  let luggage = document.getElementById("luggage").value;
-  let depositLink = document.getElementById("depositLink").value;
-  let depositAmount = document.getElementById("depositAmount").value;
+function dismissAlert() {
+  document.getElementById("alertToast").classList.remove("show");
+  if (alertTimeout) clearTimeout(alertTimeout);
+}
 
-  if(!name || !phone) {alert("Please enter Passenger Name and Phone Number");return;}
+document.getElementById("alertToast").addEventListener("click", function() {
+  const docId = this.dataset.docId;
+  dismissAlert();
+  if (docId) {
+    switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
+    setTimeout(function() { openJobModal(docId, "available"); }, 200);
+  }
+});
 
-  if(paymentArray.includes("Deposit")){
-    if(!date || !time){
-      alert("Please select date and time for deposit booking");
+function clearFormRefresh() {
+  location.reload();
+}
+
+function clearForm() {
+  ["name","phone","pickup","drop","adults","kids","luggage","date","time","price","depositLink","depositAmount"].forEach(function(id) {
+    document.getElementById(id).value = "";
+  });
+  document.getElementById("phoneHint").classList.remove("show");
+  setVehicle("None"); setTime("None"); setAMPM("None"); setPriceType("None");
+  paymentArray = [];
+  ["cabBtn","cardBtn","mptpBtn","cashBtn","depositBtn"].forEach(function(id) {
+    document.getElementById(id).classList.remove("glow");
+  });
+  document.getElementById("depositLink").disabled = true;
+  document.getElementById("depositAmount").disabled = true;
+  paymentSelected.innerText = "None";
+}
+
+async function dispatch() {
+  if (!firebaseReady) { alert("Firebase not connected"); return; }
+  const btn = document.getElementById("dispatchBtn");
+  btn.disabled = true;
+  try {
+    const jobId = await getNextJobId();
+    const job = collectJobData(jobId, "available");
+    const message = buildDispatchMessage(job);
+    await db.collection("jobs").add(job);
+    await saveCustomerRecord(job);
+    saveLastTrip(job);
+    rememberOperator(job.operator);
+    clearForm();
+    switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
+
+    const copied = await copyToClipboard(message);
+    if (copied) {
+      alert("Dispatched ✔ JOB-" + jobId + " — copied!");
+    } else {
+      alert("Dispatched ✔ JOB-" + jobId + "\n\nTap Available → job card → Copy Dispatch");
+    }
+    openWhatsAppGroup();
+  } catch (err) {
+    console.error(err);
+    alert("Dispatch failed: " + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function initializeGoogleMaps() {
+  if (!window.google) return;
+  autocompleteService = new google.maps.places.AutocompleteService();
+  map = new google.maps.Map(document.createElement("div"));
+  setupAutocomplete("pickup", "pickupList");
+  setupAutocomplete("drop", "dropList");
+}
+
+function setupAutocomplete(inputId, listId) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  let timer;
+  input.addEventListener("input", function() {
+    clearTimeout(timer);
+    const val = this.value.trim();
+    if (val.length < 2) { list.classList.remove("active"); return; }
+    timer = setTimeout(function() {
+      getPlacePredictions(val, function(preds) {
+        list.innerHTML = "";
+        const sorted = sortPredictionsLocalFirst(preds);
+        sorted.forEach(function(p) {
+          const local = isLocalArea(p.description);
+          const item = document.createElement("div");
+          item.className = "autocomplete-item" + (local ? " geelong-highlight" : "");
+          item.innerHTML = '<span class="pac-icon">📍</span>' + p.description;
+          item.onclick = function() {
+            input.value = p.description.replace(/\s*,?\s*Australia\s*$/i, "").replace(/\s*,?\s*$/, "");
+            list.classList.remove("active");
+          };
+          list.appendChild(item);
+        });
+        list.classList.toggle("active", sorted.length > 0);
+      });
+    }, 300);
+  });
+  input.addEventListener("blur", function() { setTimeout(function() { list.classList.remove("active"); }, 200); });
+}
+
+function geelongAreaRank(description) {
+  const d = description.toLowerCase();
+  if (/\bgeelong\b/.test(d)) return 0;
+  for (let i = 0; i < GEELONG_SUBURBS.length; i++) {
+    if (d.includes(GEELONG_SUBURBS[i])) return 1;
+  }
+  if (/\bvic\b|victoria/.test(d)) return 2;
+  return 3;
+}
+
+function isLocalArea(description) {
+  return geelongAreaRank(description) <= 1;
+}
+
+function sortPredictionsLocalFirst(predictions) {
+  return predictions.slice().sort(function(a, b) {
+    return geelongAreaRank(a.description) - geelongAreaRank(b.description);
+  }).slice(0, 8);
+}
+
+function getPlacePredictions(input, cb) {
+  const request = {
+    input: input,
+    componentRestrictions: { country: "au" },
+    types: ["geocode", "establishment"],
+    location: new google.maps.LatLng(GEELONG_CENTER.lat, GEELONG_CENTER.lng),
+    radius: GEELONG_BIAS_RADIUS
+  };
+  autocompleteService.getPlacePredictions(request, function(preds, status) {
+    if (status !== google.maps.places.PlacesServiceStatus.OK || !preds) {
+      cb([]);
       return;
     }
-    if(!depositLink || !depositAmount){
-      alert("Please enter deposit link and amount");
-      return;
-    }
+    cb(sortPredictionsLocalFirst(preds));
+  });
+}
+
+function titleCase(str) {
+  return str.toLowerCase().split(" ").filter(Boolean).map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join(" ");
+}
+function getTodayDate() {
+  const t = new Date();
+  return t.getFullYear() + "-" + String(t.getMonth()+1).padStart(2,"0") + "-" + String(t.getDate()).padStart(2,"0");
+}
+function formatDateDisplay(d) {
+  if (!d) return "Today";
+  if (d === getTodayDate()) return "Today";
+  return new Date(d + "T00:00:00").toLocaleDateString("en-AU", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+}
+function pluralize(c, s, p) { c = parseInt(c,10); return c === 1 ? c + " " + s : c + " " + p; }
+
+document.getElementById("time").addEventListener("input", function(e) {
+  let v = e.target.value.replace(/[^0-9]/g, "");
+  if (v.length > 4) v = v.slice(0, 4);
+  e.target.value = v.length <= 2 ? v : v.slice(0,2) + ":" + v.slice(2);
+  updateTimeDisplay();
+});
+
+function setTime(t) {
+  if (selectedTime === t) { selectedTime = "None"; ["quickBtn","readyBtn","laterBtn"].forEach(function(id) { document.getElementById(id).classList.remove("glow"); }); }
+  else {
+    selectedTime = t;
+    ["quickBtn","readyBtn","laterBtn"].forEach(function(id) { document.getElementById(id).classList.remove("glow"); });
+    if (t === "Quick") quickBtn.classList.add("glow");
+    if (t === "Ready Now") readyBtn.classList.add("glow");
+    if (t === "Later") laterBtn.classList.add("glow");
   }
+  const later = selectedTime === "Later";
+  date.disabled = !later; time.disabled = !later; amBtn.disabled = !later; pmBtn.disabled = !later;
+  if (!later) { date.value = ""; time.value = ""; selectedAMPM = "None"; amBtn.classList.remove("glow"); pmBtn.classList.remove("glow"); }
+  updateTimeDisplay();
+}
 
-  if(selectedTime === "Later"){
-    if(!date || !time){
-      alert("Please select date and time for Later pickup");
-      return;
-    }
+function setAMPM(p) {
+  if (selectedAMPM === p) { selectedAMPM = "None"; amBtn.classList.remove("glow"); pmBtn.classList.remove("glow"); }
+  else { selectedAMPM = p; amBtn.classList.remove("glow"); pmBtn.classList.remove("glow"); if (p === "AM") amBtn.classList.add("glow"); if (p === "PM") pmBtn.classList.add("glow"); }
+  updateTimeDisplay();
+}
+
+function updateTimeDisplay() {
+  let d = "Selected: " + selectedTime;
+  if (date.value) d += " | " + date.value;
+  if (time.value) d += " | " + time.value;
+  if (selectedAMPM !== "None") d += " " + selectedAMPM;
+  timeSelected.innerText = d;
+}
+date.addEventListener("change", updateTimeDisplay);
+time.addEventListener("change", updateTimeDisplay);
+
+function setVehicle(v) {
+  if (selectedVehicle === v) { selectedVehicle = "None"; ["sedanBtn","suvBtn","luxBtn","maxiBtn"].forEach(function(id) { document.getElementById(id).classList.remove("glow"); }); }
+  else {
+    selectedVehicle = v;
+    ["sedanBtn","suvBtn","luxBtn","maxiBtn"].forEach(function(id) { document.getElementById(id).classList.remove("glow"); });
+    if (v === "Sedan") sedanBtn.classList.add("glow");
+    if (v === "SUV") suvBtn.classList.add("glow");
+    if (v === "Luxury") luxBtn.classList.add("glow");
+    if (v === "MAXI") maxiBtn.classList.add("glow");
   }
+  vehicleSelected.innerText = "Selected: " + selectedVehicle;
+}
 
-  if(selectedTime === "Later" && !date && time) {date = getTodayDate();}
-
-  let msg;
-
-  if(paymentArray.includes("Deposit") && depositLink && depositAmount){
-    let dateDisplay = formatDateDisplay(date);
-    let passengerInfo = "";
-    let passengerArray = [];
-    if(adults) {passengerArray.push(pluralize(adults, "Adult", "Adults"));}
-    if(kids) {passengerArray.push(pluralize(kids, "Kid", "Kids"));}
-    passengerInfo = passengerArray.join(", ");
-
-    let luggageInfo = "";
-    if(luggage) {luggageInfo = `\nLuggage: ${pluralize(luggage, "Bag", "Bags")}`;}
-
-    msg =`Hi ${name},\n\nYour taxi booking has been confirmed.\n\nDate & Time: ${dateDisplay}, ${time} ${selectedAMPM}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}${luggageInfo}\nVehicle: ${selectedVehicle}\n\nPlease use the link below to make the upfront payment of $${depositAmount}.\n\n${depositLink}\n\nPlease contact us immediately if any changes are required.${SIGNATURE}`;
-  }
-  else if(selectedTime === "Later" && date && time) {
-    let dateDisplay = formatDateDisplay(date);
-    let passengerInfo = "";
-    let passengerArray = [];
-    if(adults) {passengerArray.push(pluralize(adults, "Adult", "Adults"));}
-    if(kids) {passengerArray.push(pluralize(kids, "Kid", "Kids"));}
-    passengerInfo = passengerArray.join(", ");
-    let luggageInfo = "";
-    if(luggage) {luggageInfo = `\nLuggage: ${pluralize(luggage, "Bag", "Bags")}`;}
-
-    msg =`Hi ${name},\n\nYour taxi booking has been Confirmed.\n\nDate & Time: ${dateDisplay}, ${time} ${selectedAMPM}\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\nPassengers: ${passengerInfo}${luggageInfo}\nVehicle: ${selectedVehicle}\n\nPlease contact us immediately if any changes are required.\n\nThank you for choosing our service.${SIGNATURE}`;
+function togglePayment(p) {
+  const map = { Cabcharge:"cabBtn", MPTP:"mptpBtn", "Debit/Credit":"cardBtn", Cash:"cashBtn", Deposit:"depositBtn" };
+  const btn = document.getElementById(map[p]);
+  if (paymentArray.includes(p)) {
+    paymentArray = paymentArray.filter(function(x) { return x !== p; });
+    btn.classList.remove("glow");
+    if (p === "Deposit") { depositLink.disabled = true; depositLink.value = ""; depositAmount.disabled = true; depositAmount.value = ""; }
   } else {
-    msg =`Hi ${name},\n\nYour Taxi booking is Confirmed.\n\nPickup Address: ${pickup}\nDrop-off Address: ${drop}\n\nYour driver will be there shortly.\n\nThank you for choosing our service.${SIGNATURE}`;
+    if (paymentArray.length < 2) {
+      paymentArray.push(p); btn.classList.add("glow");
+      if (p === "Deposit") { depositLink.disabled = false; depositAmount.disabled = false; }
+    } else alert("Max 2 payments");
   }
-
-  window.location.href="sms:"+phone+"&body="+encodeURIComponent(msg);
+  paymentSelected.innerText = paymentArray.join(", ") || "None";
 }
 
-function sendFollowUp(){
-  let name = titleCase(document.getElementById("name").value);
-  let phone = document.getElementById("phone").value.replace(/\s+/g,'');
-  if(!name || !phone) {alert("Please enter Passenger Name and Phone Number");return;}
-
-  let msg =`Hi ${name},\n\nThanks for riding with Geelong City Cabs today.\nWe're here 24/7 for all your travel needs.${SIGNATURE}`;
-
-  window.location.href="sms:"+phone+"&body="+encodeURIComponent(msg);
+function setPriceType(p) {
+  if (priceType === p) {
+    priceType = "None"; meterBtn.classList.remove("glow"); setBtn.classList.remove("glow");
+    price.disabled = true; price.value = "";
+  } else {
+    priceType = p; meterBtn.classList.remove("glow"); setBtn.classList.remove("glow");
+    if (p === "Meter Fare") { meterBtn.classList.add("glow"); price.disabled = true; price.value = ""; }
+    if (p === "Set Price") { setBtn.classList.add("glow"); price.disabled = false; }
+  }
+  priceSelected.innerText = "Selected: " + priceType;
 }
 
-window.addEventListener("DOMContentLoaded", function(){
-  updateJobHistoryDropdown();
-  const script = document.createElement('script');
-  script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyDMA_Frd6ut6hv4s0YnoWoYdI4hRoEWZs4&libraries=places`;
-  script.async = true;
-  script.defer = true;
-  script.onload = initializeGoogleMaps;
-  document.head.appendChild(script);
+function sendQuote() {
+  const name = titleCase(document.getElementById("name").value);
+  const phone = document.getElementById("phone").value.replace(/\s+/g, "");
+  const pickup = titleCase(document.getElementById("pickup").value);
+  const drop = titleCase(document.getElementById("drop").value);
+  const dateVal = document.getElementById("date").value;
+  const timeVal = document.getElementById("time").value;
+  const adults = document.getElementById("adults").value;
+  const kids = document.getElementById("kids").value;
+  const luggage = document.getElementById("luggage").value;
+  const priceVal = document.getElementById("price").value;
+  if (!name || !phone) { alert("Please enter Passenger Name and Phone Number"); return; }
+  if (!priceVal) { alert("Please enter price for quote"); return; }
+  if (selectedTime === "Later" && (!dateVal || !timeVal)) { alert("Please select date and time for Later pickup"); return; }
+  const timeDisplay = selectedTime === "Later" && dateVal && timeVal ? formatDateDisplay(dateVal) + ", " + timeVal + " " + selectedAMPM : "ASAP";
+  const pa = []; if (adults) pa.push(pluralize(adults,"Adult","Adults")); if (kids) pa.push(pluralize(kids,"Kid","Kids"));
+  const msg = "Hi " + name + ",\n\nThank you for your inquiry.\n\nTrip Details:\nDate & Time: " + timeDisplay + "\nPickup Address: " + pickup + "\nDrop-off Address: " + drop + "\nPassengers: " + pa.join(", ") + (luggage ? "\nLuggage: " + pluralize(luggage,"Bag","Bags") : "") + "\nVehicle: " + selectedVehicle + "\nEstimated Fare: $" + priceVal + " GST Inclusive\n\nTo confirm your booking or discuss price, simply reply to this message or give us a call." + SIGNATURE;
+  copyToClipboard(msg);
+  window.location.href = "sms:" + phone + "&body=" + encodeURIComponent(msg);
+}
+
+function sendConfirmation() {
+  const name = titleCase(document.getElementById("name").value);
+  const phone = document.getElementById("phone").value.replace(/\s+/g, "");
+  const pickup = titleCase(document.getElementById("pickup").value);
+  const drop = titleCase(document.getElementById("drop").value);
+  let dateVal = document.getElementById("date").value;
+  const timeVal = document.getElementById("time").value;
+  const adults = document.getElementById("adults").value;
+  const kids = document.getElementById("kids").value;
+  const luggage = document.getElementById("luggage").value;
+  const depositLink = document.getElementById("depositLink").value;
+  const depositAmount = document.getElementById("depositAmount").value;
+  if (!name || !phone) { alert("Please enter Passenger Name and Phone Number"); return; }
+  if (paymentArray.includes("Deposit")) {
+    if (!dateVal || !timeVal) { alert("Please select date and time for deposit booking"); return; }
+    if (!depositLink || !depositAmount) { alert("Please enter deposit link and amount"); return; }
+  }
+  if (selectedTime === "Later" && (!dateVal || !timeVal)) { alert("Please select date and time for Later pickup"); return; }
+  if (selectedTime === "Later" && !dateVal && timeVal) dateVal = getTodayDate();
+  let msg;
+  const pa = []; if (adults) pa.push(pluralize(adults,"Adult","Adults")); if (kids) pa.push(pluralize(kids,"Kid","Kids"));
+  const lug = luggage ? "\nLuggage: " + pluralize(luggage,"Bag","Bags") : "";
+  if (paymentArray.includes("Deposit") && depositLink && depositAmount) {
+    msg = "Hi " + name + ",\n\nYour taxi booking has been confirmed.\n\nDate & Time: " + formatDateDisplay(dateVal) + ", " + timeVal + " " + selectedAMPM + "\nPickup Address: " + pickup + "\nDrop-off Address: " + drop + "\nPassengers: " + pa.join(", ") + lug + "\nVehicle: " + selectedVehicle + "\n\nPlease use the link below to make the upfront payment of $" + depositAmount + ".\n\n" + depositLink + "\n\nPlease contact us immediately if any changes are required." + SIGNATURE;
+  } else if (selectedTime === "Later" && dateVal && timeVal) {
+    msg = "Hi " + name + ",\n\nYour taxi booking has been Confirmed.\n\nDate & Time: " + formatDateDisplay(dateVal) + ", " + timeVal + " " + selectedAMPM + "\nPickup Address: " + pickup + "\nDrop-off Address: " + drop + "\nPassengers: " + pa.join(", ") + lug + "\nVehicle: " + selectedVehicle + "\n\nPlease contact us immediately if any changes are required.\n\nThank you for choosing our service." + SIGNATURE;
+  } else {
+    msg = "Hi " + name + ",\n\nYour Taxi booking is Confirmed.\n\nPickup Address: " + pickup + "\nDrop-off Address: " + drop + "\n\nYour driver will be there shortly.\n\nThank you for choosing our service." + SIGNATURE;
+  }
+  window.location.href = "sms:" + phone + "&body=" + encodeURIComponent(msg);
+}
+
+function sendFollowUp() {
+  const name = titleCase(document.getElementById("name").value);
+  const phone = document.getElementById("phone").value.replace(/\s+/g, "");
+  if (!name || !phone) { alert("Please enter Passenger Name and Phone Number"); return; }
+  const msg = "Hi " + name + ",\n\nThanks for riding with Geelong City Cabs today.\nWe're here 24/7 for all your travel needs." + SIGNATURE;
+  window.location.href = "sms:" + phone + "&body=" + encodeURIComponent(msg);
+}
+
+window.addEventListener("DOMContentLoaded", function() {
+  initializeFirebase();
+  updateOperatorDatalist();
+  if (sessionStorage.getItem("lastTrip")) {
+    document.getElementById("returnTripBtn").style.display = "block";
+  }
+  document.body.addEventListener("click", function() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }, { once: true });
+  const s = document.createElement("script");
+  s.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAPS_API_KEY + "&libraries=places";
+  s.async = true; s.defer = true; s.onload = initializeGoogleMaps;
+  document.head.appendChild(s);
 });
 </script>
 </body>
