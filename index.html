@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -197,6 +197,8 @@ button:disabled{
   background:#1e293b;border:1px solid #334155;border-radius:10px;
   padding:10px;cursor:pointer;
 }
+.jobCardAvailable{border-color:#2563eb;background:#1a2744}
+.jobCardAccepted{border-color:#facc15;background:#1c2a1c}
 .jobCardTop{display:flex;justify-content:space-between;gap:8px}
 .jobId{font-weight:700;color:#facc15;font-size:13px}
 .jobTime{font-size:11px;color:#94a3b8;text-align:right}
@@ -206,19 +208,67 @@ button:disabled{
 .jobTag{font-size:10px;padding:2px 8px;border-radius:6px;background:#334155;color:#cbd5e1}
 .jobTag.asap{background:#10b98133;color:#34d399}
 .jobTag.dispatched{background:#3b82f633;color:#93c5fd}
+.jobTag.accepted{background:#facc1533;color:#facc15;font-weight:700}
+.jobTag.completedBy{background:#64748b;color:#e2e8f0}
+.acceptedBanner{
+  margin-top:8px;padding:7px 10px;border-radius:8px;
+  background:#facc1522;border:1px solid #facc1555;
+  color:#facc15;font-size:13px;font-weight:800;text-align:center;
+}
+.jobActions{display:flex;gap:6px;margin-top:10px}
+.jobActions button{flex:1;margin:0;padding:10px;font-size:13px}
+.btnAccept{background:#10b981!important}
+.btnComplete{background:#059669!important}
+.btnRecall{background:#dc2626!important;flex:0.85}
 .jobPhone{
   display:inline-block;margin:4px 0 2px;
   color:#38bdf8;font-size:13px;font-weight:700;
   text-decoration:none;padding:4px 0;
 }
 .jobPhone:active{opacity:.8}
-.returnTripBtn{
-  width:100%;background:#0ea5e9!important;
-  margin:3px 0 2px;padding:10px;
-}
 .detailPhone{color:#38bdf8;font-weight:700;text-decoration:none}
 .emptyState{text-align:center;padding:30px 16px;color:#94a3b8;font-size:13px}
 .listHeader{font-size:14px;color:#94a3b8;margin-bottom:4px}
+.prevHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.prevHeader h3{margin:0}
+.btnFilter{background:#475569!important;padding:8px 14px;font-size:13px;margin:0}
+.filterPanel{
+  background:#1e293b;border:1px solid #334155;border-radius:10px;
+  padding:10px;margin-bottom:8px;display:none;
+}
+.filterPanel.open{display:block}
+.filterLabel{font-size:11px;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;font-weight:700}
+.filterRow{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.filterOpBtn{flex:1;min-width:28%;font-size:11px;padding:8px 4px;margin:0}
+.filterTypeBtn{flex:1;font-size:12px;padding:10px;margin:0}
+.filterOpBtn.selected,.filterTypeBtn.selected{
+  background:#facc15!important;color:#000!important;
+  box-shadow:0 0 8px #facc15;
+}
+.filterSearchRow{display:flex;gap:6px}
+.filterSearchRow button{flex:1;margin:0}
+.jobCardTopRight{display:flex;align-items:flex-start;gap:4px}
+.jobDelete{
+  background:transparent!important;padding:0 4px;margin:0;
+  font-size:15px;box-shadow:none;border:none;cursor:pointer;line-height:1;
+}
+#pinModal.open{align-items:center;justify-content:center;padding:16px}
+#fareModal.open{align-items:center;justify-content:center;padding:16px}
+.pinModalSheet input{text-align:center;font-size:22px;letter-spacing:6px}
+.fareInputWrap{
+  display:flex;align-items:center;background:#0f172a;
+  border:2px solid #334155;border-radius:10px;padding:6px 12px;margin:10px 0;
+}
+.farePrefix{font-size:32px;color:#4ade80;font-weight:700;padding-right:4px}
+.fareInputWrap input{
+  border:none;background:transparent;font-size:32px;color:#fff;
+  flex:1;padding:10px 4px;outline:none;width:100%;
+}
+.jobTag.fareTag{background:#15803d;color:#fff;font-weight:700}
+.jobFare{display:block;margin-top:4px;font-size:16px;font-weight:700;color:#4ade80}
+.pinActions{display:flex;gap:8px;margin-top:10px}
+.pinActions button{flex:1;margin:0}
+.btnPinDelete{background:#dc2626!important}
 
 .modalOverlay{
   display:none;position:fixed;inset:0;
@@ -291,8 +341,6 @@ button:disabled{
     <input id="drop" placeholder="Drop Location" autocomplete="off">
     <div id="dropList" class="autocomplete-list"></div>
   </div>
-
-  <button id="returnTripBtn" type="button" class="returnTripBtn" style="display:none" onclick="loadReturnTrip()">↩ Return Trip (swap pickup &amp; drop)</button>
 
   <div class="section">
     <h3>Pickup Time</h3>
@@ -370,15 +418,59 @@ button:disabled{
 <!-- TAB 2: AVAILABLE BOOKINGS -->
 <div id="tabAvailable" class="tabPanel">
   <h3>Available Bookings</h3>
-  <div class="listHeader">Sorted by pickup date &amp; time</div>
+  <div class="listHeader">Accept jobs · Accepted jobs show in yellow</div>
   <div id="availableList" class="jobList"></div>
 </div>
 
 <!-- TAB 3: PREVIOUS JOBS -->
 <div id="tabPrevious" class="tabPanel">
-  <h3>Previous Jobs</h3>
-  <div class="listHeader">Tap to view or reload into New Booking</div>
+  <div class="prevHeader">
+    <h3>Previous Jobs</h3>
+    <button class="btnFilter" onclick="toggleFilterPanel()">Filter</button>
+  </div>
+  <div id="filterPanel" class="filterPanel">
+    <div class="filterLabel">Operator</div>
+    <div class="filterRow" id="operatorFilterRow"></div>
+    <div class="filterLabel">Type</div>
+    <div class="filterRow">
+      <button id="filterDispatched" class="filterTypeBtn" onclick="setFilterType('dispatched')">Dispatched</button>
+      <button id="filterCompleted" class="filterTypeBtn" onclick="setFilterType('completed')">Completed</button>
+    </div>
+    <div class="filterSearchRow">
+      <button style="background:#2563eb" onclick="runPreviousFilter()">Search</button>
+      <button style="background:#64748b" onclick="clearPreviousFilter()">Clear</button>
+    </div>
+  </div>
+  <div id="previousListHint" class="listHeader">Tap to view or reload into New Booking</div>
   <div id="previousList" class="jobList"></div>
+</div>
+
+<!-- PIN DELETE MODAL -->
+<div id="pinModal" class="modalOverlay" onclick="if(event.target===this)closePinModal()">
+  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
+    <h3 style="color:#facc15;margin-bottom:10px;text-align:center">Enter PIN to Delete</h3>
+    <input id="pinInput" type="tel" inputmode="numeric" maxlength="4" placeholder="••••">
+    <div class="pinActions">
+      <button class="btnPinDelete" onclick="confirmDeleteJob()">Delete</button>
+      <button style="background:#64748b" onclick="closePinModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- FARE MODAL -->
+<div id="fareModal" class="modalOverlay" onclick="if(event.target===this)closeFareModal()">
+  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
+    <h3 style="color:#4ade80;margin-bottom:4px;text-align:center">Enter Fare</h3>
+    <p style="text-align:center;color:#94a3b8;font-size:12px;margin-bottom:8px">Trip fare to complete this job</p>
+    <div class="fareInputWrap">
+      <span class="farePrefix">$</span>
+      <input id="fareInput" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off">
+    </div>
+    <div class="pinActions">
+      <button class="btnComplete" onclick="confirmCompleteJob()">Complete Job</button>
+      <button style="background:#64748b" onclick="closeFareModal()">Cancel</button>
+    </div>
+  </div>
 </div>
 
 <!-- JOB DETAIL MODAL -->
@@ -432,7 +524,13 @@ let selectedVehicle = "None", selectedTime = "None", selectedAMPM = "None";
 let paymentArray = [], priceType = "None";
 let autocompleteService, map;
 let db, firebaseReady = false;
-let availableJobs = [], previousJobs = [];
+let availableJobs = [], previousJobs = [], historyJobs = [];
+let teamOperators = ["", "", "", "", "", ""];
+let selectedFilterOperator = "", selectedFilterType = "";
+let previousFilterActive = false, filteredPreviousJobs = null;
+let pendingDeleteDocId = null;
+let pendingCompleteDocId = null;
+const DELETE_PIN = "2814";
 let availableUnsub = null, previousUnsub = null;
 let sessionId = localStorage.getItem("sessionId") || ("s_" + Date.now() + "_" + Math.random().toString(36).slice(2));
 localStorage.setItem("sessionId", sessionId);
@@ -459,7 +557,7 @@ function initializeFirebase() {
     setSyncStatus("Connected — live sync active", false);
     subscribeAvailableJobs();
     subscribePreviousJobs();
-    loadOperatorName();
+    loadTeamOperators();
   } catch (err) {
     console.error(err);
     setSyncStatus("Firebase error — check config", true);
@@ -493,36 +591,20 @@ function formatDispatchedAt(job) {
   return "Dispatched " + d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
 }
 
-function saveLastTrip(job) {
-  if (!job.pickup && !job.drop) return;
-  sessionStorage.setItem("lastTrip", JSON.stringify({
-    name: job.name || "",
-    phone: job.phone || "",
-    pickup: job.pickup || "",
-    drop: job.drop || ""
-  }));
-  const btn = document.getElementById("returnTripBtn");
-  if (btn) btn.style.display = "block";
-}
-
-function loadReturnTrip() {
-  const raw = sessionStorage.getItem("lastTrip");
-  if (!raw) return;
-  const t = JSON.parse(raw);
-  document.getElementById("name").value = t.name || "";
-  document.getElementById("phone").value = formatPhoneDisplay(t.phone || "");
-  document.getElementById("pickup").value = t.drop || "";
-  document.getElementById("drop").value = t.pickup || "";
-  switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
-}
-
 function loadOperatorName() {
+  const el = document.getElementById("operator");
   const saved = localStorage.getItem("operatorName");
-  if (saved) document.getElementById("operator").value = saved;
-  document.getElementById("operator").addEventListener("change", function() {
-    localStorage.setItem("operatorName", this.value.trim());
-    rememberOperator(this.value.trim());
-  });
+  if (saved && !el.value) el.value = saved;
+  if (el.dataset.bound) return;
+  el.dataset.bound = "1";
+  function persistOperatorName() {
+    const name = el.value.trim();
+    localStorage.setItem("operatorName", name);
+    if (name) rememberOperator(name);
+  }
+  el.addEventListener("input", persistOperatorName);
+  el.addEventListener("change", persistOperatorName);
+  el.addEventListener("blur", persistOperatorName);
   document.getElementById("phone").addEventListener("input", onPhoneInput);
   document.getElementById("phone").addEventListener("blur", lookupCustomerByPhone);
 }
@@ -573,6 +655,152 @@ function rememberOperator(name) {
     localStorage.setItem("operatorList", JSON.stringify(list.slice(0, 12)));
   }
   updateOperatorDatalist();
+  syncOperatorToTeam(name);
+}
+
+function padOperators(arr) {
+  const list = (arr || []).filter(function(o) { return o && String(o).trim(); }).map(function(o) { return String(o).trim(); });
+  const unique = [];
+  list.forEach(function(n) { if (!unique.includes(n)) unique.push(n); });
+  while (unique.length < 6) unique.push("");
+  return unique.slice(0, 6);
+}
+
+async function loadTeamOperators() {
+  if (!firebaseReady) return;
+  try {
+    const ref = db.collection("settings").doc("team");
+    const doc = await ref.get();
+    if (doc.exists && doc.data().operators) {
+      teamOperators = padOperators(doc.data().operators);
+    }
+    if (!teamOperators.some(function(o) { return o; })) {
+      const local = JSON.parse(localStorage.getItem("operatorList") || "[]");
+      if (local.length) {
+        teamOperators = padOperators(local);
+        await ref.set({ operators: teamOperators }, { merge: true });
+      }
+    }
+    renderOperatorFilterRow();
+  } catch (e) { console.error(e); }
+}
+
+async function syncOperatorToTeam(name) {
+  if (!firebaseReady || !name) return;
+  try {
+    const ref = db.collection("settings").doc("team");
+    const doc = await ref.get();
+    let ops = doc.exists ? padOperators(doc.data().operators) : ["", "", "", "", "", ""];
+    if (ops.indexOf(name) !== -1) return;
+    const emptyIdx = ops.findIndex(function(o) { return !o; });
+    if (emptyIdx !== -1) ops[emptyIdx] = name;
+    else {
+      const merged = [name].concat(ops.filter(function(o) { return o && o !== name; })).slice(0, 6);
+      ops = padOperators(merged);
+    }
+    await ref.set({ operators: ops }, { merge: true });
+    teamOperators = ops;
+    renderOperatorFilterRow();
+  } catch (e) { console.error(e); }
+}
+
+function renderOperatorFilterRow() {
+  const row = document.getElementById("operatorFilterRow");
+  if (!row) return;
+  row.innerHTML = teamOperators.map(function(name, i) {
+    const label = name || ("Operator " + (i + 1));
+    const sel = name && name === selectedFilterOperator ? " selected" : "";
+    return '<button type="button" class="filterOpBtn' + sel + '" onclick="setFilterOperator(' + i + ')">' + escapeHtml(label) + '</button>';
+  }).join("");
+}
+
+function toggleFilterPanel() {
+  document.getElementById("filterPanel").classList.toggle("open");
+}
+
+function setFilterOperator(index) {
+  const name = teamOperators[index];
+  if (!name) { alert("This slot is empty — enter Operator Name on New Booking first"); return; }
+  selectedFilterOperator = name;
+  renderOperatorFilterRow();
+}
+
+function setFilterType(type) {
+  selectedFilterType = type;
+  document.getElementById("filterDispatched").classList.toggle("selected", type === "dispatched");
+  document.getElementById("filterCompleted").classList.toggle("selected", type === "completed");
+}
+
+function runPreviousFilter() {
+  if (!selectedFilterOperator) { alert("Select an operator"); return; }
+  if (!selectedFilterType) { alert("Select Dispatched or Completed"); return; }
+  const op = selectedFilterOperator.trim().toLowerCase();
+  filteredPreviousJobs = historyJobs.filter(function(j) {
+    if (selectedFilterType === "completed") {
+      return j.status === "completed" && (j.completedBy || "").trim().toLowerCase() === op;
+    }
+    return (j.operator || "").trim().toLowerCase() === op;
+  });
+  previousFilterActive = true;
+  document.getElementById("previousListHint").textContent =
+    "Showing " + filteredPreviousJobs.length + " " + selectedFilterType + " job(s) for " + selectedFilterOperator;
+  renderPreviousList();
+}
+
+function clearPreviousFilter() {
+  selectedFilterOperator = "";
+  selectedFilterType = "";
+  previousFilterActive = false;
+  filteredPreviousJobs = null;
+  document.querySelectorAll(".filterOpBtn").forEach(function(b) { b.classList.remove("selected"); });
+  document.getElementById("filterDispatched").classList.remove("selected");
+  document.getElementById("filterCompleted").classList.remove("selected");
+  document.getElementById("previousListHint").textContent = "Tap to view or reload into New Booking";
+  renderPreviousList();
+}
+
+function getPreviousJobsToRender() {
+  if (previousFilterActive && filteredPreviousJobs) return filteredPreviousJobs;
+  return historyJobs.filter(function(j) { return j.status === "completed"; }).slice(0, 40);
+}
+
+function jobDeleteBtn(docId) {
+  return '<button type="button" class="jobDelete" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">🗑️</button>';
+}
+
+function promptDeleteJob(docId, e) {
+  if (e) e.stopPropagation();
+  pendingDeleteDocId = docId;
+  document.getElementById("pinInput").value = "";
+  document.getElementById("pinModal").classList.add("open");
+  setTimeout(function() { document.getElementById("pinInput").focus(); }, 200);
+}
+
+function closePinModal() {
+  document.getElementById("pinModal").classList.remove("open");
+  pendingDeleteDocId = null;
+}
+
+async function confirmDeleteJob() {
+  if (document.getElementById("pinInput").value !== DELETE_PIN) {
+    alert("Wrong PIN");
+    return;
+  }
+  if (!pendingDeleteDocId) return;
+  try {
+    await db.collection("jobs").doc(pendingDeleteDocId).delete();
+    closePinModal();
+    closeJobModal();
+  } catch (err) {
+    alert("Delete failed: " + err.message);
+  }
+}
+
+function findJobById(docId) {
+  let job = availableJobs.find(function(j) { return j.docId === docId; });
+  if (job) return job;
+  job = historyJobs.find(function(j) { return j.docId === docId; });
+  return job || null;
 }
 
 function updateOperatorDatalist() {
@@ -649,27 +877,42 @@ function getJobTimeLabel(job) {
   return "ASAP";
 }
 
+function getCurrentOperator() {
+  return document.getElementById("operator").value.trim();
+}
+
+function isJobAcceptedByMe(job) {
+  const me = getCurrentOperator().toLowerCase();
+  const who = (job.acceptedBy || "").trim().toLowerCase();
+  return me && who && me === who;
+}
+
 function subscribeAvailableJobs() {
   if (availableUnsub) availableUnsub();
   availableUnsub = db.collection("jobs")
-    .where("status", "==", "available")
+    .where("status", "in", ["available", "accepted"])
     .onSnapshot(function(snap) {
       const changes = snap.docChanges();
       availableJobs = snap.docs.map(function(d) {
         return Object.assign({ docId: d.id }, d.data());
       });
       availableJobs.sort(function(a, b) {
+        if (a.status !== b.status) {
+          if (a.status === "available") return -1;
+          if (b.status === "available") return 1;
+        }
         return (a.sortKey || 0) - (b.sortKey || 0);
       });
       renderAvailableList();
-      document.getElementById("availableBadge").textContent = availableJobs.length;
-      document.getElementById("availableBadge").style.display = availableJobs.length ? "inline" : "none";
+      const openCount = availableJobs.filter(function(j) { return j.status === "available"; }).length;
+      document.getElementById("availableBadge").textContent = openCount;
+      document.getElementById("availableBadge").style.display = openCount ? "inline" : "none";
 
       if (jobsListenerReady) {
         changes.forEach(function(change) {
           if (change.type === "added") {
             const job = change.doc.data();
-            if (job.sessionId !== sessionId) {
+            if (job.status === "available" && job.sessionId !== sessionId) {
               showNewJobAlert(Object.assign({ docId: change.doc.id }, job));
             }
           }
@@ -678,7 +921,7 @@ function subscribeAvailableJobs() {
       jobsListenerReady = true;
     }, function(err) {
       console.error(err);
-      setSyncStatus("Firestore rules error", true);
+      setSyncStatus("Firestore index needed for status — check console", true);
     });
 }
 
@@ -686,11 +929,12 @@ function subscribePreviousJobs() {
   if (previousUnsub) previousUnsub();
   previousUnsub = db.collection("jobs")
     .orderBy("dispatchedAt", "desc")
-    .limit(80)
+    .limit(120)
     .onSnapshot(function(snap) {
-      previousJobs = snap.docs.map(function(d) {
+      historyJobs = snap.docs.map(function(d) {
         return Object.assign({ docId: d.id }, d.data());
-      }).filter(function(j) { return j.status === "completed"; }).slice(0, 40);
+      });
+      previousJobs = getPreviousJobsToRender();
       renderPreviousList();
     });
 }
@@ -704,11 +948,27 @@ function renderAvailableList() {
   el.innerHTML = availableJobs.map(function(job) {
     const asap = job.time !== "Later";
     const dispatched = formatDispatchedAt(job);
+    const isAccepted = job.status === "accepted";
+    const cardClass = isAccepted ? "jobCardAccepted" : "jobCardAvailable";
     const phoneHtml = job.phone
       ? '<a class="jobPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
       : "";
-    return '<div class="jobCard" onclick="openJobModal(\'' + job.docId + '\',\'available\')">' +
-      '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span><span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div>' +
+    let actionsHtml = "";
+    if (!isAccepted) {
+      actionsHtml = '<div class="jobActions" onclick="event.stopPropagation()">' +
+        '<button class="btnAccept" onclick="acceptJob(\'' + job.docId + '\')">Accept</button></div>';
+    } else if (isJobAcceptedByMe(job)) {
+      actionsHtml = '<div class="acceptedBanner">Accepted (' + escapeHtml(job.acceptedBy) + ')</div>' +
+        '<div class="jobActions" onclick="event.stopPropagation()">' +
+        '<button class="btnComplete" onclick="completeJob(\'' + job.docId + '\')">Complete</button>' +
+        '<button class="btnRecall" onclick="recallJob(\'' + job.docId + '\')">Recall</button></div>';
+    } else {
+      actionsHtml = '<div class="acceptedBanner">Accepted (' + escapeHtml(job.acceptedBy || "Unknown") + ')</div>';
+    }
+    return '<div class="jobCard ' + cardClass + '" onclick="openJobModal(\'' + job.docId + '\',\'available\')">' +
+      '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span>' +
+      '<div class="jobCardTopRight">' + jobDeleteBtn(job.docId) +
+      '<span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div></div>' +
       '<div class="jobName">' + escapeHtml(job.name || "Unknown") + '</div>' +
       phoneHtml +
       '<div class="jobRoute">📍 ' + escapeHtml(job.pickup || "—") + '<br>→ ' + escapeHtml(job.drop || "—") + '</div>' +
@@ -716,33 +976,54 @@ function renderAvailableList() {
         (dispatched ? '<span class="jobTag dispatched">' + escapeHtml(dispatched) + '</span>' : '') +
         (asap ? '<span class="jobTag asap">' + escapeHtml(job.time || "ASAP") + '</span>' : '') +
         '<span class="jobTag">' + escapeHtml(job.vehicle || "—") + '</span>' +
-        (job.operator ? '<span class="jobTag">👤 ' + escapeHtml(job.operator) + '</span>' : '') +
-      '</div></div>';
+        (job.operator ? '<span class="jobTag">Dispatched: ' + escapeHtml(job.operator) + '</span>' : '') +
+      '</div>' + actionsHtml + '</div>';
   }).join("");
 }
 
 function renderPreviousList() {
   const el = document.getElementById("previousList");
-  if (!previousJobs.length) {
-    el.innerHTML = '<div class="emptyState"><div class="icon">📋</div>No previous jobs yet</div>';
+  const jobs = getPreviousJobsToRender();
+  previousJobs = jobs;
+  if (!jobs.length) {
+    el.innerHTML = '<div class="emptyState"><div class="icon">📋</div>No jobs found</div>';
     return;
   }
-  el.innerHTML = previousJobs.map(function(job) {
+  el.innerHTML = jobs.map(function(job) {
     const dispatched = formatDispatchedAt(job);
+    const finisher = job.completedBy || job.acceptedBy || job.operator || "Unknown";
     const phoneHtml = job.phone
       ? '<a class="jobPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
       : "";
+    const typeTag = job.status === "completed"
+      ? '<span class="jobTag completedBy">' + escapeHtml(finisher) + '</span>'
+      : '<span class="jobTag">' + escapeHtml(job.status || "—") + '</span>';
     return '<div class="jobCard" onclick="openJobModal(\'' + job.docId + '\',\'previous\')">' +
-      '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span><span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div>' +
-      '<div class="jobName">' + escapeHtml(job.name || "Unknown") + '</div>' +
+      '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span>' +
+      '<div class="jobCardTopRight">' + jobDeleteBtn(job.docId) +
+      '<span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div></div>' +
+      '<div class="jobName">' + escapeHtml(job.name || "Unknown") + fareLineHtml(job) + '</div>' +
       phoneHtml +
       '<div class="jobRoute">📍 ' + escapeHtml(job.pickup || "—") + ' → ' + escapeHtml(job.drop || "—") + '</div>' +
       '<div class="jobMeta">' +
         (dispatched ? '<span class="jobTag dispatched">' + escapeHtml(dispatched) + '</span>' : '') +
-        '<span class="jobTag">Completed</span>' +
-        (job.operator ? '<span class="jobTag">👤 ' + escapeHtml(job.operator) + '</span>' : '') +
+        typeTag +
+        (job.operator ? '<span class="jobTag">Disp: ' + escapeHtml(job.operator) + '</span>' : '') +
       '</div></div>';
   }).join("");
+}
+
+function formatFareDisplay(fare) {
+  if (fare === undefined || fare === null || fare === "") return "";
+  const n = parseFloat(String(fare).replace(/[^0-9.]/g, ""));
+  if (isNaN(n)) return "";
+  return n % 1 === 0 ? "$" + n.toFixed(0) : "$" + n.toFixed(2);
+}
+
+function fareLineHtml(job) {
+  const label = formatFareDisplay(job.fare);
+  if (!label) return "";
+  return '<span class="jobFare">Fare: ' + escapeHtml(label) + "</span>";
 }
 
 function escapeHtml(str) {
@@ -750,7 +1031,7 @@ function escapeHtml(str) {
 }
 
 function openJobModal(docId, source) {
-  const job = (source === "available" ? availableJobs : previousJobs).find(function(j) { return j.docId === docId; });
+  const job = findJobById(docId);
   if (!job) return;
 
   document.getElementById("modalJobTitle").textContent = "JOB-" + job.id;
@@ -774,6 +1055,15 @@ function openJobModal(docId, source) {
   }
   const dispatched = formatDispatchedAt(job);
   if (dispatched) rows.splice(3, 0, ["Dispatched", dispatched]);
+  if (job.status === "accepted" && job.acceptedBy) {
+    rows.splice(4, 0, ["Accepted by", job.acceptedBy]);
+  }
+  if (job.status === "completed" && job.fare != null && job.fare !== "") {
+    rows.push(["Fare", formatFareDisplay(job.fare)]);
+  }
+  if (job.status === "completed" && job.completedBy) {
+    rows.push(["Completed by", job.completedBy]);
+  }
 
   document.getElementById("modalJobBody").innerHTML = rows.map(function(r) {
     const val = r[0] === "Passenger" ? r[1] : escapeHtml(r[1]).replace(/\n/g, "<br>");
@@ -782,8 +1072,12 @@ function openJobModal(docId, source) {
 
   let actions = '<button onclick="copyJobMessage(\'' + docId + '\')">Copy Dispatch</button>';
   actions += '<button onclick="loadJobIntoForm(\'' + docId + '\')">Load to Form</button>';
-  if (job.status === "available") {
-    actions += '<button style="background:#475569" onclick="completeJob(\'' + docId + '\')">Mark Complete</button>';
+  if (source === "available" && job.status === "available") {
+    actions += '<button class="btnAccept" onclick="acceptJob(\'' + docId + '\');closeJobModal()">Accept</button>';
+  }
+  if (source === "available" && job.status === "accepted" && isJobAcceptedByMe(job)) {
+    actions += '<button class="btnComplete" onclick="completeJob(\'' + docId + '\')">Complete</button>';
+    actions += '<button class="btnRecall" onclick="recallJob(\'' + docId + '\')">Recall</button>';
   }
   document.getElementById("modalJobActions").innerHTML = actions;
   document.getElementById("jobModal").classList.add("open");
@@ -856,7 +1150,7 @@ function openWhatsAppGroup() {
 }
 
 function copyJobMessage(docId) {
-  const job = availableJobs.concat(previousJobs).find(function(j) { return j.docId === docId; });
+  const job = findJobById(docId);
   if (!job) return;
   copyToClipboard(buildDispatchMessage(job)).then(function(ok) {
     alert(ok ? "Copied ✔" : "Could not copy — select text manually");
@@ -864,24 +1158,110 @@ function copyJobMessage(docId) {
 }
 
 function loadJobIntoForm(docId) {
-  const job = availableJobs.concat(previousJobs).find(function(j) { return j.docId === docId; });
+  const job = findJobById(docId);
   if (!job) return;
   closeJobModal();
   applyJobToForm(job);
   switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
 }
 
+async function acceptJob(docId) {
+  const op = getCurrentOperator();
+  if (!op) {
+    alert("Enter your Operator Name first (top of New Booking)");
+    switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
+    return;
+  }
+  try {
+    await db.runTransaction(async function(tx) {
+      const ref = db.collection("jobs").doc(docId);
+      const doc = await tx.get(ref);
+      if (!doc.exists) throw new Error("Job not found");
+      const data = doc.data();
+      if (data.status !== "available") throw new Error("Job already accepted by someone else");
+      tx.update(ref, {
+        status: "accepted",
+        acceptedBy: op,
+        acceptedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        acceptedBySession: sessionId
+      });
+    });
+  } catch (err) {
+    alert(err.message || "Could not accept job");
+  }
+}
+
+async function recallJob(docId) {
+  const job = availableJobs.find(function(j) { return j.docId === docId; });
+  if (!job || !isJobAcceptedByMe(job)) {
+    alert("Only the operator who accepted can recall this job");
+    return;
+  }
+  if (!confirm("Recall this job? It will become available for others.")) return;
+  try {
+    await db.collection("jobs").doc(docId).update({
+      status: "available",
+      acceptedBy: firebase.firestore.FieldValue.delete(),
+      acceptedAt: firebase.firestore.FieldValue.delete(),
+      acceptedBySession: firebase.firestore.FieldValue.delete()
+    });
+    closeJobModal();
+  } catch (err) {
+    alert("Recall failed: " + err.message);
+  }
+}
+
 async function completeJob(docId) {
-  if (!confirm("Mark this job as complete?")) return;
-  await db.collection("jobs").doc(docId).update({
-    status: "completed",
-    completedAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  closeJobModal();
+  const job = findJobById(docId);
+  if (job && job.status === "accepted" && !isJobAcceptedByMe(job)) {
+    alert("Only " + (job.acceptedBy || "the accepter") + " can complete this job");
+    return;
+  }
+  if (!getCurrentOperator()) {
+    alert("Enter your Operator Name first");
+    return;
+  }
+  pendingCompleteDocId = docId;
+  const fareEl = document.getElementById("fareInput");
+  fareEl.value = job && job.price ? String(job.price).replace(/[^0-9.]/g, "") : "";
+  document.getElementById("fareModal").classList.add("open");
+  setTimeout(function() { fareEl.focus(); fareEl.select(); }, 200);
+}
+
+function closeFareModal() {
+  document.getElementById("fareModal").classList.remove("open");
+  pendingCompleteDocId = null;
+}
+
+async function confirmCompleteJob() {
+  const docId = pendingCompleteDocId;
+  if (!docId) return;
+  const raw = document.getElementById("fareInput").value.trim();
+  const fare = parseFloat(raw.replace(/[^0-9.]/g, ""));
+  if (!raw || isNaN(fare) || fare <= 0) {
+    alert("Enter the fare amount");
+    return;
+  }
+  const op = getCurrentOperator();
+  try {
+    await db.collection("jobs").doc(docId).update({
+      status: "completed",
+      completedBy: op,
+      completedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      fare: fare
+    });
+    closeFareModal();
+    closeJobModal();
+  } catch (err) {
+    alert("Complete failed: " + err.message);
+  }
 }
 
 function applyJobToForm(job) {
-  document.getElementById("operator").value = job.operator || "";
+  if (job.operator) {
+    document.getElementById("operator").value = job.operator;
+    localStorage.setItem("operatorName", job.operator);
+  }
   document.getElementById("name").value = job.name || "";
   document.getElementById("phone").value = formatPhoneDisplay(job.phone || "");
   document.getElementById("pickup").value = job.pickup || "";
@@ -971,7 +1351,7 @@ document.getElementById("alertToast").addEventListener("click", function() {
 });
 
 function clearFormRefresh() {
-  location.reload();
+  clearForm();
 }
 
 function clearForm() {
@@ -999,7 +1379,6 @@ async function dispatch() {
     const message = buildDispatchMessage(job);
     await db.collection("jobs").add(job);
     await saveCustomerRecord(job);
-    saveLastTrip(job);
     rememberOperator(job.operator);
     clearForm();
     switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
@@ -1249,11 +1628,9 @@ function sendFollowUp() {
 }
 
 window.addEventListener("DOMContentLoaded", function() {
+  loadOperatorName();
   initializeFirebase();
   updateOperatorDatalist();
-  if (sessionStorage.getItem("lastTrip")) {
-    document.getElementById("returnTripBtn").style.display = "block";
-  }
   document.body.addEventListener("click", function() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }, { once: true });
@@ -1267,6 +1644,12 @@ window.addEventListener("DOMContentLoaded", function() {
       console.warn("Service worker registration failed:", err);
     });
   }
+  document.getElementById("pinInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") confirmDeleteJob();
+  });
+  document.getElementById("fareInput").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") confirmCompleteJob();
+  });
 });
 </script>
 </body>
