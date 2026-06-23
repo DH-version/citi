@@ -1,4 +1,4 @@
-const CACHE = "gpn-v3";
+const CACHE = "gpn-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -34,18 +34,22 @@ self.addEventListener("fetch", function(event) {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
+  if (!/\.(html|js|json|png|svg)$/.test(url.pathname) && !url.pathname.endsWith("/citi/")) return;
 
   event.respondWith(
-    fetch(event.request).then(function(response) {
-      const copy = response.clone();
-      caches.open(CACHE).then(function(cache) {
-        cache.put(event.request, copy);
+    caches.match(event.request).then(function(cached) {
+      const network = fetch(event.request).then(function(response) {
+        if (response && response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE).then(function(cache) {
+            cache.put(event.request, copy);
+          });
+        }
+        return response;
       });
-      return response;
+      return cached || network;
     }).catch(function() {
-      return caches.match(event.request).then(function(cached) {
-        return cached || caches.match("./index.html");
-      });
+      return caches.match("./index.html");
     })
   );
 });
