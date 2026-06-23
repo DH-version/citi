@@ -160,7 +160,6 @@ button:disabled{
 .operatorStatus.invalid{color:#f87171}
 #bookingForm.locked{opacity:.45;pointer-events:none;user-select:none}
 body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-events:none}
-body.appLocked #tabAvailable,#tabPrevious{pointer-events:none}
 
 .autocomplete-container{position:relative;width:100%}
 .autocomplete-list{
@@ -549,6 +548,7 @@ localStorage.setItem("sessionId", sessionId);
 let jobsListenerReady = false;
 let alertTimeout = null;
 let audioCtx = null;
+let timeSelected, vehicleSelected, paymentSelected, priceSelected;
 
 function switchTab(tabId, btn) {
   if (tabId !== "tabNew" && !getCurrentOperator()) {
@@ -1684,6 +1684,10 @@ function sendFollowUp() {
 window.addEventListener("DOMContentLoaded", function() {
   initOperatorField();
   initializeFirebase();
+  timeSelected = document.getElementById("timeSelected");
+  vehicleSelected = document.getElementById("vehicleSelected");
+  paymentSelected = document.getElementById("paymentSelected");
+  priceSelected = document.getElementById("priceSelected");
   document.body.addEventListener("click", function() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }, { once: true });
