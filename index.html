@@ -535,14 +535,15 @@ let selectedVehicle = "None", selectedTime = "None", selectedAMPM = "None";
 let paymentArray = [], priceType = "None";
 let autocompleteService, map;
 let db, firebaseReady = false;
-let availableJobs = [], previousJobs = [], historyJobs = [];
+let availableJobs = [], previousJobs = [], completedJobs = [], filterResultJobs = [], historyJobs = [];
 let teamOperators = AUTHORIZED_OPERATORS.slice();
 let selectedFilterOperator = "", selectedFilterType = "";
-let previousFilterActive = false, filteredPreviousJobs = null;
+let previousFilterActive = false;
 let pendingDeleteDocId = null;
 let pendingCompleteDocId = null;
 const DELETE_PIN = "2814";
-let availableUnsub = null, previousUnsub = null;
+let availableUnsub = null, completedUnsub = null, filterUnsub = null;
+let renderPreviousScheduled = false, renderAvailableScheduled = false;
 let sessionId = localStorage.getItem("sessionId") || ("s_" + Date.now() + "_" + Math.random().toString(36).slice(2));
 localStorage.setItem("sessionId", sessionId);
 let jobsListenerReady = false;
@@ -676,8 +677,8 @@ function initializeFirebase() {
     firebaseReady = true;
     setSyncStatus("Connected — live sync active", false);
     subscribeAvailableJobs();
-    subscribePreviousJobs();
-    loadTeamOperators();
+    subscribeCompletedJobs();
+    renderOperatorFilterRow();
   } catch (err) {
     console.error(err);
     setSyncStatus("Firebase error — check config", true);
@@ -749,15 +750,6 @@ async function saveCustomerRecord(job) {
   }, { merge: true });
 }
 
-async function loadTeamOperators() {
-  teamOperators = AUTHORIZED_OPERATORS.slice();
-  renderOperatorFilterRow();
-  if (!firebaseReady) return;
-  try {
-    await db.collection("settings").doc("team").set({ operators: teamOperators }, { merge: true });
-  } catch (e) { console.error(e); }
-}
-
 function renderOperatorFilterRow() {
   const row = document.getElementById("operatorFilterRow");
   if (!row) return;
@@ -767,6 +759,87 @@ function renderOperatorFilterRow() {
   }).join("");
 }
 
+function docsToJobs(docs) {
+  return docs.map(function(d) { return Object.assign({ docId: d.id }, d.data()); });
+}
+
+function scheduleRenderPrevious() {
+  if (renderPreviousScheduled) return;
+  renderPreviousScheduled = true;
+  requestAnimationFrame(function() {
+    renderPreviousScheduled = false;
+    renderPreviousList();
+  });
+}
+
+function scheduleRenderAvailable() {
+  if (renderAvailableScheduled) return;
+  renderAvailableScheduled = true;
+  requestAnimationFrame(function() {
+    renderAvailableScheduled = false;
+    renderAvailableList();
+  });
+}
+
+function stopFilterSubscription() {
+  if (filterUnsub) {
+    filterUnsub();
+    filterUnsub = null;
+  }
+}
+
+function subscribeCompletedJobs() {
+  if (completedUnsub) completedUnsub();
+  completedUnsub = db.collection("jobs")
+    .where("status", "==", "completed")
+    .orderBy("completedAt", "desc")
+    .limit(80)
+    .onSnapshot(function(snap) {
+      completedJobs = docsToJobs(snap.docs);
+      if (!previousFilterActive) scheduleRenderPrevious();
+    }, function(err) {
+      console.error("Completed jobs index may be needed:", err);
+      subscribePreviousJobsFallback();
+    });
+}
+
+function subscribePreviousJobsFallback() {
+  if (completedUnsub) completedUnsub();
+  completedUnsub = db.collection("jobs")
+    .orderBy("dispatchedAt", "desc")
+    .limit(150)
+    .onSnapshot(function(snap) {
+      historyJobs = docsToJobs(snap.docs);
+      completedJobs = historyJobs.filter(function(j) { return j.status === "completed"; }).slice(0, 80);
+      if (!previousFilterActive) scheduleRenderPrevious();
+    });
+}
+
+function applyOptimisticComplete(docId, op, fare) {
+  const job = findJobById(docId);
+  if (!job) return;
+  const updated = Object.assign({}, job, {
+    status: "completed",
+    completedBy: op,
+    fare: fare,
+    completedAt: { seconds: Date.now() / 1000, toDate: function() { return new Date(); } }
+  });
+  completedJobs = [updated].concat(completedJobs.filter(function(j) { return j.docId !== docId; })).slice(0, 80);
+  if (previousFilterActive && selectedFilterType === "completed" && selectedFilterOperator === op) {
+    filterResultJobs = [updated].concat(filterResultJobs.filter(function(j) { return j.docId !== docId; }));
+    document.getElementById("previousListHint").textContent =
+      "Showing " + filterResultJobs.length + " completed job(s) for " + op;
+  }
+  scheduleRenderPrevious();
+}
+
+function removeJobLocally(docId) {
+  completedJobs = completedJobs.filter(function(j) { return j.docId !== docId; });
+  filterResultJobs = filterResultJobs.filter(function(j) { return j.docId !== docId; });
+  historyJobs = historyJobs.filter(function(j) { return j.docId !== docId; });
+  scheduleRenderPrevious();
+}
+
 function toggleFilterPanel() {
   document.getElementById("filterPanel").classList.toggle("open");
 }
@@ -774,46 +847,95 @@ function toggleFilterPanel() {
 function setFilterOperator(index) {
   selectedFilterOperator = teamOperators[index];
   renderOperatorFilterRow();
+  maybeAutoFilter();
 }
 
 function setFilterType(type) {
   selectedFilterType = type;
   document.getElementById("filterDispatched").classList.toggle("selected", type === "dispatched");
   document.getElementById("filterCompleted").classList.toggle("selected", type === "completed");
+  maybeAutoFilter();
 }
 
-function runPreviousFilter() {
+function maybeAutoFilter() {
+  if (selectedFilterOperator && selectedFilterType) applyPreviousFilter();
+}
+
+function applyPreviousFilterClient(op) {
+  const key = op.trim().toLowerCase();
+  const source = historyJobs.length ? historyJobs : completedJobs;
+  filterResultJobs = source.filter(function(j) {
+    if (selectedFilterType === "completed") {
+      return j.status === "completed" && (j.completedBy || "").trim().toLowerCase() === key;
+    }
+    return (j.operator || "").trim().toLowerCase() === key;
+  });
+  document.getElementById("previousListHint").textContent =
+    "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + op;
+  scheduleRenderPrevious();
+}
+
+function applyPreviousFilter() {
   if (!requireOperator("search previous jobs")) return;
   if (!selectedFilterOperator) { alert("Select an operator"); return; }
   if (!selectedFilterType) { alert("Select Dispatched or Completed"); return; }
-  const op = selectedFilterOperator.trim().toLowerCase();
-  filteredPreviousJobs = historyJobs.filter(function(j) {
-    if (selectedFilterType === "completed") {
-      return j.status === "completed" && (j.completedBy || "").trim().toLowerCase() === op;
-    }
-    return (j.operator || "").trim().toLowerCase() === op;
-  });
+
   previousFilterActive = true;
-  document.getElementById("previousListHint").textContent =
-    "Showing " + filteredPreviousJobs.length + " " + selectedFilterType + " job(s) for " + selectedFilterOperator;
-  renderPreviousList();
+  stopFilterSubscription();
+
+  const op = selectedFilterOperator;
+  let query;
+  if (selectedFilterType === "completed") {
+    query = db.collection("jobs")
+      .where("status", "==", "completed")
+      .where("completedBy", "==", op)
+      .orderBy("completedAt", "desc")
+      .limit(100);
+  } else {
+    query = db.collection("jobs")
+      .where("operator", "==", op)
+      .orderBy("dispatchedAt", "desc")
+      .limit(100);
+  }
+
+  filterUnsub = query.onSnapshot(function(snap) {
+    filterResultJobs = docsToJobs(snap.docs);
+    document.getElementById("previousListHint").textContent =
+      "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + op;
+    scheduleRenderPrevious();
+  }, function(err) {
+    console.error("Filter index may be needed:", err);
+    if (!historyJobs.length) {
+      db.collection("jobs").orderBy("dispatchedAt", "desc").limit(150).get().then(function(snap) {
+        historyJobs = docsToJobs(snap.docs);
+        applyPreviousFilterClient(op);
+      });
+    } else {
+      applyPreviousFilterClient(op);
+    }
+  });
+}
+
+function runPreviousFilter() {
+  applyPreviousFilter();
 }
 
 function clearPreviousFilter() {
   selectedFilterOperator = "";
   selectedFilterType = "";
   previousFilterActive = false;
-  filteredPreviousJobs = null;
+  filterResultJobs = [];
+  stopFilterSubscription();
   document.querySelectorAll(".filterOpBtn").forEach(function(b) { b.classList.remove("selected"); });
   document.getElementById("filterDispatched").classList.remove("selected");
   document.getElementById("filterCompleted").classList.remove("selected");
   document.getElementById("previousListHint").textContent = "Tap to view or reload into New Booking";
-  renderPreviousList();
+  scheduleRenderPrevious();
 }
 
 function getPreviousJobsToRender() {
-  if (previousFilterActive && filteredPreviousJobs) return filteredPreviousJobs;
-  return historyJobs.filter(function(j) { return j.status === "completed"; }).slice(0, 40);
+  if (previousFilterActive) return filterResultJobs;
+  return completedJobs;
 }
 
 function focusModalInput(input, selectAll) {
@@ -859,6 +981,7 @@ async function confirmDeleteJob() {
   if (!pendingDeleteDocId) return;
   try {
     await db.collection("jobs").doc(pendingDeleteDocId).delete();
+    removeJobLocally(pendingDeleteDocId);
     closePinModal();
     closeJobModal();
   } catch (err) {
@@ -869,8 +992,11 @@ async function confirmDeleteJob() {
 function findJobById(docId) {
   let job = availableJobs.find(function(j) { return j.docId === docId; });
   if (job) return job;
-  job = historyJobs.find(function(j) { return j.docId === docId; });
-  return job || null;
+  job = completedJobs.find(function(j) { return j.docId === docId; });
+  if (job) return job;
+  job = filterResultJobs.find(function(j) { return j.docId === docId; });
+  if (job) return job;
+  return historyJobs.find(function(j) { return j.docId === docId; }) || null;
 }
 
 async function getNextJobId() {
@@ -958,7 +1084,7 @@ function subscribeAvailableJobs() {
         }
         return (a.sortKey || 0) - (b.sortKey || 0);
       });
-      renderAvailableList();
+      scheduleRenderAvailable();
       const openCount = availableJobs.filter(function(j) { return j.status === "available"; }).length;
       document.getElementById("availableBadge").textContent = openCount;
       document.getElementById("availableBadge").style.display = openCount ? "inline" : "none";
@@ -977,20 +1103,6 @@ function subscribeAvailableJobs() {
     }, function(err) {
       console.error(err);
       setSyncStatus("Firestore index needed for status — check console", true);
-    });
-}
-
-function subscribePreviousJobs() {
-  if (previousUnsub) previousUnsub();
-  previousUnsub = db.collection("jobs")
-    .orderBy("dispatchedAt", "desc")
-    .limit(120)
-    .onSnapshot(function(snap) {
-      historyJobs = snap.docs.map(function(d) {
-        return Object.assign({ docId: d.id }, d.data());
-      });
-      previousJobs = getPreviousJobsToRender();
-      renderPreviousList();
     });
 }
 
@@ -1295,6 +1407,7 @@ async function confirmCompleteJob() {
   const op = requireOperator("complete jobs");
   if (!op) return;
   try {
+    applyOptimisticComplete(docId, op, fare);
     await db.collection("jobs").doc(docId).update({
       status: "completed",
       completedBy: op,
@@ -1305,6 +1418,8 @@ async function confirmCompleteJob() {
     closeJobModal();
   } catch (err) {
     alert("Complete failed: " + err.message);
+    subscribeCompletedJobs();
+    if (previousFilterActive) applyPreviousFilter();
   }
 }
 
