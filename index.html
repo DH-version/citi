@@ -154,15 +154,13 @@ button:disabled{
 .phoneHint.show{display:block}
 
 .operatorRow{margin-bottom:6px}
-.operatorStatus{font-size:12px;color:#94a3b8;text-align:center;margin-bottom:6px}
+.operatorRow input{padding:10px;font-size:14px;width:100%}
+.operatorStatus{font-size:11px;color:#94a3b8;text-align:center;margin-top:4px;line-height:1.3}
 .operatorStatus.ready{color:#4ade80;font-weight:700}
-.operatorPickBtn{flex:1;min-width:30%;font-size:11px;padding:8px 4px;margin:0}
-.operatorPickBtn.selected{
-  background:#facc15!important;color:#000!important;
-  box-shadow:0 0 8px #facc15;
-}
+.operatorStatus.invalid{color:#f87171}
 #bookingForm.locked{opacity:.45;pointer-events:none;user-select:none}
 body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-events:none}
+body.appLocked #tabAvailable,#tabPrevious{pointer-events:none}
 
 .autocomplete-container{position:relative;width:100%}
 .autocomplete-list{
@@ -333,9 +331,8 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="tabNew" class="tabPanel active">
 
   <div class="operatorRow">
-    <div id="operatorStatus" class="operatorStatus">Tap your name to start</div>
-    <div class="filterRow" id="operatorSelectRow"></div>
-    <input type="hidden" id="operator" value="">
+    <input id="operator" placeholder="Operator Name" autocomplete="off" autocapitalize="words">
+    <div id="operatorStatus" class="operatorStatus">Enter your operator name to enable the app</div>
   </div>
 
   <div id="bookingForm" class="locked">
@@ -463,7 +460,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="pinModal" class="modalOverlay" onclick="if(event.target===this)closePinModal()">
   <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
     <h3 style="color:#facc15;margin-bottom:10px;text-align:center">Enter PIN to Delete</h3>
-    <input id="pinInput" type="tel" inputmode="numeric" maxlength="4" placeholder="••••">
+    <input id="pinInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autocomplete="off" enterkeyhint="done" readonly>
     <div class="pinActions">
       <button class="btnPinDelete" onclick="confirmDeleteJob()">Delete</button>
       <button style="background:#64748b" onclick="closePinModal()">Cancel</button>
@@ -478,7 +475,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <p style="text-align:center;color:#94a3b8;font-size:12px;margin-bottom:8px">Trip fare to complete this job</p>
     <div class="fareInputWrap">
       <span class="farePrefix">$</span>
-      <input id="fareInput" type="text" inputmode="decimal" placeholder="0.00" autocomplete="off">
+      <input id="fareInput" type="tel" inputmode="decimal" pattern="[0-9]*" placeholder="0.00" autocomplete="off" enterkeyhint="done" readonly>
     </div>
     <div class="pinActions">
       <button class="btnComplete" onclick="confirmCompleteJob()">Complete Job</button>
@@ -555,7 +552,7 @@ let audioCtx = null;
 
 function switchTab(tabId, btn) {
   if (tabId !== "tabNew" && !getCurrentOperator()) {
-    alert("Select your operator name first");
+    alert("Enter your operator name first");
     return;
   }
   document.querySelectorAll(".tabPanel").forEach(function(p) { p.classList.remove("active"); });
@@ -580,37 +577,68 @@ function getCurrentOperator() {
 function requireOperator(actionLabel) {
   const op = getCurrentOperator();
   if (!op) {
-    alert("Select your operator name first" + (actionLabel ? " to " + actionLabel : ""));
+    alert("Enter your operator name first" + (actionLabel ? " to " + actionLabel : ""));
     switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
     return "";
   }
   return op;
 }
 
-function initOperatorSelect() {
-  renderOperatorSelectRow();
+function initOperatorField() {
   renderOperatorFilterRow();
+  const el = document.getElementById("operator");
   const saved = localStorage.getItem("operatorName");
-  if (saved && resolveOperator(saved)) setSelectedOperator(saved);
-  else updateAppLockState();
-  if (document.getElementById("phone").dataset.bound) return;
-  document.getElementById("phone").dataset.bound = "1";
-  document.getElementById("phone").addEventListener("input", onPhoneInput);
-  document.getElementById("phone").addEventListener("blur", lookupCustomerByPhone);
+  if (saved && resolveOperator(saved)) {
+    el.value = resolveOperator(saved);
+    updateOperatorAccess(true);
+  } else {
+    if (saved) localStorage.removeItem("operatorName");
+    updateOperatorAccess(false);
+  }
+  if (!el.dataset.bound) {
+    el.dataset.bound = "1";
+    el.addEventListener("input", onOperatorInput);
+    el.addEventListener("blur", onOperatorBlur);
+  }
+  const phoneEl = document.getElementById("phone");
+  if (!phoneEl.dataset.bound) {
+    phoneEl.dataset.bound = "1";
+    phoneEl.addEventListener("input", onPhoneInput);
+    phoneEl.addEventListener("blur", lookupCustomerByPhone);
+  }
 }
 
-function renderOperatorSelectRow() {
-  const row = document.getElementById("operatorSelectRow");
-  if (!row) return;
-  const current = getCurrentOperator();
-  row.innerHTML = AUTHORIZED_OPERATORS.map(function(name, i) {
-    const sel = name === current ? " selected" : "";
-    return '<button type="button" class="operatorPickBtn' + sel + '" onclick="selectOperator(' + i + ')">' + escapeHtml(name) + '</button>';
-  }).join("");
+function onOperatorInput() {
+  const el = document.getElementById("operator");
+  const raw = el.value;
+  if (!raw.trim()) {
+    localStorage.removeItem("operatorName");
+    updateOperatorAccess(false);
+    return;
+  }
+  const canonical = resolveOperator(raw);
+  if (canonical) {
+    el.value = canonical;
+    localStorage.setItem("operatorName", canonical);
+    updateOperatorAccess(true);
+  } else {
+    updateOperatorAccess(false, true);
+  }
 }
 
-function selectOperator(index) {
-  setSelectedOperator(AUTHORIZED_OPERATORS[index]);
+function onOperatorBlur() {
+  const el = document.getElementById("operator");
+  const canonical = resolveOperator(el.value);
+  if (canonical) {
+    el.value = canonical;
+    localStorage.setItem("operatorName", canonical);
+    updateOperatorAccess(true);
+  } else if (!el.value.trim()) {
+    localStorage.removeItem("operatorName");
+    updateOperatorAccess(false);
+  } else {
+    updateOperatorAccess(false, true);
+  }
 }
 
 function setSelectedOperator(name) {
@@ -618,16 +646,23 @@ function setSelectedOperator(name) {
   if (!canonical) return;
   document.getElementById("operator").value = canonical;
   localStorage.setItem("operatorName", canonical);
-  document.getElementById("operatorStatus").textContent = "Signed in as: " + canonical;
-  document.getElementById("operatorStatus").classList.add("ready");
-  renderOperatorSelectRow();
-  updateAppLockState();
+  updateOperatorAccess(true);
 }
 
-function updateAppLockState() {
-  const ok = !!getCurrentOperator();
-  document.getElementById("bookingForm").classList.toggle("locked", !ok);
-  document.body.classList.toggle("appLocked", !ok);
+function updateOperatorAccess(isValid, showInvalid) {
+  const status = document.getElementById("operatorStatus");
+  if (isValid) {
+    status.textContent = "Signed in as: " + getCurrentOperator();
+    status.className = "operatorStatus ready";
+  } else if (showInvalid && document.getElementById("operator").value.trim()) {
+    status.textContent = "Name not recognised — use Danial, Najaf, Mudassir, Asif, Khizar or Tuqeer";
+    status.className = "operatorStatus invalid";
+  } else {
+    status.textContent = "Enter your operator name to enable the app";
+    status.className = "operatorStatus";
+  }
+  document.getElementById("bookingForm").classList.toggle("locked", !isValid);
+  document.body.classList.toggle("appLocked", !isValid);
 }
 
 function initializeFirebase() {
@@ -781,6 +816,21 @@ function getPreviousJobsToRender() {
   return historyJobs.filter(function(j) { return j.status === "completed"; }).slice(0, 40);
 }
 
+function focusModalInput(input, selectAll) {
+  if (!input) return;
+  input.removeAttribute("readonly");
+  input.focus({ preventScroll: true });
+  if (selectAll && input.value && input.setSelectionRange) {
+    try { input.setSelectionRange(0, input.value.length); } catch (e) {}
+  }
+  requestAnimationFrame(function() {
+    input.focus({ preventScroll: true });
+    if (selectAll && input.value && input.setSelectionRange) {
+      try { input.setSelectionRange(0, input.value.length); } catch (e) {}
+    }
+  });
+}
+
 function jobDeleteBtn(docId) {
   return '<button type="button" class="jobDelete" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">🗑️</button>';
 }
@@ -789,13 +839,15 @@ function promptDeleteJob(docId, e) {
   if (e) e.stopPropagation();
   if (!requireOperator("delete jobs")) return;
   pendingDeleteDocId = docId;
-  document.getElementById("pinInput").value = "";
+  const pinEl = document.getElementById("pinInput");
+  pinEl.value = "";
   document.getElementById("pinModal").classList.add("open");
-  setTimeout(function() { document.getElementById("pinInput").focus(); }, 200);
+  focusModalInput(pinEl);
 }
 
 function closePinModal() {
   document.getElementById("pinModal").classList.remove("open");
+  document.getElementById("pinInput").setAttribute("readonly", "readonly");
   pendingDeleteDocId = null;
 }
 
@@ -1222,11 +1274,12 @@ async function completeJob(docId) {
   const fareEl = document.getElementById("fareInput");
   fareEl.value = job && job.price ? String(job.price).replace(/[^0-9.]/g, "") : "";
   document.getElementById("fareModal").classList.add("open");
-  setTimeout(function() { fareEl.focus(); fareEl.select(); }, 200);
+  focusModalInput(fareEl, true);
 }
 
 function closeFareModal() {
   document.getElementById("fareModal").classList.remove("open");
+  document.getElementById("fareInput").setAttribute("readonly", "readonly");
   pendingCompleteDocId = null;
 }
 
@@ -1629,7 +1682,7 @@ function sendFollowUp() {
 }
 
 window.addEventListener("DOMContentLoaded", function() {
-  initOperatorSelect();
+  initOperatorField();
   initializeFirebase();
   document.body.addEventListener("click", function() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
