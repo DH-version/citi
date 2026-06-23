@@ -153,8 +153,16 @@ button:disabled{
 .phoneHint{font-size:11px;color:#34d399;margin-top:2px;display:none}
 .phoneHint.show{display:block}
 
-.operatorRow{margin-bottom:3px}
-.operatorRow input{padding:10px;font-size:14px}
+.operatorRow{margin-bottom:6px}
+.operatorStatus{font-size:12px;color:#94a3b8;text-align:center;margin-bottom:6px}
+.operatorStatus.ready{color:#4ade80;font-weight:700}
+.operatorPickBtn{flex:1;min-width:30%;font-size:11px;padding:8px 4px;margin:0}
+.operatorPickBtn.selected{
+  background:#facc15!important;color:#000!important;
+  box-shadow:0 0 8px #facc15;
+}
+#bookingForm.locked{opacity:.45;pointer-events:none;user-select:none}
+body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-events:none}
 
 .autocomplete-container{position:relative;width:100%}
 .autocomplete-list{
@@ -325,10 +333,12 @@ button:disabled{
 <div id="tabNew" class="tabPanel active">
 
   <div class="operatorRow">
-    <input id="operator" placeholder="Operator Name" list="operatorList">
-    <datalist id="operatorList"></datalist>
+    <div id="operatorStatus" class="operatorStatus">Tap your name to start</div>
+    <div class="filterRow" id="operatorSelectRow"></div>
+    <input type="hidden" id="operator" value="">
   </div>
 
+  <div id="bookingForm" class="locked">
   <div class="twoCol">
     <input id="name" placeholder="Passenger Name">
     <input id="phone" type="tel" inputmode="numeric" placeholder="Phone Number">
@@ -415,6 +425,7 @@ button:disabled{
       <button style="flex:1;background:#8b5cf6;" onclick="sendFollowUp()">Follow Up</button>
     </div>
     <button style="width:100%;background:#64748b;margin-top:4px;" onclick="clearFormRefresh()">Clear Form</button>
+  </div>
   </div>
 </div>
 
@@ -522,13 +533,14 @@ const GEELONG_SUBURBS = [
   "east geelong", "thomson", "ceres", "bannockburn", "inverleigh", "little river"
 ].map(function(s) { return s.trim().toLowerCase(); });
 const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 330 596\n🌎 www.geelongcitytaxicab.com.au";
+const AUTHORIZED_OPERATORS = ["Danial", "Najaf", "Mudassir", "Asif", "Khizar", "Tuqeer"];
 
 let selectedVehicle = "None", selectedTime = "None", selectedAMPM = "None";
 let paymentArray = [], priceType = "None";
 let autocompleteService, map;
 let db, firebaseReady = false;
 let availableJobs = [], previousJobs = [], historyJobs = [];
-let teamOperators = ["", "", "", "", "", ""];
+let teamOperators = AUTHORIZED_OPERATORS.slice();
 let selectedFilterOperator = "", selectedFilterType = "";
 let previousFilterActive = false, filteredPreviousJobs = null;
 let pendingDeleteDocId = null;
@@ -542,10 +554,80 @@ let alertTimeout = null;
 let audioCtx = null;
 
 function switchTab(tabId, btn) {
+  if (tabId !== "tabNew" && !getCurrentOperator()) {
+    alert("Select your operator name first");
+    return;
+  }
   document.querySelectorAll(".tabPanel").forEach(function(p) { p.classList.remove("active"); });
   document.querySelectorAll(".navTab").forEach(function(t) { t.classList.remove("active"); });
   document.getElementById(tabId).classList.add("active");
   btn.classList.add("active");
+}
+
+function resolveOperator(name) {
+  if (!name) return "";
+  const key = String(name).trim().toLowerCase();
+  for (let i = 0; i < AUTHORIZED_OPERATORS.length; i++) {
+    if (AUTHORIZED_OPERATORS[i].toLowerCase() === key) return AUTHORIZED_OPERATORS[i];
+  }
+  return "";
+}
+
+function getCurrentOperator() {
+  return resolveOperator(document.getElementById("operator").value);
+}
+
+function requireOperator(actionLabel) {
+  const op = getCurrentOperator();
+  if (!op) {
+    alert("Select your operator name first" + (actionLabel ? " to " + actionLabel : ""));
+    switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
+    return "";
+  }
+  return op;
+}
+
+function initOperatorSelect() {
+  renderOperatorSelectRow();
+  renderOperatorFilterRow();
+  const saved = localStorage.getItem("operatorName");
+  if (saved && resolveOperator(saved)) setSelectedOperator(saved);
+  else updateAppLockState();
+  if (document.getElementById("phone").dataset.bound) return;
+  document.getElementById("phone").dataset.bound = "1";
+  document.getElementById("phone").addEventListener("input", onPhoneInput);
+  document.getElementById("phone").addEventListener("blur", lookupCustomerByPhone);
+}
+
+function renderOperatorSelectRow() {
+  const row = document.getElementById("operatorSelectRow");
+  if (!row) return;
+  const current = getCurrentOperator();
+  row.innerHTML = AUTHORIZED_OPERATORS.map(function(name, i) {
+    const sel = name === current ? " selected" : "";
+    return '<button type="button" class="operatorPickBtn' + sel + '" onclick="selectOperator(' + i + ')">' + escapeHtml(name) + '</button>';
+  }).join("");
+}
+
+function selectOperator(index) {
+  setSelectedOperator(AUTHORIZED_OPERATORS[index]);
+}
+
+function setSelectedOperator(name) {
+  const canonical = resolveOperator(name);
+  if (!canonical) return;
+  document.getElementById("operator").value = canonical;
+  localStorage.setItem("operatorName", canonical);
+  document.getElementById("operatorStatus").textContent = "Signed in as: " + canonical;
+  document.getElementById("operatorStatus").classList.add("ready");
+  renderOperatorSelectRow();
+  updateAppLockState();
+}
+
+function updateAppLockState() {
+  const ok = !!getCurrentOperator();
+  document.getElementById("bookingForm").classList.toggle("locked", !ok);
+  document.body.classList.toggle("appLocked", !ok);
 }
 
 function initializeFirebase() {
@@ -594,24 +676,6 @@ function formatDispatchedAt(job) {
   return "Dispatched " + d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
 }
 
-function loadOperatorName() {
-  const el = document.getElementById("operator");
-  const saved = localStorage.getItem("operatorName");
-  if (saved && !el.value) el.value = saved;
-  if (el.dataset.bound) return;
-  el.dataset.bound = "1";
-  function persistOperatorName() {
-    const name = el.value.trim();
-    localStorage.setItem("operatorName", name);
-    if (name) rememberOperator(name);
-  }
-  el.addEventListener("input", persistOperatorName);
-  el.addEventListener("change", persistOperatorName);
-  el.addEventListener("blur", persistOperatorName);
-  document.getElementById("phone").addEventListener("input", onPhoneInput);
-  document.getElementById("phone").addEventListener("blur", lookupCustomerByPhone);
-}
-
 function onPhoneInput(e) {
   const el = e.target;
   const formatted = formatPhoneDisplay(el.value);
@@ -650,60 +714,12 @@ async function saveCustomerRecord(job) {
   }, { merge: true });
 }
 
-function rememberOperator(name) {
-  if (!name) return;
-  const list = JSON.parse(localStorage.getItem("operatorList") || "[]");
-  if (!list.includes(name)) {
-    list.unshift(name);
-    localStorage.setItem("operatorList", JSON.stringify(list.slice(0, 12)));
-  }
-  updateOperatorDatalist();
-  syncOperatorToTeam(name);
-}
-
-function padOperators(arr) {
-  const list = (arr || []).filter(function(o) { return o && String(o).trim(); }).map(function(o) { return String(o).trim(); });
-  const unique = [];
-  list.forEach(function(n) { if (!unique.includes(n)) unique.push(n); });
-  while (unique.length < 6) unique.push("");
-  return unique.slice(0, 6);
-}
-
 async function loadTeamOperators() {
+  teamOperators = AUTHORIZED_OPERATORS.slice();
+  renderOperatorFilterRow();
   if (!firebaseReady) return;
   try {
-    const ref = db.collection("settings").doc("team");
-    const doc = await ref.get();
-    if (doc.exists && doc.data().operators) {
-      teamOperators = padOperators(doc.data().operators);
-    }
-    if (!teamOperators.some(function(o) { return o; })) {
-      const local = JSON.parse(localStorage.getItem("operatorList") || "[]");
-      if (local.length) {
-        teamOperators = padOperators(local);
-        await ref.set({ operators: teamOperators }, { merge: true });
-      }
-    }
-    renderOperatorFilterRow();
-  } catch (e) { console.error(e); }
-}
-
-async function syncOperatorToTeam(name) {
-  if (!firebaseReady || !name) return;
-  try {
-    const ref = db.collection("settings").doc("team");
-    const doc = await ref.get();
-    let ops = doc.exists ? padOperators(doc.data().operators) : ["", "", "", "", "", ""];
-    if (ops.indexOf(name) !== -1) return;
-    const emptyIdx = ops.findIndex(function(o) { return !o; });
-    if (emptyIdx !== -1) ops[emptyIdx] = name;
-    else {
-      const merged = [name].concat(ops.filter(function(o) { return o && o !== name; })).slice(0, 6);
-      ops = padOperators(merged);
-    }
-    await ref.set({ operators: ops }, { merge: true });
-    teamOperators = ops;
-    renderOperatorFilterRow();
+    await db.collection("settings").doc("team").set({ operators: teamOperators }, { merge: true });
   } catch (e) { console.error(e); }
 }
 
@@ -711,9 +727,8 @@ function renderOperatorFilterRow() {
   const row = document.getElementById("operatorFilterRow");
   if (!row) return;
   row.innerHTML = teamOperators.map(function(name, i) {
-    const label = name || ("Operator " + (i + 1));
-    const sel = name && name === selectedFilterOperator ? " selected" : "";
-    return '<button type="button" class="filterOpBtn' + sel + '" onclick="setFilterOperator(' + i + ')">' + escapeHtml(label) + '</button>';
+    const sel = name === selectedFilterOperator ? " selected" : "";
+    return '<button type="button" class="filterOpBtn' + sel + '" onclick="setFilterOperator(' + i + ')">' + escapeHtml(name) + '</button>';
   }).join("");
 }
 
@@ -722,9 +737,7 @@ function toggleFilterPanel() {
 }
 
 function setFilterOperator(index) {
-  const name = teamOperators[index];
-  if (!name) { alert("This slot is empty — enter Operator Name on New Booking first"); return; }
-  selectedFilterOperator = name;
+  selectedFilterOperator = teamOperators[index];
   renderOperatorFilterRow();
 }
 
@@ -735,6 +748,7 @@ function setFilterType(type) {
 }
 
 function runPreviousFilter() {
+  if (!requireOperator("search previous jobs")) return;
   if (!selectedFilterOperator) { alert("Select an operator"); return; }
   if (!selectedFilterType) { alert("Select Dispatched or Completed"); return; }
   const op = selectedFilterOperator.trim().toLowerCase();
@@ -773,6 +787,7 @@ function jobDeleteBtn(docId) {
 
 function promptDeleteJob(docId, e) {
   if (e) e.stopPropagation();
+  if (!requireOperator("delete jobs")) return;
   pendingDeleteDocId = docId;
   document.getElementById("pinInput").value = "";
   document.getElementById("pinModal").classList.add("open");
@@ -806,17 +821,6 @@ function findJobById(docId) {
   return job || null;
 }
 
-function updateOperatorDatalist() {
-  const list = JSON.parse(localStorage.getItem("operatorList") || "[]");
-  const dl = document.getElementById("operatorList");
-  dl.innerHTML = "";
-  list.forEach(function(n) {
-    const o = document.createElement("option");
-    o.value = n;
-    dl.appendChild(o);
-  });
-}
-
 async function getNextJobId() {
   const ref = db.collection("counters").doc("jobs");
   return db.runTransaction(async function(tx) {
@@ -836,7 +840,7 @@ function collectJobData(jobId, status) {
   return {
     id: jobId,
     status: status,
-    operator: document.getElementById("operator").value.trim(),
+    operator: getCurrentOperator(),
     name: titleCase(document.getElementById("name").value),
     phone: formatPhoneDisplay(document.getElementById("phone").value) || document.getElementById("phone").value,
     pickup: titleCase(document.getElementById("pickup").value),
@@ -878,10 +882,6 @@ function getJobTimeLabel(job) {
   }
   if (job.time && job.time !== "None") return job.time + " · ASAP";
   return "ASAP";
-}
-
-function getCurrentOperator() {
-  return document.getElementById("operator").value.trim();
 }
 
 function isJobAcceptedByMe(job) {
@@ -1169,12 +1169,8 @@ function loadJobIntoForm(docId) {
 }
 
 async function acceptJob(docId) {
-  const op = getCurrentOperator();
-  if (!op) {
-    alert("Enter your Operator Name first (top of New Booking)");
-    switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
-    return;
-  }
+  const op = requireOperator("accept jobs");
+  if (!op) return;
   try {
     await db.runTransaction(async function(tx) {
       const ref = db.collection("jobs").doc(docId);
@@ -1195,6 +1191,7 @@ async function acceptJob(docId) {
 }
 
 async function recallJob(docId) {
+  if (!requireOperator("recall jobs")) return;
   const job = availableJobs.find(function(j) { return j.docId === docId; });
   if (!job || !isJobAcceptedByMe(job)) {
     alert("Only the operator who accepted can recall this job");
@@ -1220,10 +1217,7 @@ async function completeJob(docId) {
     alert("Only " + (job.acceptedBy || "the accepter") + " can complete this job");
     return;
   }
-  if (!getCurrentOperator()) {
-    alert("Enter your Operator Name first");
-    return;
-  }
+  if (!requireOperator("complete jobs")) return;
   pendingCompleteDocId = docId;
   const fareEl = document.getElementById("fareInput");
   fareEl.value = job && job.price ? String(job.price).replace(/[^0-9.]/g, "") : "";
@@ -1245,7 +1239,8 @@ async function confirmCompleteJob() {
     alert("Enter the fare amount");
     return;
   }
-  const op = getCurrentOperator();
+  const op = requireOperator("complete jobs");
+  if (!op) return;
   try {
     await db.collection("jobs").doc(docId).update({
       status: "completed",
@@ -1262,8 +1257,8 @@ async function confirmCompleteJob() {
 
 function applyJobToForm(job) {
   if (job.operator) {
-    document.getElementById("operator").value = job.operator;
-    localStorage.setItem("operatorName", job.operator);
+    const canonical = resolveOperator(job.operator);
+    if (canonical) setSelectedOperator(canonical);
   }
   document.getElementById("name").value = job.name || "";
   document.getElementById("phone").value = formatPhoneDisplay(job.phone || "");
@@ -1374,6 +1369,7 @@ function clearForm() {
 
 async function dispatch() {
   if (!firebaseReady) { alert("Firebase not connected"); return; }
+  if (!requireOperator("dispatch")) return;
   const btn = document.getElementById("dispatchBtn");
   btn.disabled = true;
   try {
@@ -1382,7 +1378,6 @@ async function dispatch() {
     const message = buildDispatchMessage(job);
     await db.collection("jobs").add(job);
     await saveCustomerRecord(job);
-    rememberOperator(job.operator);
     clearForm();
     switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
 
@@ -1570,6 +1565,7 @@ function setPriceType(p) {
 }
 
 function sendQuote() {
+  if (!requireOperator("send quote")) return;
   const name = titleCase(document.getElementById("name").value);
   const phone = document.getElementById("phone").value.replace(/\s+/g, "");
   const pickup = titleCase(document.getElementById("pickup").value);
@@ -1591,6 +1587,7 @@ function sendQuote() {
 }
 
 function sendConfirmation() {
+  if (!requireOperator("send confirmation")) return;
   const name = titleCase(document.getElementById("name").value);
   const phone = document.getElementById("phone").value.replace(/\s+/g, "");
   const pickup = titleCase(document.getElementById("pickup").value);
@@ -1623,6 +1620,7 @@ function sendConfirmation() {
 }
 
 function sendFollowUp() {
+  if (!requireOperator("send follow up")) return;
   const name = titleCase(document.getElementById("name").value);
   const phone = document.getElementById("phone").value.replace(/\s+/g, "");
   if (!name || !phone) { alert("Please enter Passenger Name and Phone Number"); return; }
@@ -1631,9 +1629,8 @@ function sendFollowUp() {
 }
 
 window.addEventListener("DOMContentLoaded", function() {
-  loadOperatorName();
+  initOperatorSelect();
   initializeFirebase();
-  updateOperatorDatalist();
   document.body.addEventListener("click", function() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }, { once: true });
