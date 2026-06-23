@@ -1,10 +1,13 @@
-const CACHE = "gpn-v1";
+const CACHE = "gpn-v2";
 const ASSETS = [
   "./",
   "./index.html",
   "./manifest.json",
   "./firebase-config.js",
-  "./icons/icon.svg"
+  "./icons/icon.svg",
+  "./icons/icon-192.png",
+  "./icons/icon-512.png",
+  "./icons/apple-touch-icon.png"
 ];
 
 self.addEventListener("install", function(event) {
