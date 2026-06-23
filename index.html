@@ -7,9 +7,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="GPN Dispatch">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="manifest" href="/citi/manifest.json">
+<link rel="icon" href="/citi/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/citi/icons/icon.svg">
 <title>Geelong Premium Network</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -1263,7 +1263,7 @@ window.addEventListener("DOMContentLoaded", function() {
   document.head.appendChild(s);
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js").catch(function(err) {
+    navigator.serviceWorker.register("/citi/sw.js", { scope: "/citi/" }).catch(function(err) {
       console.warn("Service worker registration failed:", err);
     });
   }
