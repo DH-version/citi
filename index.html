@@ -14,11 +14,11 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Geelong Premium Network</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 
 body{
-  font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;
-  background:linear-gradient(135deg,#0f172a,#111827);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  background:linear-gradient(145deg,#0b1220 0%,#111827 50%,#0f172a 100%);
   padding:6px;
   padding-top:max(6px, env(safe-area-inset-top));
   color:#fff;
@@ -83,11 +83,14 @@ button{
   font-size:15px;
   border-radius:10px;
   border:none;
-  background:#2563eb;
+  background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);
   color:#fff;
   font-weight:bold;
   cursor:pointer;
+  box-shadow:0 2px 8px rgba(37,99,235,.35), inset 0 1px 0 rgba(255,255,255,.12);
+  transition:transform .1s ease, box-shadow .1s ease;
 }
+button:active:not(:disabled){transform:scale(.98);box-shadow:0 1px 4px rgba(37,99,235,.3)}
 button:disabled{
   background:#d1d5db;
   color:#9ca3af;
@@ -103,8 +106,10 @@ button:disabled{
 .row{display:flex;gap:4px}
 .row button{flex:1}
 
-.twoCol{display:flex;gap:6px}
-.twoCol input{flex:1}
+.twoCol{display:flex;gap:6px;align-items:stretch;margin:3px 0}
+.twoCol input,.twoCol .phoneInputWrap{flex:1;min-width:0;margin:0}
+.phoneInputWrap{position:relative;min-width:0}
+.phoneInputWrap input{width:100%;margin:0}
 
 .threeCol{display:flex;gap:4px}
 .threeCol input{flex:1}
@@ -158,11 +163,48 @@ button:disabled{
 .operatorStatus{font-size:11px;color:#94a3b8;text-align:center;margin-top:4px;line-height:1.3}
 .operatorStatus.ready{color:#4ade80;font-weight:700}
 .operatorStatus.invalid{color:#f87171}
-.btnSwitchOp{
-  display:none;width:100%;margin-top:4px;padding:6px;
-  background:#334155!important;font-size:11px;
+.btnSwitchOp{display:none!important}
+.notesBox{
+  width:100%;min-height:72px;padding:12px;border-radius:10px;
+  border:1px solid #475569;background:#0f172a;color:#fff;
+  font-size:15px;line-height:1.45;resize:vertical;margin-top:4px;
 }
-.btnSwitchOp.show{display:block}
+.notesBox.qbNotes{
+  min-height:110px;font-size:17px;line-height:1.5;
+  border:2px solid #3b82f6;background:#0c1528;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+}
+.qbField{font-size:17px;padding:13px;margin-bottom:8px}
+.jobCard{
+  background:linear-gradient(180deg,#1e293b 0%,#172033 100%);
+  border:1px solid #475569;border-radius:12px;
+  padding:12px;cursor:pointer;
+  box-shadow:0 3px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+}
+.jobEdit{
+  background:transparent!important;padding:0 4px;margin:0;
+  font-size:14px;box-shadow:none;border:none;cursor:pointer;line-height:1;
+}
+.jobTag.edited{background:#7c3aed33;color:#c4b5fd;font-weight:700}
+.prospectTable{
+  width:100%;border-collapse:separate;border-spacing:0;
+  border-radius:12px;overflow:hidden;
+  border:1px solid #334155;box-shadow:0 2px 12px rgba(0,0,0,.25);
+}
+.prospectTable th,.prospectTable td{
+  padding:12px 10px;text-align:left;border-bottom:1px solid #334155;
+}
+.prospectTable th{background:#0f172a;color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.prospectTable td{background:#1e293b;color:#fff;font-size:15px;font-weight:600}
+.prospectTable tr:last-child td{border-bottom:none}
+.prospectTable td.pointsCell{text-align:center;color:#facc15;font-size:18px;font-weight:800}
+.prospectTable input{
+  width:60px;text-align:center;font-size:16px;font-weight:700;
+  padding:8px;margin:0;background:#0f172a;border:1px solid #3b82f6;color:#facc15;
+}
+.prospectToolbar{display:flex;gap:8px;margin-bottom:10px}
+.prospectToolbar button{flex:1;margin:0;font-size:12px}
+.navTab{font-size:9px;padding:7px 2px 5px}
 .availToggle{display:flex;gap:6px;margin-bottom:8px}
 .availToggle button{flex:1;margin:0;font-size:12px;padding:10px 6px}
 .btnQuickBooking{
@@ -173,9 +215,7 @@ button:disabled{
 .qbTimeRow button{flex:1;margin:0;font-weight:700;font-size:15px;padding:12px}
 .qbField{width:100%;margin-bottom:8px}
 .qbNotes{
-  width:100%;min-height:70px;padding:10px;border-radius:8px;
-  border:1px solid #334155;background:#0f172a;color:#fff;font-size:14px;
-  resize:vertical;margin-bottom:8px;
+  width:100%;resize:vertical;margin-bottom:8px;
 }
 .phoneSuggestList{
   position:absolute;top:100%;left:0;right:0;
@@ -189,7 +229,6 @@ button:disabled{
 .phoneSuggestItem:hover{background:#e0f2fe}
 .phoneSuggestItem strong{display:block;color:#000}
 .phoneSuggestItem span{color:#555;font-size:12px}
-.phoneInputWrap{position:relative;width:100%;margin-bottom:8px}
 #bookingForm.locked{opacity:.45;pointer-events:none;user-select:none}
 body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-events:none}
 
@@ -233,12 +272,8 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 }
 
 .jobList{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.jobCard{
-  background:#1e293b;border:1px solid #334155;border-radius:10px;
-  padding:10px;cursor:pointer;
-}
-.jobCardAvailable{border-color:#2563eb;background:#1a2744}
-.jobCardAccepted{border-color:#facc15;background:#1c2a1c}
+.jobCardAvailable{border-color:#2563eb;background:linear-gradient(135deg,#1a2744,#1e293b)}
+.jobCardAccepted{border-color:#facc15;background:linear-gradient(135deg,#1c2a1c,#1e293b)}
 .jobCardTop{display:flex;justify-content:space-between;gap:8px}
 .jobId{font-weight:700;color:#facc15;font-size:13px}
 .jobTime{font-size:11px;color:#94a3b8;text-align:right}
@@ -365,7 +400,6 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <div class="operatorRow">
     <input id="operator" placeholder="Operator Name" autocomplete="off" autocapitalize="words">
     <div id="operatorStatus" class="operatorStatus">Enter your operator name to enable the app</div>
-    <button type="button" id="switchOperatorBtn" class="btnSwitchOp" onclick="signOutOperator(false)">Switch operator</button>
   </div>
 
   <div id="bookingForm" class="locked">
@@ -388,6 +422,8 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <input id="drop" placeholder="Drop Location" autocomplete="off">
     <div id="dropList" class="autocomplete-list"></div>
   </div>
+
+  <textarea id="jobNotes" class="notesBox" placeholder="Notes (optional)"></textarea>
 
   <div class="section">
     <h3>Pickup Time</h3>
@@ -497,17 +533,49 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <div id="previousList" class="jobList"></div>
 </div>
 
-<!-- PIN DELETE MODAL -->
+<!-- TAB 4: PROSPECT TRACKER -->
+<div id="tabProspect" class="tabPanel">
+  <h3>Prospect Tracker</h3>
+  <div class="listHeader">Points from completed fares · Edit with PIN</div>
+  <div class="prospectToolbar">
+    <button style="background:#2563eb" onclick="promptProspectEdit()">✏️ Edit Points (PIN)</button>
+    <button id="prospectSaveBtn" style="background:#10b981;display:none" onclick="saveProspectScores()">Save Points</button>
+  </div>
+  <table class="prospectTable">
+    <thead><tr><th>Operator</th><th style="text-align:center">Points</th></tr></thead>
+    <tbody id="prospectTableBody"></tbody>
+  </table>
+</div>
+
+<!-- PIN MODAL -->
 <div id="pinModal" class="modalOverlay" onclick="if(event.target===this)closePinModal()">
   <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
-    <h3 style="color:#facc15;margin-bottom:10px;text-align:center">Enter PIN to Delete</h3>
+    <h3 id="pinModalTitle" style="color:#facc15;margin-bottom:10px;text-align:center">Enter PIN</h3>
     <input id="pinInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autocomplete="off" enterkeyhint="done" readonly>
     <div class="pinActions">
-      <button class="btnPinDelete" onclick="confirmDeleteJob()">Delete</button>
+      <button id="pinConfirmBtn" style="background:#2563eb" onclick="confirmPinAction()">Continue</button>
       <button style="background:#64748b" onclick="closePinModal()">Cancel</button>
     </div>
   </div>
 </div>
+
+<!-- EDIT JOB MODAL -->
+<div id="editJobModal" class="modalOverlay" onclick="if(event.target===this)closeEditJobModal()">
+  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px;max-height:92vh;overflow-y:auto">
+    <h3 style="color:#60a5fa;margin-bottom:10px;text-align:center">Edit Job</h3>
+    <input id="editName" placeholder="Passenger Name">
+    <input id="editPhone" type="tel" inputmode="numeric" placeholder="Phone Number">
+    <input id="editPickup" placeholder="Pickup Location">
+    <input id="editDrop" placeholder="Drop-off Location">
+    <textarea id="editNotes" class="notesBox" placeholder="Notes"></textarea>
+    <div class="pinActions">
+      <button style="background:#10b981;flex:1" onclick="saveEditedJob()">Save Changes</button>
+      <button style="background:#64748b;flex:1" onclick="closeEditJobModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN DELETE MODAL (legacy anchor removed) -->
 
 <!-- FARE MODAL -->
 <div id="fareModal" class="modalOverlay" onclick="if(event.target===this)closeFareModal()">
@@ -534,7 +602,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button type="button" id="qbReadyBtn" onclick="setQuickTime('Ready Now')">Ready Now</button>
     </div>
     <div class="phoneInputWrap">
-      <input id="qbPhone" class="qbField" type="tel" inputmode="numeric" placeholder="Phone Number" autocomplete="off">
+      <input id="qbPhone" class="qbField" type="tel" inputmode="numeric" placeholder="Phone Number (optional)" autocomplete="off">
       <div id="qbPhoneList" class="phoneSuggestList"></div>
     </div>
     <input id="qbName" type="hidden" value="">
@@ -546,7 +614,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <input id="qbDrop" class="qbField" placeholder="Drop-off Location" autocomplete="off">
       <div id="qbDropList" class="autocomplete-list"></div>
     </div>
-    <textarea id="qbNotes" class="qbNotes" placeholder="Notes (optional)"></textarea>
+    <textarea id="qbNotes" class="notesBox qbNotes" placeholder="Notes — driver instructions, special requests…"></textarea>
     <div class="pinActions">
       <button style="background:#10b981;flex:1" onclick="dispatchQuick()">Dispatch</button>
       <button style="background:#2563eb;flex:1" onclick="sendQuickConfirmation()">Confirmation</button>
@@ -580,6 +648,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <button class="navTab" data-tab="tabPrevious" onclick="switchTab('tabPrevious',this)">
     <span class="icon">📋</span>Previous
   </button>
+  <button class="navTab" data-tab="tabProspect" onclick="switchTab('tabProspect',this)">
+    <span class="icon">🏆</span>Prospect
+  </button>
 </nav>
 
 <script src="firebase-config.js"></script>
@@ -602,6 +673,7 @@ const GEELONG_SUBURBS = [
 ].map(function(s) { return s.trim().toLowerCase(); });
 const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 330 596\n🌎 www.geelongcitytaxicab.com.au";
 const AUTHORIZED_OPERATORS = ["Danial", "Najaf", "Mudassir", "Asif", "Khizar", "Tuqeer"];
+const PROSPECT_ORDER = ["Tuqeer", "Khizar", "Asif", "Mudassir", "Najaf", "Danial"];
 
 let selectedVehicle = "None", selectedTime = "None", selectedAMPM = "None";
 let paymentArray = [], priceType = "None";
@@ -613,6 +685,11 @@ let selectedFilterOperator = "", selectedFilterType = "";
 let previousFilterActive = false;
 let pendingDeleteDocId = null;
 let pendingCompleteDocId = null;
+let pendingEditDocId = null;
+let pinAction = "";
+let prospectScores = {};
+let prospectEditMode = false;
+let prospectUnsub = null;
 const DELETE_PIN = "2814";
 let availableUnsub = null, completedUnsub = null, filterUnsub = null, operatorSessionUnsub = null;
 let renderPreviousScheduled = false, renderAvailableScheduled = false;
@@ -846,19 +923,15 @@ async function onOperatorBlur() {
 
 function updateOperatorAccess(isValid, showInvalid) {
   const status = document.getElementById("operatorStatus");
-  const switchBtn = document.getElementById("switchOperatorBtn");
   if (isValid) {
-    status.textContent = "Signed in as: " + getCurrentOperator() + " (this device only)";
+    status.textContent = "Signed in as: " + getCurrentOperator();
     status.className = "operatorStatus ready";
-    switchBtn.classList.add("show");
   } else if (showInvalid && document.getElementById("operator").value.trim()) {
     status.textContent = "Name not recognised — use Danial, Najaf, Mudassir, Asif, Khizar or Tuqeer";
     status.className = "operatorStatus invalid";
-    switchBtn.classList.remove("show");
   } else {
     status.textContent = "Enter your operator name to enable the app";
     status.className = "operatorStatus";
-    switchBtn.classList.remove("show");
   }
   document.getElementById("bookingForm").classList.toggle("locked", !isValid);
   document.body.classList.toggle("appLocked", !isValid);
@@ -877,6 +950,7 @@ function initializeFirebase() {
     subscribeAvailableJobs();
     subscribeCompletedJobs();
     subscribeCustomers();
+    subscribeProspectScores();
     renderOperatorFilterRow();
     restoreOperatorSession();
   } catch (err) {
@@ -910,6 +984,147 @@ function formatDispatchedAt(job) {
   else if (job.dispatchedAt.seconds) d = new Date(job.dispatchedAt.seconds * 1000);
   else return "";
   return "Dispatched " + d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function formatEditedAt(job) {
+  if (!job.editedAt) return "Edited";
+  let d;
+  if (job.editedAt.toDate) d = job.editedAt.toDate();
+  else if (job.editedAt.seconds) d = new Date(job.editedAt.seconds * 1000);
+  else return "Edited";
+  return "Edited " + d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function jobTimeMetaTag(job) {
+  if (job.edited) return '<span class="jobTag edited">' + escapeHtml(formatEditedAt(job)) + "</span>";
+  const dispatched = formatDispatchedAt(job);
+  return dispatched ? '<span class="jobTag dispatched">' + escapeHtml(dispatched) + "</span>" : "";
+}
+
+function computeProspectPoints(fare) {
+  const f = parseFloat(fare);
+  if (isNaN(f)) return 0;
+  if (f >= 400) return 5;
+  if (f >= 270 && f <= 280) return 4;
+  if (f >= 210 && f <= 220) return 3;
+  if (f >= 150 && f <= 160) return 2;
+  if (f >= 90 && f <= 100) return 1;
+  return 0;
+}
+
+function subscribeProspectScores() {
+  if (prospectUnsub) prospectUnsub();
+  prospectUnsub = db.collection("settings").doc("prospectTracker").onSnapshot(function(doc) {
+    const scores = {};
+    PROSPECT_ORDER.forEach(function(n) { scores[n] = 0; });
+    if (doc.exists && doc.data().scores) {
+      PROSPECT_ORDER.forEach(function(n) {
+        scores[n] = parseInt(doc.data().scores[n], 10) || 0;
+      });
+    }
+    prospectScores = scores;
+    renderProspectTable();
+  });
+}
+
+function renderProspectTable() {
+  const body = document.getElementById("prospectTableBody");
+  if (!body) return;
+  body.innerHTML = PROSPECT_ORDER.map(function(name) {
+    const pts = prospectScores[name] || 0;
+    if (prospectEditMode) {
+      return "<tr><td>" + escapeHtml(name) + '</td><td class="pointsCell"><input type="tel" inputmode="numeric" data-op="' + escapeHtml(name) + '" value="' + pts + '"></td></tr>';
+    }
+    return "<tr><td>" + escapeHtml(name) + '</td><td class="pointsCell">' + pts + "</td></tr>";
+  }).join("");
+}
+
+function enableProspectEdit() {
+  prospectEditMode = true;
+  document.getElementById("prospectSaveBtn").style.display = "block";
+  renderProspectTable();
+}
+
+function disableProspectEdit() {
+  prospectEditMode = false;
+  document.getElementById("prospectSaveBtn").style.display = "none";
+  renderProspectTable();
+}
+
+async function saveProspectScores() {
+  if (!firebaseReady) return;
+  const scores = {};
+  document.querySelectorAll("#prospectTableBody input[data-op]").forEach(function(inp) {
+    scores[inp.dataset.op] = parseInt(inp.value, 10) || 0;
+  });
+  try {
+    await db.collection("settings").doc("prospectTracker").set({
+      scores: scores,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    prospectScores = scores;
+    disableProspectEdit();
+    alert("Points saved");
+  } catch (e) {
+    alert("Save failed: " + e.message);
+  }
+}
+
+async function addProspectPoints(operatorName, points) {
+  if (!firebaseReady || !points) return;
+  const canonical = resolveOperator(operatorName);
+  if (!canonical || PROSPECT_ORDER.indexOf(canonical) === -1) return;
+  const ref = db.collection("settings").doc("prospectTracker");
+  await db.runTransaction(async function(tx) {
+    const doc = await tx.get(ref);
+    const scores = {};
+    PROSPECT_ORDER.forEach(function(n) { scores[n] = 0; });
+    if (doc.exists && doc.data().scores) {
+      PROSPECT_ORDER.forEach(function(n) { scores[n] = parseInt(doc.data().scores[n], 10) || 0; });
+    }
+    scores[canonical] = (scores[canonical] || 0) + points;
+    tx.set(ref, { scores: scores, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+  });
+}
+
+function openEditJobModal(docId) {
+  const job = findJobById(docId);
+  if (!job) return;
+  pendingEditDocId = docId;
+  document.getElementById("editName").value = job.name || "";
+  document.getElementById("editPhone").value = formatPhoneDisplay(job.phone || "");
+  document.getElementById("editPickup").value = job.pickup || "";
+  document.getElementById("editDrop").value = job.drop || "";
+  document.getElementById("editNotes").value = job.notes || "";
+  document.getElementById("editJobModal").classList.add("open");
+}
+
+function closeEditJobModal() {
+  document.getElementById("editJobModal").classList.remove("open");
+  pendingEditDocId = null;
+}
+
+async function saveEditedJob() {
+  const docId = pendingEditDocId;
+  if (!docId || !firebaseReady) return;
+  const op = getCurrentOperator();
+  if (!op) return;
+  try {
+    await db.collection("jobs").doc(docId).update({
+      name: titleCase(document.getElementById("editName").value) || "Customer",
+      phone: formatPhoneDisplay(document.getElementById("editPhone").value),
+      pickup: titleCase(document.getElementById("editPickup").value),
+      drop: titleCase(document.getElementById("editDrop").value),
+      notes: document.getElementById("editNotes").value.trim(),
+      edited: true,
+      editedBy: op,
+      editedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeEditJobModal();
+    closeJobModal();
+  } catch (e) {
+    alert("Save failed: " + e.message);
+  }
 }
 
 function isFutureTimeType(timeType) {
@@ -1243,20 +1458,73 @@ function jobDeleteBtn(docId) {
   return '<button type="button" class="jobDelete" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">🗑️</button>';
 }
 
+function jobEditBtn(docId) {
+  return '<button type="button" class="jobEdit" onclick="promptEditJob(\'' + docId + '\', event)" title="Edit">✏️</button>';
+}
+
+function openPinModal(action, docId) {
+  pinAction = action;
+  pendingDeleteDocId = action === "delete" ? docId : null;
+  pendingEditDocId = action === "edit" ? docId : null;
+  const title = document.getElementById("pinModalTitle");
+  const btn = document.getElementById("pinConfirmBtn");
+  if (action === "delete") {
+    title.textContent = "Enter PIN to Delete";
+    btn.textContent = "Delete";
+    btn.style.background = "#dc2626";
+  } else if (action === "edit") {
+    title.textContent = "Enter PIN to Edit Job";
+    btn.textContent = "Continue";
+    btn.style.background = "#2563eb";
+  } else {
+    title.textContent = "Enter PIN to Edit Points";
+    btn.textContent = "Continue";
+    btn.style.background = "#2563eb";
+  }
+  document.getElementById("pinInput").value = "";
+  document.getElementById("pinModal").classList.add("open");
+  focusModalInput(document.getElementById("pinInput"));
+}
+
 function promptDeleteJob(docId, e) {
   if (e) e.stopPropagation();
   if (!requireOperator("delete jobs")) return;
-  pendingDeleteDocId = docId;
-  const pinEl = document.getElementById("pinInput");
-  pinEl.value = "";
-  document.getElementById("pinModal").classList.add("open");
-  focusModalInput(pinEl);
+  openPinModal("delete", docId);
+}
+
+function promptEditJob(docId, e) {
+  if (e) e.stopPropagation();
+  if (!requireOperator("edit jobs")) return;
+  openPinModal("edit", docId);
+}
+
+function promptProspectEdit() {
+  if (!requireOperator("edit prospect points")) return;
+  openPinModal("prospect", null);
+}
+
+function confirmPinAction() {
+  if (document.getElementById("pinInput").value !== DELETE_PIN) {
+    alert("Wrong PIN");
+    return;
+  }
+  if (pinAction === "delete") confirmDeleteJob();
+  else if (pinAction === "edit") {
+    const docId = pendingEditDocId;
+    closePinModal();
+    openEditJobModal(docId);
+  } else if (pinAction === "prospect") {
+    closePinModal();
+    enableProspectEdit();
+  }
 }
 
 function closePinModal() {
   document.getElementById("pinModal").classList.remove("open");
   document.getElementById("pinInput").setAttribute("readonly", "readonly");
   pendingDeleteDocId = null;
+  pendingEditDocId = null;
+  pinAction = "";
 }
 
 async function confirmDeleteJob() {
@@ -1322,6 +1590,7 @@ function collectJobData(jobId, status) {
     price: document.getElementById("price").value,
     depositLink: document.getElementById("depositLink").value,
     depositAmount: document.getElementById("depositAmount").value,
+    notes: document.getElementById("jobNotes").value.trim(),
     sortKey: computeSortKey(selectedTime, date, timeInput, selectedAMPM),
     sessionId: sessionId,
     dispatchedAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -1409,7 +1678,6 @@ function renderAvailableList() {
     return;
   }
   el.innerHTML = jobs.map(function(job) {
-    const asap = isCurrentJob(job);
     const dispatched = formatDispatchedAt(job);
     const isAccepted = job.status === "accepted";
     const cardClass = isAccepted ? "jobCardAccepted" : "jobCardAvailable";
@@ -1430,14 +1698,14 @@ function renderAvailableList() {
     }
     return '<div class="jobCard ' + cardClass + '" onclick="openJobModal(\'' + job.docId + '\',\'available\')">' +
       '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span>' +
-      '<div class="jobCardTopRight">' + jobDeleteBtn(job.docId) +
+      '<div class="jobCardTopRight">' + jobEditBtn(job.docId) + jobDeleteBtn(job.docId) +
       '<span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div></div>' +
       '<div class="jobName">' + escapeHtml(job.name || "Unknown") + '</div>' +
       phoneHtml +
       '<div class="jobRoute">📍 ' + escapeHtml(job.pickup || "—") + '<br>→ ' + escapeHtml(job.drop || "—") + '</div>' +
       '<div class="jobMeta">' +
-        (dispatched ? '<span class="jobTag dispatched">' + escapeHtml(dispatched) + '</span>' : '') +
-        (asap ? '<span class="jobTag asap">' + escapeHtml(job.time || "ASAP") + '</span>' : '') +
+        jobTimeMetaTag(job) +
+        (isCurrentJob(job) ? '<span class="jobTag asap">' + escapeHtml(job.time || "ASAP") + '</span>' : '<span class="jobTag">' + escapeHtml(job.time || "Future") + '</span>') +
         '<span class="jobTag">' + escapeHtml(job.vehicle || "—") + '</span>' +
         (job.operator ? '<span class="jobTag">Dispatched: ' + escapeHtml(job.operator) + '</span>' : '') +
         (job.notes ? '<span class="jobTag">📝 ' + escapeHtml(job.notes.slice(0, 40)) + '</span>' : '') +
@@ -1454,7 +1722,6 @@ function renderPreviousList() {
     return;
   }
   el.innerHTML = jobs.map(function(job) {
-    const dispatched = formatDispatchedAt(job);
     const finisher = job.completedBy || job.acceptedBy || job.operator || "Unknown";
     const phoneHtml = job.phone
       ? '<a class="jobPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
@@ -1464,15 +1731,16 @@ function renderPreviousList() {
       : '<span class="jobTag">' + escapeHtml(job.status || "—") + '</span>';
     return '<div class="jobCard" onclick="openJobModal(\'' + job.docId + '\',\'previous\')">' +
       '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span>' +
-      '<div class="jobCardTopRight">' + jobDeleteBtn(job.docId) +
+      '<div class="jobCardTopRight">' + jobEditBtn(job.docId) + jobDeleteBtn(job.docId) +
       '<span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div></div>' +
       '<div class="jobName">' + escapeHtml(job.name || "Unknown") + fareLineHtml(job) + '</div>' +
       phoneHtml +
       '<div class="jobRoute">📍 ' + escapeHtml(job.pickup || "—") + ' → ' + escapeHtml(job.drop || "—") + '</div>' +
       '<div class="jobMeta">' +
-        (dispatched ? '<span class="jobTag dispatched">' + escapeHtml(dispatched) + '</span>' : '') +
+        jobTimeMetaTag(job) +
         typeTag +
         (job.operator ? '<span class="jobTag">Disp: ' + escapeHtml(job.operator) + '</span>' : '') +
+        (job.notes ? '<span class="jobTag">📝 ' + escapeHtml(job.notes.slice(0, 40)) + '</span>' : '') +
       '</div></div>';
   }).join("");
 }
@@ -1713,6 +1981,8 @@ async function confirmCompleteJob() {
       completedAt: firebase.firestore.FieldValue.serverTimestamp(),
       fare: fare
     });
+    const pts = computeProspectPoints(fare);
+    if (pts > 0) await addProspectPoints(op, pts);
     closeFareModal();
     closeJobModal();
   } catch (err) {
@@ -1727,6 +1997,7 @@ function applyJobToForm(job) {
   document.getElementById("phone").value = formatPhoneDisplay(job.phone || "");
   document.getElementById("pickup").value = job.pickup || "";
   document.getElementById("drop").value = job.drop || "";
+  document.getElementById("jobNotes").value = job.notes || "";
   document.getElementById("adults").value = job.adults || "";
   document.getElementById("kids").value = job.kids || "";
   document.getElementById("luggage").value = job.luggage || "";
@@ -1816,7 +2087,7 @@ function clearFormRefresh() {
 }
 
 function clearForm() {
-  ["name","phone","pickup","drop","adults","kids","luggage","date","time","price","depositLink","depositAmount"].forEach(function(id) {
+  ["name","phone","pickup","drop","jobNotes","adults","kids","luggage","date","time","price","depositLink","depositAmount"].forEach(function(id) {
     document.getElementById(id).value = "";
   });
   document.getElementById("phoneHint").classList.remove("show");
@@ -1928,19 +2199,23 @@ function collectQuickJobData(jobId) {
   };
 }
 
-function validateQuickBooking() {
-  const phone = normalizePhone(document.getElementById("qbPhone").value);
-  if (phone.length < 8) { alert("Enter phone number"); return false; }
+function validateQuickDispatch() {
   if (!document.getElementById("qbPickup").value.trim()) { alert("Enter pickup location"); return false; }
   if (!document.getElementById("qbDrop").value.trim()) { alert("Enter drop-off location"); return false; }
   if (quickSelectedTime === "None") { alert("Select Quick or Ready Now"); return false; }
   return true;
 }
 
+function validateQuickConfirmation() {
+  const phone = normalizePhone(document.getElementById("qbPhone").value);
+  if (phone.length < 8) { alert("Enter phone number for confirmation SMS"); return false; }
+  return validateQuickDispatch();
+}
+
 async function dispatchQuick() {
   if (!firebaseReady) { alert("Firebase not connected"); return; }
   if (!requireOperator("dispatch")) return;
-  if (!validateQuickBooking()) return;
+  if (!validateQuickDispatch()) return;
   try {
     const jobId = await getNextJobId();
     const job = collectQuickJobData(jobId);
@@ -1960,7 +2235,7 @@ async function dispatchQuick() {
 
 function sendQuickConfirmation() {
   if (!requireOperator("send confirmation")) return;
-  if (!validateQuickBooking()) return;
+  if (!validateQuickConfirmation()) return;
   const phone = document.getElementById("qbPhone").value.replace(/\s+/g, "");
   const name = document.getElementById("qbName").value.trim() || "Customer";
   const pickup = titleCase(document.getElementById("qbPickup").value);
@@ -2229,7 +2504,7 @@ window.addEventListener("DOMContentLoaded", function() {
     });
   }
   document.getElementById("pinInput").addEventListener("keydown", function(e) {
-    if (e.key === "Enter") confirmDeleteJob();
+    if (e.key === "Enter") confirmPinAction();
   });
   document.getElementById("fareInput").addEventListener("keydown", function(e) {
     if (e.key === "Enter") confirmCompleteJob();
