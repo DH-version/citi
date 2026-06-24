@@ -54,6 +54,23 @@ h3{
 .tabPanel.active{display:block}
 
 .section{margin-top:6px}
+#bookingForm .section{margin-top:3px}
+#bookingForm h3{font-size:12px;margin:2px 0 3px}
+#bookingForm input:not([type="date"]){
+  padding:9px 10px;margin:2px 0;font-size:15px;
+}
+#bookingForm .notesInline{
+  padding:9px 10px;margin:2px 0;font-size:15px;
+}
+#bookingForm #timeSelected,#bookingForm #vehicleSelected,
+#bookingForm #paymentSelected,#bookingForm #priceSelected{
+  font-size:10px;margin-top:1px;line-height:1.2;
+}
+#bookingForm .row,#bookingForm .threeCol,#bookingForm .fourCol,
+#bookingForm .depositRow,#bookingForm .paymentLinkRow,#bookingForm .priceRow{gap:3px}
+#bookingForm .btnQuickBooking{margin-bottom:5px}
+#bookingForm .twoCol{margin:2px 0}
+#bookingForm .autocomplete-container{margin:0}
 
 input,select{
   width:100%;
@@ -158,7 +175,7 @@ button:disabled{
 .phoneHint{font-size:11px;color:#34d399;margin-top:2px;display:none}
 .phoneHint.show{display:block}
 
-.operatorRow{margin-bottom:6px}
+.operatorRow{margin-bottom:4px}
 .operatorRow input{padding:10px;font-size:14px;width:100%}
 .operatorStatus{font-size:11px;color:#94a3b8;text-align:center;margin-top:4px;line-height:1.3}
 .operatorStatus.ready{color:#4ade80;font-weight:700}
@@ -168,6 +185,11 @@ button:disabled{
   width:100%;min-height:72px;padding:12px;border-radius:10px;
   border:1px solid #475569;background:#0f172a;color:#fff;
   font-size:15px;line-height:1.45;resize:vertical;margin-top:4px;
+}
+.notesInline{
+  width:100%;padding:10px 12px;border-radius:10px;
+  border:1px solid #475569;background:#0f172a;color:#fff;
+  font-size:15px;margin:3px 0;
 }
 .notesBox.qbNotes{
   min-height:110px;font-size:17px;line-height:1.5;
@@ -278,7 +300,18 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .jobId{font-weight:700;color:#facc15;font-size:13px}
 .jobTime{font-size:11px;color:#94a3b8;text-align:right}
 .jobName{font-size:14px;font-weight:600;margin:4px 0 2px}
-.jobRoute{font-size:12px;color:#94a3b8;line-height:1.4}
+.jobRoute{margin:8px 0 4px;display:flex;flex-direction:column;gap:5px}
+.jobAddr{
+  font-size:17px;font-weight:800;line-height:1.3;
+  color:#f8fafc;letter-spacing:-.01em;
+}
+.jobAddrPickup{color:#fff}
+.jobAddrDrop{color:#e2e8f0}
+.jobAddrLbl{
+  display:inline-block;font-size:10px;font-weight:800;
+  letter-spacing:.6px;color:#38bdf8;margin-right:4px;vertical-align:1px;
+}
+.detailValue.routeBig{font-size:18px;font-weight:800;color:#f8fafc;line-height:1.35}
 .jobMeta{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
 .jobTag{font-size:10px;padding:2px 8px;border-radius:6px;background:#334155;color:#cbd5e1}
 .jobTag.asap{background:#10b98133;color:#34d399}
@@ -423,7 +456,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <div id="dropList" class="autocomplete-list"></div>
   </div>
 
-  <textarea id="jobNotes" class="notesBox" placeholder="Notes (optional)"></textarea>
+  <input id="jobNotes" class="notesInline" type="text" placeholder="Notes (optional)" autocomplete="off">
 
   <div class="section">
     <h3>Pickup Time</h3>
@@ -601,11 +634,11 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button type="button" id="qbQuickBtn" onclick="setQuickTime('Quick')">Quick</button>
       <button type="button" id="qbReadyBtn" onclick="setQuickTime('Ready Now')">Ready Now</button>
     </div>
+    <input id="qbName" class="qbField" type="text" placeholder="Passenger Name" autocomplete="off" autocapitalize="words">
     <div class="phoneInputWrap">
       <input id="qbPhone" class="qbField" type="tel" inputmode="numeric" placeholder="Phone Number (optional)" autocomplete="off">
       <div id="qbPhoneList" class="phoneSuggestList"></div>
     </div>
-    <input id="qbName" type="hidden" value="">
     <div class="autocomplete-container">
       <input id="qbPickup" class="qbField" placeholder="Pickup Location" autocomplete="off">
       <div id="qbPickupList" class="autocomplete-list"></div>
@@ -1702,7 +1735,7 @@ function renderAvailableList() {
       '<span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div></div>' +
       '<div class="jobName">' + escapeHtml(job.name || "Unknown") + '</div>' +
       phoneHtml +
-      '<div class="jobRoute">📍 ' + escapeHtml(job.pickup || "—") + '<br>→ ' + escapeHtml(job.drop || "—") + '</div>' +
+      jobRouteHtml(job) +
       '<div class="jobMeta">' +
         jobTimeMetaTag(job) +
         (isCurrentJob(job) ? '<span class="jobTag asap">' + escapeHtml(job.time || "ASAP") + '</span>' : '<span class="jobTag">' + escapeHtml(job.time || "Future") + '</span>') +
@@ -1735,7 +1768,7 @@ function renderPreviousList() {
       '<span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div></div>' +
       '<div class="jobName">' + escapeHtml(job.name || "Unknown") + fareLineHtml(job) + '</div>' +
       phoneHtml +
-      '<div class="jobRoute">📍 ' + escapeHtml(job.pickup || "—") + ' → ' + escapeHtml(job.drop || "—") + '</div>' +
+      jobRouteHtml(job) +
       '<div class="jobMeta">' +
         jobTimeMetaTag(job) +
         typeTag +
@@ -1750,6 +1783,13 @@ function formatFareDisplay(fare) {
   const n = parseFloat(String(fare).replace(/[^0-9.]/g, ""));
   if (isNaN(n)) return "";
   return n % 1 === 0 ? "$" + n.toFixed(0) : "$" + n.toFixed(2);
+}
+
+function jobRouteHtml(job) {
+  return '<div class="jobRoute">' +
+    '<div class="jobAddr jobAddrPickup"><span class="jobAddrLbl">PICKUP</span>' + escapeHtml(job.pickup || "—") + '</div>' +
+    '<div class="jobAddr jobAddrDrop"><span class="jobAddrLbl">DROP</span>' + escapeHtml(job.drop || "—") + '</div>' +
+    '</div>';
 }
 
 function fareLineHtml(job) {
@@ -1799,8 +1839,10 @@ function openJobModal(docId, source) {
   }
 
   document.getElementById("modalJobBody").innerHTML = rows.map(function(r) {
+    const isRoute = r[0] === "Pickup" || r[0] === "Drop-off";
     const val = r[0] === "Passenger" ? r[1] : escapeHtml(r[1]).replace(/\n/g, "<br>");
-    return '<div class="detailRow"><div class="detailLabel">' + r[0] + '</div><div class="detailValue">' + val + '</div></div>';
+    const valClass = isRoute ? "detailValue routeBig" : "detailValue";
+    return '<div class="detailRow"><div class="detailLabel">' + r[0] + '</div><div class="' + valClass + '">' + val + '</div></div>';
   }).join("");
 
   let actions = '<button onclick="copyJobMessage(\'' + docId + '\')">Copy Dispatch</button>';
