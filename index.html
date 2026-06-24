@@ -158,6 +158,38 @@ button:disabled{
 .operatorStatus{font-size:11px;color:#94a3b8;text-align:center;margin-top:4px;line-height:1.3}
 .operatorStatus.ready{color:#4ade80;font-weight:700}
 .operatorStatus.invalid{color:#f87171}
+.btnSwitchOp{
+  display:none;width:100%;margin-top:4px;padding:6px;
+  background:#334155!important;font-size:11px;
+}
+.btnSwitchOp.show{display:block}
+.availToggle{display:flex;gap:6px;margin-bottom:8px}
+.availToggle button{flex:1;margin:0;font-size:12px;padding:10px 6px}
+.btnQuickBooking{
+  width:100%;margin-bottom:8px;background:#2563eb!important;
+  font-weight:700;padding:12px;
+}
+.qbTimeRow{display:flex;gap:8px;margin-bottom:8px}
+.qbTimeRow button{flex:1;margin:0;font-weight:700;font-size:15px;padding:12px}
+.qbField{width:100%;margin-bottom:8px}
+.qbNotes{
+  width:100%;min-height:70px;padding:10px;border-radius:8px;
+  border:1px solid #334155;background:#0f172a;color:#fff;font-size:14px;
+  resize:vertical;margin-bottom:8px;
+}
+.phoneSuggestList{
+  position:absolute;top:100%;left:0;right:0;
+  background:#fff;border:1px solid #ddd;border-radius:8px;
+  max-height:200px;overflow-y:auto;z-index:1001;display:none;margin-top:2px;
+}
+.phoneSuggestList.active{display:block}
+.phoneSuggestItem{
+  padding:10px 12px;cursor:pointer;border-bottom:1px solid #eee;color:#111;font-size:13px;
+}
+.phoneSuggestItem:hover{background:#e0f2fe}
+.phoneSuggestItem strong{display:block;color:#000}
+.phoneSuggestItem span{color:#555;font-size:12px}
+.phoneInputWrap{position:relative;width:100%;margin-bottom:8px}
 #bookingForm.locked{opacity:.45;pointer-events:none;user-select:none}
 body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-events:none}
 
@@ -262,6 +294,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 }
 #pinModal.open{align-items:center;justify-content:center;padding:16px}
 #fareModal.open{align-items:center;justify-content:center;padding:16px}
+#quickBookingModal.open{align-items:center;justify-content:center;padding:16px}
 .pinModalSheet input{text-align:center;font-size:22px;letter-spacing:6px}
 .fareInputWrap{
   display:flex;align-items:center;background:#0f172a;
@@ -332,12 +365,17 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <div class="operatorRow">
     <input id="operator" placeholder="Operator Name" autocomplete="off" autocapitalize="words">
     <div id="operatorStatus" class="operatorStatus">Enter your operator name to enable the app</div>
+    <button type="button" id="switchOperatorBtn" class="btnSwitchOp" onclick="signOutOperator(false)">Switch operator</button>
   </div>
 
   <div id="bookingForm" class="locked">
+  <button type="button" class="btnQuickBooking" onclick="openQuickBooking()">⚡ Quick Booking</button>
   <div class="twoCol">
     <input id="name" placeholder="Passenger Name">
-    <input id="phone" type="tel" inputmode="numeric" placeholder="Phone Number">
+    <div class="phoneInputWrap">
+      <input id="phone" type="tel" inputmode="numeric" placeholder="Phone Number" autocomplete="off">
+      <div id="phoneList" class="phoneSuggestList"></div>
+    </div>
   </div>
   <div id="phoneHint" class="phoneHint">Customer found — details filled</div>
 
@@ -356,7 +394,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <div class="row">
       <button id="quickBtn" onclick="setTime('Quick')">Quick</button>
       <button id="readyBtn" onclick="setTime('Ready Now')">Ready Now</button>
-      <button id="laterBtn" onclick="setTime('Later')">Later</button>
+      <button id="laterBtn" onclick="setTime('Future')">Future</button>
     </div>
     <div class="threeCol">
       <input id="date" type="date" disabled>
@@ -428,7 +466,11 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <!-- TAB 2: AVAILABLE BOOKINGS -->
 <div id="tabAvailable" class="tabPanel">
   <h3>Available Bookings</h3>
-  <div class="listHeader">Accept jobs · Accepted jobs show in yellow</div>
+  <div class="availToggle">
+    <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
+    <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Future Bookings</button>
+  </div>
+  <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
   <div id="availableList" class="jobList"></div>
 </div>
 
@@ -480,6 +522,36 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button class="btnComplete" onclick="confirmCompleteJob()">Complete Job</button>
       <button style="background:#64748b" onclick="closeFareModal()">Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- QUICK BOOKING MODAL -->
+<div id="quickBookingModal" class="modalOverlay" onclick="if(event.target===this)closeQuickBooking()">
+  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px;max-height:92vh">
+    <h3 style="color:#60a5fa;margin-bottom:10px;text-align:center">Quick Booking</h3>
+    <div class="qbTimeRow">
+      <button type="button" id="qbQuickBtn" onclick="setQuickTime('Quick')">Quick</button>
+      <button type="button" id="qbReadyBtn" onclick="setQuickTime('Ready Now')">Ready Now</button>
+    </div>
+    <div class="phoneInputWrap">
+      <input id="qbPhone" class="qbField" type="tel" inputmode="numeric" placeholder="Phone Number" autocomplete="off">
+      <div id="qbPhoneList" class="phoneSuggestList"></div>
+    </div>
+    <input id="qbName" type="hidden" value="">
+    <div class="autocomplete-container">
+      <input id="qbPickup" class="qbField" placeholder="Pickup Location" autocomplete="off">
+      <div id="qbPickupList" class="autocomplete-list"></div>
+    </div>
+    <div class="autocomplete-container">
+      <input id="qbDrop" class="qbField" placeholder="Drop-off Location" autocomplete="off">
+      <div id="qbDropList" class="autocomplete-list"></div>
+    </div>
+    <textarea id="qbNotes" class="qbNotes" placeholder="Notes (optional)"></textarea>
+    <div class="pinActions">
+      <button style="background:#10b981;flex:1" onclick="dispatchQuick()">Dispatch</button>
+      <button style="background:#2563eb;flex:1" onclick="sendQuickConfirmation()">Confirmation</button>
+    </div>
+    <button style="width:100%;background:#64748b;margin-top:8px" onclick="closeQuickBooking()">Cancel</button>
   </div>
 </div>
 
@@ -542,8 +614,12 @@ let previousFilterActive = false;
 let pendingDeleteDocId = null;
 let pendingCompleteDocId = null;
 const DELETE_PIN = "2814";
-let availableUnsub = null, completedUnsub = null, filterUnsub = null;
+let availableUnsub = null, completedUnsub = null, filterUnsub = null, operatorSessionUnsub = null;
 let renderPreviousScheduled = false, renderAvailableScheduled = false;
+let customersCache = [], customersUnsub = null;
+let availableView = "current", quickSelectedTime = "None";
+let deviceId = localStorage.getItem("deviceId") || ("d_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10));
+localStorage.setItem("deviceId", deviceId);
 let sessionId = localStorage.getItem("sessionId") || ("s_" + Date.now() + "_" + Math.random().toString(36).slice(2));
 localStorage.setItem("sessionId", sessionId);
 let jobsListenerReady = false;
@@ -587,80 +663,202 @@ function requireOperator(actionLabel) {
 
 function initOperatorField() {
   renderOperatorFilterRow();
+  bindOperatorFieldEvents();
+  restoreOperatorSession();
+}
+
+function bindOperatorFieldEvents() {
   const el = document.getElementById("operator");
-  const saved = localStorage.getItem("operatorName");
-  if (saved && resolveOperator(saved)) {
-    el.value = resolveOperator(saved);
-    updateOperatorAccess(true);
-  } else {
-    if (saved) localStorage.removeItem("operatorName");
-    updateOperatorAccess(false);
-  }
   if (!el.dataset.bound) {
     el.dataset.bound = "1";
     el.addEventListener("input", onOperatorInput);
     el.addEventListener("blur", onOperatorBlur);
   }
   const phoneEl = document.getElementById("phone");
-  if (!phoneEl.dataset.bound) {
-    phoneEl.dataset.bound = "1";
-    phoneEl.addEventListener("input", onPhoneInput);
-    phoneEl.addEventListener("blur", lookupCustomerByPhone);
+  if (!phoneEl.dataset.suggestBound) {
+    setupPhoneSuggestions("phone", "phoneList", {
+      nameEl: document.getElementById("name"),
+      phoneEl: phoneEl,
+      pickupEl: document.getElementById("pickup"),
+      dropEl: document.getElementById("drop"),
+      hintEl: document.getElementById("phoneHint")
+    });
   }
 }
 
-function onOperatorInput() {
+function saveOperatorLocally(canonical) {
+  document.getElementById("operator").value = canonical;
+  localStorage.setItem("operatorName", canonical);
+  localStorage.setItem("operatorSession", JSON.stringify({ deviceId: deviceId, operator: canonical }));
+  updateOperatorAccess(true);
+}
+
+function watchOperatorSession(operatorName) {
+  if (!firebaseReady || !operatorName) return;
+  if (operatorSessionUnsub) operatorSessionUnsub();
+  operatorSessionUnsub = db.collection("operatorSessions").doc(operatorName).onSnapshot(function(doc) {
+    if (!doc.exists) return;
+    const data = doc.data();
+    if (data.deviceId && data.deviceId !== deviceId) {
+      signOutOperator(true);
+    }
+  });
+}
+
+async function restoreOperatorSession() {
+  let canonical = "";
+  try {
+    const saved = JSON.parse(localStorage.getItem("operatorSession") || "null");
+    if (saved && saved.deviceId === deviceId && resolveOperator(saved.operator)) {
+      canonical = resolveOperator(saved.operator);
+    }
+  } catch (e) {}
+  if (!canonical) {
+    const legacy = localStorage.getItem("operatorName");
+    if (legacy && resolveOperator(legacy)) canonical = resolveOperator(legacy);
+  }
+  if (canonical && firebaseReady) {
+    try {
+      const doc = await db.collection("operatorSessions").doc(canonical).get();
+      if (doc.exists && doc.data().deviceId && doc.data().deviceId !== deviceId) {
+        canonical = "";
+        localStorage.removeItem("operatorName");
+        localStorage.removeItem("operatorSession");
+      }
+    } catch (e) { console.error(e); }
+  }
+  if (canonical) {
+    saveOperatorLocally(canonical);
+    watchOperatorSession(canonical);
+    if (firebaseReady) claimOperatorSession(canonical, true);
+  } else {
+    localStorage.removeItem("operatorName");
+    localStorage.removeItem("operatorSession");
+    updateOperatorAccess(false);
+  }
+}
+
+async function claimOperatorSession(canonical, silent) {
+  if (!firebaseReady) return;
+  const current = getCurrentOperator();
+  if (current && current !== canonical && !silent) {
+    if (!confirm("Switch from " + current + " to " + canonical + " on this device?")) {
+      document.getElementById("operator").value = current;
+      updateOperatorAccess(true);
+      return false;
+    }
+    await releaseOperatorSession(current);
+  }
+  try {
+    const existing = await db.collection("operatorSessions").doc(canonical).get();
+    if (existing.exists && existing.data().deviceId && existing.data().deviceId !== deviceId) {
+      if (!silent && !confirm(canonical + " is active on another device. Sign in here instead?")) {
+        document.getElementById("operator").value = current || "";
+        updateOperatorAccess(!!current);
+        return false;
+      }
+    }
+    await db.collection("operatorSessions").doc(canonical).set({
+      deviceId: deviceId,
+      sessionId: sessionId,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection("devices").doc(deviceId).set({
+      operator: canonical,
+      sessionId: sessionId,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    saveOperatorLocally(canonical);
+    watchOperatorSession(canonical);
+    return true;
+  } catch (e) {
+    console.error(e);
+    saveOperatorLocally(canonical);
+    return true;
+  }
+}
+
+async function releaseOperatorSession(operatorName) {
+  if (!firebaseReady || !operatorName) return;
+  try {
+    const doc = await db.collection("operatorSessions").doc(operatorName).get();
+    if (doc.exists && doc.data().deviceId === deviceId) {
+      await db.collection("operatorSessions").doc(operatorName).delete();
+    }
+    const dev = await db.collection("devices").doc(deviceId).get();
+    if (dev.exists && dev.data().operator === operatorName) {
+      await db.collection("devices").doc(deviceId).delete();
+    }
+  } catch (e) { console.error(e); }
+}
+
+function signOutOperator(forced, otherDeviceId) {
+  const op = getCurrentOperator();
+  if (operatorSessionUnsub) {
+    operatorSessionUnsub();
+    operatorSessionUnsub = null;
+  }
+  document.getElementById("operator").value = "";
+  localStorage.removeItem("operatorName");
+  localStorage.removeItem("operatorSession");
+  updateOperatorAccess(false);
+  if (forced) {
+    alert(op + " signed in on another device. This device was signed out.");
+  }
+  releaseOperatorSession(op);
+  switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
+}
+
+async function onOperatorInput() {
   const el = document.getElementById("operator");
   const raw = el.value;
   if (!raw.trim()) {
+    if (getCurrentOperator()) await releaseOperatorSession(getCurrentOperator());
     localStorage.removeItem("operatorName");
+    localStorage.removeItem("operatorSession");
     updateOperatorAccess(false);
     return;
   }
   const canonical = resolveOperator(raw);
   if (canonical) {
     el.value = canonical;
-    localStorage.setItem("operatorName", canonical);
-    updateOperatorAccess(true);
+    await claimOperatorSession(canonical, false);
   } else {
     updateOperatorAccess(false, true);
   }
 }
 
-function onOperatorBlur() {
+async function onOperatorBlur() {
   const el = document.getElementById("operator");
   const canonical = resolveOperator(el.value);
   if (canonical) {
     el.value = canonical;
-    localStorage.setItem("operatorName", canonical);
-    updateOperatorAccess(true);
+    await claimOperatorSession(canonical, true);
   } else if (!el.value.trim()) {
+    if (getCurrentOperator()) await releaseOperatorSession(getCurrentOperator());
     localStorage.removeItem("operatorName");
+    localStorage.removeItem("operatorSession");
     updateOperatorAccess(false);
   } else {
     updateOperatorAccess(false, true);
   }
 }
 
-function setSelectedOperator(name) {
-  const canonical = resolveOperator(name);
-  if (!canonical) return;
-  document.getElementById("operator").value = canonical;
-  localStorage.setItem("operatorName", canonical);
-  updateOperatorAccess(true);
-}
-
 function updateOperatorAccess(isValid, showInvalid) {
   const status = document.getElementById("operatorStatus");
+  const switchBtn = document.getElementById("switchOperatorBtn");
   if (isValid) {
-    status.textContent = "Signed in as: " + getCurrentOperator();
+    status.textContent = "Signed in as: " + getCurrentOperator() + " (this device only)";
     status.className = "operatorStatus ready";
+    switchBtn.classList.add("show");
   } else if (showInvalid && document.getElementById("operator").value.trim()) {
     status.textContent = "Name not recognised — use Danial, Najaf, Mudassir, Asif, Khizar or Tuqeer";
     status.className = "operatorStatus invalid";
+    switchBtn.classList.remove("show");
   } else {
     status.textContent = "Enter your operator name to enable the app";
     status.className = "operatorStatus";
+    switchBtn.classList.remove("show");
   }
   document.getElementById("bookingForm").classList.toggle("locked", !isValid);
   document.body.classList.toggle("appLocked", !isValid);
@@ -678,7 +876,9 @@ function initializeFirebase() {
     setSyncStatus("Connected — live sync active", false);
     subscribeAvailableJobs();
     subscribeCompletedJobs();
+    subscribeCustomers();
     renderOperatorFilterRow();
+    restoreOperatorSession();
   } catch (err) {
     console.error(err);
     setSyncStatus("Firebase error — check config", true);
@@ -712,29 +912,115 @@ function formatDispatchedAt(job) {
   return "Dispatched " + d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
 }
 
-function onPhoneInput(e) {
-  const el = e.target;
-  const formatted = formatPhoneDisplay(el.value);
-  if (el.value !== formatted) el.value = formatted;
-  document.getElementById("phoneHint").classList.remove("show");
+function isFutureTimeType(timeType) {
+  return timeType === "Future" || timeType === "Later";
 }
 
-async function lookupCustomerByPhone() {
+function isFutureJob(job) {
+  return isFutureTimeType(job.time || "");
+}
+
+function isCurrentJob(job) {
+  return !isFutureJob(job);
+}
+
+function setAvailableView(view) {
+  availableView = view;
+  document.getElementById("availCurrentBtn").classList.toggle("selected", view === "current");
+  document.getElementById("availFutureBtn").classList.toggle("selected", view === "future");
+  document.getElementById("availableListHint").textContent = view === "future"
+    ? "Future scheduled jobs"
+    : "Quick & Ready Now jobs · Accept to take";
+  scheduleRenderAvailable();
+}
+
+function subscribeCustomers() {
+  if (customersUnsub) customersUnsub();
+  customersUnsub = db.collection("customers").limit(400).onSnapshot(function(snap) {
+    customersCache = snap.docs.map(function(d) {
+      const data = d.data();
+      return {
+        phone: d.id,
+        name: data.name || "",
+        pickup: data.pickup || "",
+        drop: data.drop || ""
+      };
+    });
+  }, function(err) { console.error(err); });
+}
+
+function applyCustomerData(c, fields) {
+  if (!c) return;
+  if (fields.nameEl && c.name) fields.nameEl.value = c.name;
+  if (fields.phoneEl) fields.phoneEl.value = formatPhoneDisplay(c.phone);
+  if (fields.pickupEl && c.pickup) fields.pickupEl.value = c.pickup;
+  if (fields.dropEl && c.drop) fields.dropEl.value = c.drop;
+  if (fields.hintEl) fields.hintEl.classList.add("show");
+}
+
+function searchPhoneSuggestions(query, listEl, onPick) {
+  const digits = normalizePhone(query);
+  if (digits.length < 3) {
+    listEl.classList.remove("active");
+    listEl.innerHTML = "";
+    return;
+  }
+  const matches = customersCache.filter(function(c) {
+    return c.phone.indexOf(digits) === 0 || normalizePhone(c.phone).indexOf(digits) === 0;
+  }).slice(0, 8);
+  if (!matches.length) {
+    listEl.classList.remove("active");
+    return;
+  }
+  listEl.innerHTML = matches.map(function(c, i) {
+    return '<div class="phoneSuggestItem" data-idx="' + i + '"><strong>' + escapeHtml(formatPhoneDisplay(c.phone)) + '</strong><span>' + escapeHtml(c.name || "Unknown") + " · " + escapeHtml(c.pickup || "—") + '</span></div>';
+  }).join("");
+  listEl.querySelectorAll(".phoneSuggestItem").forEach(function(item) {
+    item.onclick = function() {
+      onPick(matches[parseInt(item.dataset.idx, 10)]);
+      listEl.classList.remove("active");
+    };
+  });
+  listEl.classList.add("active");
+}
+
+function setupPhoneSuggestions(inputId, listId, fieldMap) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  if (!input || input.dataset.suggestBound) return;
+  input.dataset.suggestBound = "1";
+  input.addEventListener("input", function() {
+    const formatted = formatPhoneDisplay(input.value);
+    if (input.value !== formatted) input.value = formatted;
+    if (fieldMap.hintEl) fieldMap.hintEl.classList.remove("show");
+    searchPhoneSuggestions(input.value, list, function(c) {
+      applyCustomerData(c, fieldMap);
+    });
+  });
+  input.addEventListener("blur", function() {
+    setTimeout(function() { list.classList.remove("active"); }, 200);
+    lookupCustomerByPhoneFields(input, fieldMap);
+  });
+}
+
+async function lookupCustomerByPhoneFields(inputEl, fieldMap) {
   if (!firebaseReady) return;
-  const phone = normalizePhone(document.getElementById("phone").value);
+  const phone = normalizePhone(inputEl.value);
   if (phone.length < 8) return;
   try {
     const doc = await db.collection("customers").doc(phone).get();
-    if (doc.exists) {
-      const c = doc.data();
-      if (c.name) document.getElementById("name").value = c.name;
-      if (c.pickup) document.getElementById("pickup").value = c.pickup;
-      if (c.drop) document.getElementById("drop").value = c.drop;
-      if (c.phone) document.getElementById("phone").value = formatPhoneDisplay(c.phone);
-      else document.getElementById("phone").value = formatPhoneDisplay(phone);
-      document.getElementById("phoneHint").classList.add("show");
-    }
+    if (doc.exists) applyCustomerData(Object.assign({ phone: phone }, doc.data()), fieldMap);
   } catch (e) { console.error(e); }
+}
+
+async function lookupCustomerByPhone() {
+  await lookupCustomerByPhoneFields(document.getElementById("phone"), {
+    nameEl: document.getElementById("name"),
+    phoneEl: document.getElementById("phone"),
+    pickupEl: document.getElementById("pickup"),
+    dropEl: document.getElementById("drop"),
+    hintEl: document.getElementById("phoneHint")
+  });
 }
 
 async function saveCustomerRecord(job) {
@@ -1013,7 +1299,7 @@ async function getNextJobId() {
 function collectJobData(jobId, status) {
   let date = document.getElementById("date").value;
   const timeInput = document.getElementById("time").value;
-  if (selectedTime === "Later" && !date && timeInput) date = getTodayDate();
+  if (selectedTime === "Future" && !date && timeInput) date = getTodayDate();
 
   return {
     id: jobId,
@@ -1044,7 +1330,7 @@ function collectJobData(jobId, status) {
 }
 
 function computeSortKey(timeType, date, timeInput, ampm) {
-  if (timeType !== "Later" || !date) return Date.now();
+  if (!isFutureTimeType(timeType) || !date) return Date.now();
   if (!timeInput) return new Date(date + "T23:59:59").getTime();
   const parts = timeInput.split(":");
   let h = parseInt(parts[0], 10) || 0;
@@ -1055,7 +1341,7 @@ function computeSortKey(timeType, date, timeInput, ampm) {
 }
 
 function getJobTimeLabel(job) {
-  if (job.time === "Later" && job.date && job.timeInput) {
+  if (isFutureJob(job) && job.date && job.timeInput) {
     return formatDateDisplay(job.date) + " · " + job.timeInput + " " + (job.ampm !== "None" ? job.ampm : "");
   }
   if (job.time && job.time !== "None") return job.time + " · ASAP";
@@ -1085,7 +1371,7 @@ function subscribeAvailableJobs() {
         return (a.sortKey || 0) - (b.sortKey || 0);
       });
       scheduleRenderAvailable();
-      const openCount = availableJobs.filter(function(j) { return j.status === "available"; }).length;
+      const openCount = availableJobs.filter(function(j) { return j.status === "available" && isCurrentJob(j); }).length;
       document.getElementById("availableBadge").textContent = openCount;
       document.getElementById("availableBadge").style.display = openCount ? "inline" : "none";
 
@@ -1108,12 +1394,22 @@ function subscribeAvailableJobs() {
 
 function renderAvailableList() {
   const el = document.getElementById("availableList");
-  if (!availableJobs.length) {
-    el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No available bookings<br><span style="font-size:12px">Dispatched jobs appear here</span></div>';
+  const jobs = availableJobs.filter(function(job) {
+    return availableView === "future" ? isFutureJob(job) : isCurrentJob(job);
+  }).sort(function(a, b) {
+    if (availableView === "future") return (a.sortKey || 0) - (b.sortKey || 0);
+    if (a.status !== b.status) {
+      if (a.status === "available") return -1;
+      if (b.status === "available") return 1;
+    }
+    return (a.sortKey || 0) - (b.sortKey || 0);
+  });
+  if (!jobs.length) {
+    el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No ' + (availableView === "future" ? "future" : "current") + ' bookings<br><span style="font-size:12px">' + (availableView === "future" ? "Future jobs appear here" : "Quick & Ready Now jobs appear here") + '</span></div>';
     return;
   }
-  el.innerHTML = availableJobs.map(function(job) {
-    const asap = job.time !== "Later";
+  el.innerHTML = jobs.map(function(job) {
+    const asap = isCurrentJob(job);
     const dispatched = formatDispatchedAt(job);
     const isAccepted = job.status === "accepted";
     const cardClass = isAccepted ? "jobCardAccepted" : "jobCardAvailable";
@@ -1144,6 +1440,7 @@ function renderAvailableList() {
         (asap ? '<span class="jobTag asap">' + escapeHtml(job.time || "ASAP") + '</span>' : '') +
         '<span class="jobTag">' + escapeHtml(job.vehicle || "—") + '</span>' +
         (job.operator ? '<span class="jobTag">Dispatched: ' + escapeHtml(job.operator) + '</span>' : '') +
+        (job.notes ? '<span class="jobTag">📝 ' + escapeHtml(job.notes.slice(0, 40)) + '</span>' : '') +
       '</div>' + actionsHtml + '</div>';
   }).join("");
 }
@@ -1217,6 +1514,7 @@ function openJobModal(docId, source) {
     ["Price", (job.priceType || "None") + (job.price ? " · $" + job.price : "")],
     ["Operator", job.operator || "—"]
   ];
+  if (job.notes) rows.push(["Notes", job.notes]);
   if ((job.payment || []).includes("Deposit")) {
     rows.push(["Deposit", "$" + (job.depositAmount || "—") + (job.depositLink ? "\n" + job.depositLink : "")]);
   }
@@ -1256,20 +1554,21 @@ function closeJobModal() {
 
 function buildDispatchMessage(job) {
   let date = job.date;
-  if (job.time === "Later" && !date && job.timeInput) date = getTodayDate();
+  if (isFutureJob(job) && !date && job.timeInput) date = getTodayDate();
   const dateFormatted = formatDateDisplay(date);
-  const timeSection = job.time === "Later" && date && job.timeInput
-    ? "🪧 *Pickup Time - " + job.time + "*\n📅 *Date: " + dateFormatted + "*\n⏱️ *Time: " + job.timeInput + " " + job.ampm + "*"
+  const timeSection = isFutureJob(job) && date && job.timeInput
+    ? "🪧 *Pickup Time - " + (job.time === "Later" ? "Future" : job.time) + "*\n📅 *Date: " + dateFormatted + "*\n⏱️ *Time: " + job.timeInput + " " + job.ampm + "*"
     : "🪧 *Pickup Time - " + job.time + "*";
   let passengers = "👥 Adults: " + (job.adults || "None");
   if (job.kids) passengers += "\n👥 Kids: " + job.kids;
   if (job.luggage) passengers += "\n👜 Luggage: " + job.luggage;
-  let payment = "💳 " + (job.payment || []).join(", ");
+  let payment = "💳 " + ((job.payment || []).join(", ") || "None");
   if ((job.payment || []).includes("Deposit")) payment += "\n💳 *Deposit Required - $" + job.depositAmount + "*";
   const op = job.operator ? "\n👤 Operator: " + job.operator : "";
+  const notes = job.notes ? "\n📝 Notes: " + job.notes : "";
   return "🚖 TAXI DISPATCH\n🆔 JOB-" + job.id + op + "\n⏰ " + new Date().toLocaleString() + "\n" + timeSection +
-    "\n\n👤 " + job.name + "\n📞 " + job.phone + "\n\n🚗 " + job.vehicle + "\n" + payment +
-    "\n💲 " + job.priceType + " " + (job.price ? "$" + job.price : "") + "\n" + passengers +
+    "\n\n👤 " + job.name + "\n📞 " + job.phone + "\n\n🚗 " + (job.vehicle || "None") + "\n" + payment +
+    "\n💲 " + (job.priceType || "None") + " " + (job.price ? "$" + job.price : "") + "\n" + passengers + notes +
     "\n\n📍 Pickup: " + job.pickup + "\n📍 Drop: " + job.drop;
 }
 
@@ -1424,10 +1723,6 @@ async function confirmCompleteJob() {
 }
 
 function applyJobToForm(job) {
-  if (job.operator) {
-    const canonical = resolveOperator(job.operator);
-    if (canonical) setSelectedOperator(canonical);
-  }
   document.getElementById("name").value = job.name || "";
   document.getElementById("phone").value = formatPhoneDisplay(job.phone || "");
   document.getElementById("pickup").value = job.pickup || "";
@@ -1564,12 +1859,128 @@ async function dispatch() {
   }
 }
 
+function openQuickBooking() {
+  if (!requireOperator("use quick booking")) return;
+  quickSelectedTime = "None";
+  ["qbQuickBtn", "qbReadyBtn"].forEach(function(id) { document.getElementById(id).classList.remove("glow"); });
+  document.getElementById("qbPhone").value = "";
+  document.getElementById("qbName").value = "";
+  document.getElementById("qbPickup").value = "";
+  document.getElementById("qbDrop").value = "";
+  document.getElementById("qbNotes").value = "";
+  document.getElementById("qbPhoneList").classList.remove("active");
+  document.getElementById("quickBookingModal").classList.add("open");
+  if (!document.getElementById("qbPhone").dataset.suggestBound) {
+    setupPhoneSuggestions("qbPhone", "qbPhoneList", {
+      nameEl: document.getElementById("qbName"),
+      phoneEl: document.getElementById("qbPhone"),
+      pickupEl: document.getElementById("qbPickup"),
+      dropEl: document.getElementById("qbDrop"),
+      hintEl: null
+    });
+  }
+  setTimeout(function() { document.getElementById("qbPhone").focus(); }, 150);
+}
+
+function closeQuickBooking() {
+  document.getElementById("quickBookingModal").classList.remove("open");
+}
+
+function setQuickTime(t) {
+  if (quickSelectedTime === t) {
+    quickSelectedTime = "None";
+    document.getElementById("qbQuickBtn").classList.remove("glow");
+    document.getElementById("qbReadyBtn").classList.remove("glow");
+  } else {
+    quickSelectedTime = t;
+    document.getElementById("qbQuickBtn").classList.toggle("glow", t === "Quick");
+    document.getElementById("qbReadyBtn").classList.toggle("glow", t === "Ready Now");
+  }
+}
+
+function collectQuickJobData(jobId) {
+  const phone = formatPhoneDisplay(document.getElementById("qbPhone").value);
+  const name = document.getElementById("qbName").value.trim();
+  return {
+    id: jobId,
+    status: "available",
+    operator: getCurrentOperator(),
+    name: name ? titleCase(name) : "Customer",
+    phone: phone,
+    pickup: titleCase(document.getElementById("qbPickup").value),
+    drop: titleCase(document.getElementById("qbDrop").value),
+    notes: document.getElementById("qbNotes").value.trim(),
+    adults: "", kids: "", luggage: "",
+    vehicle: "None",
+    payment: [],
+    time: quickSelectedTime === "None" ? "Quick" : quickSelectedTime,
+    date: "",
+    timeInput: "",
+    ampm: "None",
+    priceType: "None",
+    price: "",
+    depositLink: "",
+    depositAmount: "",
+    sortKey: Date.now(),
+    sessionId: sessionId,
+    dispatchedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+}
+
+function validateQuickBooking() {
+  const phone = normalizePhone(document.getElementById("qbPhone").value);
+  if (phone.length < 8) { alert("Enter phone number"); return false; }
+  if (!document.getElementById("qbPickup").value.trim()) { alert("Enter pickup location"); return false; }
+  if (!document.getElementById("qbDrop").value.trim()) { alert("Enter drop-off location"); return false; }
+  if (quickSelectedTime === "None") { alert("Select Quick or Ready Now"); return false; }
+  return true;
+}
+
+async function dispatchQuick() {
+  if (!firebaseReady) { alert("Firebase not connected"); return; }
+  if (!requireOperator("dispatch")) return;
+  if (!validateQuickBooking()) return;
+  try {
+    const jobId = await getNextJobId();
+    const job = collectQuickJobData(jobId);
+    const message = buildDispatchMessage(job);
+    await db.collection("jobs").add(job);
+    await saveCustomerRecord(job);
+    closeQuickBooking();
+    setAvailableView("current");
+    switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
+    const copied = await copyToClipboard(message);
+    alert(copied ? "Quick dispatch ✔ JOB-" + jobId : "Dispatched ✔ JOB-" + jobId);
+    openWhatsAppGroup();
+  } catch (err) {
+    alert("Dispatch failed: " + err.message);
+  }
+}
+
+function sendQuickConfirmation() {
+  if (!requireOperator("send confirmation")) return;
+  if (!validateQuickBooking()) return;
+  const phone = document.getElementById("qbPhone").value.replace(/\s+/g, "");
+  const name = document.getElementById("qbName").value.trim() || "Customer";
+  const pickup = titleCase(document.getElementById("qbPickup").value);
+  const drop = titleCase(document.getElementById("qbDrop").value);
+  const notes = document.getElementById("qbNotes").value.trim();
+  const timeLabel = quickSelectedTime === "None" ? "Quick" : quickSelectedTime;
+  let msg = "Hi " + titleCase(name) + ",\n\nYour Taxi booking is Confirmed.\n\nPickup: " + pickup + "\nDrop-off: " + drop + "\nTime: " + timeLabel;
+  if (notes) msg += "\nNotes: " + notes;
+  msg += "\n\nYour driver will be there shortly.\n\nThank you for choosing our service." + SIGNATURE;
+  window.location.href = "sms:" + phone + "&body=" + encodeURIComponent(msg);
+}
+
 function initializeGoogleMaps() {
   if (!window.google) return;
   autocompleteService = new google.maps.places.AutocompleteService();
   map = new google.maps.Map(document.createElement("div"));
   setupAutocomplete("pickup", "pickupList");
   setupAutocomplete("drop", "dropList");
+  setupAutocomplete("qbPickup", "qbPickupList");
+  setupAutocomplete("qbDrop", "qbDropList");
 }
 
 function setupAutocomplete(inputId, listId) {
@@ -1661,15 +2072,16 @@ document.getElementById("time").addEventListener("input", function(e) {
 });
 
 function setTime(t) {
+  if (t === "Later") t = "Future";
   if (selectedTime === t) { selectedTime = "None"; ["quickBtn","readyBtn","laterBtn"].forEach(function(id) { document.getElementById(id).classList.remove("glow"); }); }
   else {
     selectedTime = t;
     ["quickBtn","readyBtn","laterBtn"].forEach(function(id) { document.getElementById(id).classList.remove("glow"); });
     if (t === "Quick") quickBtn.classList.add("glow");
     if (t === "Ready Now") readyBtn.classList.add("glow");
-    if (t === "Later") laterBtn.classList.add("glow");
+    if (t === "Future") laterBtn.classList.add("glow");
   }
-  const later = selectedTime === "Later";
+  const later = isFutureTimeType(selectedTime);
   date.disabled = !later; time.disabled = !later; amBtn.disabled = !later; pmBtn.disabled = !later;
   if (!later) { date.value = ""; time.value = ""; selectedAMPM = "None"; amBtn.classList.remove("glow"); pmBtn.classList.remove("glow"); }
   updateTimeDisplay();
@@ -1746,8 +2158,8 @@ function sendQuote() {
   const priceVal = document.getElementById("price").value;
   if (!name || !phone) { alert("Please enter Passenger Name and Phone Number"); return; }
   if (!priceVal) { alert("Please enter price for quote"); return; }
-  if (selectedTime === "Later" && (!dateVal || !timeVal)) { alert("Please select date and time for Later pickup"); return; }
-  const timeDisplay = selectedTime === "Later" && dateVal && timeVal ? formatDateDisplay(dateVal) + ", " + timeVal + " " + selectedAMPM : "ASAP";
+  if (isFutureTimeType(selectedTime) && (!dateVal || !timeVal)) { alert("Please select date and time for Future pickup"); return; }
+  const timeDisplay = isFutureTimeType(selectedTime) && dateVal && timeVal ? formatDateDisplay(dateVal) + ", " + timeVal + " " + selectedAMPM : "ASAP";
   const pa = []; if (adults) pa.push(pluralize(adults,"Adult","Adults")); if (kids) pa.push(pluralize(kids,"Kid","Kids"));
   const msg = "Hi " + name + ",\n\nThank you for your inquiry.\n\nTrip Details:\nDate & Time: " + timeDisplay + "\nPickup Address: " + pickup + "\nDrop-off Address: " + drop + "\nPassengers: " + pa.join(", ") + (luggage ? "\nLuggage: " + pluralize(luggage,"Bag","Bags") : "") + "\nVehicle: " + selectedVehicle + "\nEstimated Fare: $" + priceVal + " GST Inclusive\n\nTo confirm your booking or discuss price, simply reply to this message or give us a call." + SIGNATURE;
   copyToClipboard(msg);
@@ -1772,14 +2184,14 @@ function sendConfirmation() {
     if (!dateVal || !timeVal) { alert("Please select date and time for deposit booking"); return; }
     if (!depositLink || !depositAmount) { alert("Please enter deposit link and amount"); return; }
   }
-  if (selectedTime === "Later" && (!dateVal || !timeVal)) { alert("Please select date and time for Later pickup"); return; }
-  if (selectedTime === "Later" && !dateVal && timeVal) dateVal = getTodayDate();
+  if (isFutureTimeType(selectedTime) && (!dateVal || !timeVal)) { alert("Please select date and time for Future pickup"); return; }
+  if (isFutureTimeType(selectedTime) && !dateVal && timeVal) dateVal = getTodayDate();
   let msg;
   const pa = []; if (adults) pa.push(pluralize(adults,"Adult","Adults")); if (kids) pa.push(pluralize(kids,"Kid","Kids"));
   const lug = luggage ? "\nLuggage: " + pluralize(luggage,"Bag","Bags") : "";
   if (paymentArray.includes("Deposit") && depositLink && depositAmount) {
     msg = "Hi " + name + ",\n\nYour taxi booking has been confirmed.\n\nDate & Time: " + formatDateDisplay(dateVal) + ", " + timeVal + " " + selectedAMPM + "\nPickup Address: " + pickup + "\nDrop-off Address: " + drop + "\nPassengers: " + pa.join(", ") + lug + "\nVehicle: " + selectedVehicle + "\n\nPlease use the link below to make the upfront payment of $" + depositAmount + ".\n\n" + depositLink + "\n\nPlease contact us immediately if any changes are required." + SIGNATURE;
-  } else if (selectedTime === "Later" && dateVal && timeVal) {
+  } else if (isFutureTimeType(selectedTime) && dateVal && timeVal) {
     msg = "Hi " + name + ",\n\nYour taxi booking has been Confirmed.\n\nDate & Time: " + formatDateDisplay(dateVal) + ", " + timeVal + " " + selectedAMPM + "\nPickup Address: " + pickup + "\nDrop-off Address: " + drop + "\nPassengers: " + pa.join(", ") + lug + "\nVehicle: " + selectedVehicle + "\n\nPlease contact us immediately if any changes are required.\n\nThank you for choosing our service." + SIGNATURE;
   } else {
     msg = "Hi " + name + ",\n\nYour Taxi booking is Confirmed.\n\nPickup Address: " + pickup + "\nDrop-off Address: " + drop + "\n\nYour driver will be there shortly.\n\nThank you for choosing our service." + SIGNATURE;
