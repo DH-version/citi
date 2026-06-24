@@ -54,17 +54,18 @@ h3{
 .tabPanel.active{display:block}
 
 .section{margin-top:6px}
-#bookingForm .section{margin-top:3px}
-#bookingForm h3{font-size:12px;margin:2px 0 3px}
+#bookingForm .formSection{
+  padding-top:8px;margin-top:8px;
+  border-top:1px solid #334155;
+}
+#bookingForm .formSection button{
+  padding:14px 8px;font-size:15px;margin:1px;
+}
 #bookingForm input:not([type="date"]){
   padding:9px 10px;margin:2px 0;font-size:15px;
 }
 #bookingForm .notesInline{
   padding:9px 10px;margin:2px 0;font-size:15px;
-}
-#bookingForm #timeSelected,#bookingForm #vehicleSelected,
-#bookingForm #paymentSelected,#bookingForm #priceSelected{
-  font-size:10px;margin-top:1px;line-height:1.2;
 }
 #bookingForm .row,#bookingForm .threeCol,#bookingForm .fourCol,
 #bookingForm .depositRow,#bookingForm .paymentLinkRow,#bookingForm .priceRow{gap:3px}
@@ -168,10 +169,6 @@ button:disabled{
   background:transparent;color:#000;
 }
 .priceBox input:disabled{background:transparent;color:#9ca3af}
-
-#timeSelected,#vehicleSelected,#paymentSelected,#priceSelected{
-  font-size:12px;color:#94a3b8;margin-top:2px;
-}
 
 .phoneHint{font-size:11px;color:#34d399;margin-top:2px;display:none}
 .phoneHint.show{display:block}
@@ -480,8 +477,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 
   <input id="jobNotes" class="notesInline" type="text" placeholder="Notes (optional)" autocomplete="off">
 
-  <div class="section">
-    <h3>Pickup Time</h3>
+  <div class="section formSection">
     <div class="row">
       <button id="quickBtn" onclick="setTime('Quick')">Quick</button>
       <button id="readyBtn" onclick="setTime('Ready Now')">Ready Now</button>
@@ -493,11 +489,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button id="amBtn" onclick="setAMPM('AM')" disabled>AM</button>
       <button id="pmBtn" onclick="setAMPM('PM')" disabled>PM</button>
     </div>
-    <div id="timeSelected">Selected: None</div>
   </div>
 
-  <div class="section">
-    <h3>Passengers &amp; Vehicle</h3>
+  <div class="section formSection">
     <div class="threeCol">
       <input id="adults" type="tel" inputmode="numeric" placeholder="Adults">
       <input id="kids" type="tel" inputmode="numeric" placeholder="Kids">
@@ -509,11 +503,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button id="luxBtn" onclick="setVehicle('Luxury')">Luxury</button>
       <button id="maxiBtn" onclick="setVehicle('MAXI')">MAXI</button>
     </div>
-    <div id="vehicleSelected">Selected: None</div>
   </div>
 
-  <div class="section">
-    <h3>Payment &amp; Price</h3>
+  <div class="section formSection">
     <div class="fourCol">
       <button id="cabBtn" onclick="togglePayment('Cabcharge')">Cabcharge</button>
       <button id="mptpBtn" onclick="togglePayment('MPTP')">MPTP</button>
@@ -530,7 +522,6 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <div class="paymentLinkRow">
       <input id="depositLink" placeholder="Deposit Payment Link" disabled>
     </div>
-    <div id="paymentSelected">Selected: None</div>
     <div class="priceRow">
       <button id="meterBtn" onclick="setPriceType('Meter Fare')">Meter Fare</button>
       <button id="setBtn" onclick="setPriceType('Set Price')">Set Price</button>
@@ -539,10 +530,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
         <input id="price" type="tel" inputmode="numeric" placeholder="Enter amount" disabled>
       </div>
     </div>
-    <div id="priceSelected">Selected: None</div>
   </div>
 
-  <div class="section">
+  <div class="section formSection">
     <button id="dispatchBtn" style="width:100%;background:#10b981;" onclick="dispatch()">DISPATCH</button>
     <div style="display:flex;gap:8px;">
       <button style="flex:1;" onclick="sendQuote()">Send Quote</button>
@@ -757,6 +747,7 @@ const DELETE_PIN = "2814";
 let availableUnsub = null, completedUnsub = null, filterUnsub = null, operatorSessionUnsub = null;
 let renderPreviousScheduled = false, renderAvailableScheduled = false;
 let customersCache = [], customersUnsub = null;
+let mainCustomerFieldMap = null, quickCustomerFieldMap = null;
 let availableView = "current", quickSelectedTime = "None";
 let deviceId = localStorage.getItem("deviceId") || ("d_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10));
 localStorage.setItem("deviceId", deviceId);
@@ -765,7 +756,6 @@ localStorage.setItem("sessionId", sessionId);
 let jobsListenerReady = false;
 let alertTimeout = null;
 let audioCtx = null;
-let timeSelected, vehicleSelected, paymentSelected, priceSelected;
 
 function switchTab(tabId, btn) {
   if (tabId !== "tabNew" && !getCurrentOperator()) {
@@ -815,22 +805,19 @@ function bindOperatorFieldEvents() {
     el.addEventListener("blur", onOperatorBlur);
   }
   const phoneEl = document.getElementById("phone");
-  if (!phoneEl.dataset.suggestBound) {
-    setupPhoneSuggestions("phone", "phoneList", {
+  if (!mainCustomerFieldMap) {
+    mainCustomerFieldMap = {
       nameEl: document.getElementById("name"),
       phoneEl: phoneEl,
       pickupEl: document.getElementById("pickup"),
       dropEl: document.getElementById("drop"),
       hintEl: document.getElementById("phoneHint")
-    });
+    };
   }
-  setupNameSuggestions("name", "nameList", {
-    nameEl: document.getElementById("name"),
-    phoneEl: phoneEl,
-    pickupEl: document.getElementById("pickup"),
-    dropEl: document.getElementById("drop"),
-    hintEl: document.getElementById("phoneHint")
-  });
+  if (!phoneEl.dataset.suggestBound) {
+    setupPhoneSuggestions("phone", "phoneList", mainCustomerFieldMap);
+  }
+  setupNameSuggestions("name", "nameList", mainCustomerFieldMap);
 }
 
 function saveOperatorLocally(canonical) {
@@ -1235,6 +1222,22 @@ function subscribeCustomers() {
   }, function(err) { console.error(err); });
 }
 
+function clearAppliedCustomerFields(fieldMap) {
+  const applied = fieldMap.appliedCustomer;
+  if (!applied) return;
+  if (fieldMap.phoneEl && formatPhoneDisplay(fieldMap.phoneEl.value) === applied.phone) {
+    fieldMap.phoneEl.value = "";
+  }
+  if (fieldMap.pickupEl && fieldMap.pickupEl.value.trim() === applied.pickup) {
+    fieldMap.pickupEl.value = "";
+  }
+  if (fieldMap.dropEl && fieldMap.dropEl.value.trim() === applied.drop) {
+    fieldMap.dropEl.value = "";
+  }
+  if (fieldMap.hintEl) fieldMap.hintEl.classList.remove("show");
+  fieldMap.appliedCustomer = null;
+}
+
 function applyCustomerData(c, fields) {
   if (!c) return;
   if (fields.nameEl && c.name) fields.nameEl.value = c.name;
@@ -1242,6 +1245,12 @@ function applyCustomerData(c, fields) {
   if (fields.pickupEl && c.pickup) fields.pickupEl.value = c.pickup;
   if (fields.dropEl && c.drop) fields.dropEl.value = c.drop;
   if (fields.hintEl) fields.hintEl.classList.add("show");
+  fields.appliedCustomer = {
+    name: (c.name || "").trim(),
+    phone: formatPhoneDisplay(c.phone || ""),
+    pickup: (c.pickup || "").trim(),
+    drop: (c.drop || "").trim()
+  };
 }
 
 function searchNameSuggestions(query, listEl, onPick) {
@@ -1286,7 +1295,13 @@ function setupNameSuggestions(inputId, listId, fieldMap) {
   if (!input || input.dataset.nameSuggestBound) return;
   input.dataset.nameSuggestBound = "1";
   input.addEventListener("input", function() {
-    if (fieldMap.hintEl) fieldMap.hintEl.classList.remove("show");
+    const val = input.value.trim();
+    const applied = fieldMap.appliedCustomer;
+    if (applied && (!val || val.toLowerCase() !== applied.name.toLowerCase())) {
+      clearAppliedCustomerFields(fieldMap);
+    } else if (fieldMap.hintEl) {
+      fieldMap.hintEl.classList.remove("show");
+    }
     searchNameSuggestions(input.value, list, function(c) {
       applyCustomerData(c, fieldMap);
     });
@@ -2198,7 +2213,6 @@ function applyJobToForm(job) {
       document.getElementById("depositAmount").disabled = false;
     }
   });
-  paymentSelected.innerText = paymentArray.join(", ") || "None";
 }
 
 function playNewJobTune() {
@@ -2267,6 +2281,7 @@ function clearForm() {
     document.getElementById(id).value = "";
   });
   document.getElementById("phoneHint").classList.remove("show");
+  if (mainCustomerFieldMap) mainCustomerFieldMap.appliedCustomer = null;
   setVehicle("None"); setTime("None"); setAMPM("None"); setPriceType("None");
   paymentArray = [];
   ["cabBtn","cardBtn","mptpBtn","cashBtn","depositBtn"].forEach(function(id) {
@@ -2274,7 +2289,6 @@ function clearForm() {
   });
   document.getElementById("depositLink").disabled = true;
   document.getElementById("depositAmount").disabled = true;
-  paymentSelected.innerText = "None";
 }
 
 async function dispatch() {
@@ -2332,23 +2346,22 @@ function openQuickBooking() {
   document.getElementById("qbDrop").value = "";
   document.getElementById("qbNotes").value = "";
   document.getElementById("qbPhoneList").classList.remove("active");
+  document.getElementById("qbNameList").classList.remove("active");
+  if (quickCustomerFieldMap) quickCustomerFieldMap.appliedCustomer = null;
   document.getElementById("quickBookingModal").classList.add("open");
-  if (!document.getElementById("qbPhone").dataset.suggestBound) {
-    setupPhoneSuggestions("qbPhone", "qbPhoneList", {
+  if (!quickCustomerFieldMap) {
+    quickCustomerFieldMap = {
       nameEl: document.getElementById("qbName"),
       phoneEl: document.getElementById("qbPhone"),
       pickupEl: document.getElementById("qbPickup"),
       dropEl: document.getElementById("qbDrop"),
       hintEl: null
-    });
+    };
   }
-  setupNameSuggestions("qbName", "qbNameList", {
-    nameEl: document.getElementById("qbName"),
-    phoneEl: document.getElementById("qbPhone"),
-    pickupEl: document.getElementById("qbPickup"),
-    dropEl: document.getElementById("qbDrop"),
-    hintEl: null
-  });
+  if (!document.getElementById("qbPhone").dataset.suggestBound) {
+    setupPhoneSuggestions("qbPhone", "qbPhoneList", quickCustomerFieldMap);
+  }
+  setupNameSuggestions("qbName", "qbNameList", quickCustomerFieldMap);
   setTimeout(function() { document.getElementById("qbQuickBtn").focus(); }, 150);
 }
 
@@ -2579,13 +2592,7 @@ function setAMPM(p) {
   updateTimeDisplay();
 }
 
-function updateTimeDisplay() {
-  let d = "Selected: " + selectedTime;
-  if (date.value) d += " | " + date.value;
-  if (time.value) d += " | " + time.value;
-  if (selectedAMPM !== "None") d += " " + selectedAMPM;
-  timeSelected.innerText = d;
-}
+function updateTimeDisplay() {}
 date.addEventListener("change", updateTimeDisplay);
 time.addEventListener("change", updateTimeDisplay);
 
@@ -2599,7 +2606,6 @@ function setVehicle(v) {
     if (v === "Luxury") luxBtn.classList.add("glow");
     if (v === "MAXI") maxiBtn.classList.add("glow");
   }
-  vehicleSelected.innerText = "Selected: " + selectedVehicle;
 }
 
 function togglePayment(p) {
@@ -2615,7 +2621,6 @@ function togglePayment(p) {
       if (p === "Deposit") { depositLink.disabled = false; depositAmount.disabled = false; }
     } else alert("Max 2 payments");
   }
-  paymentSelected.innerText = paymentArray.join(", ") || "None";
 }
 
 function setPriceType(p) {
@@ -2627,7 +2632,6 @@ function setPriceType(p) {
     if (p === "Meter Fare") { meterBtn.classList.add("glow"); price.disabled = true; price.value = ""; }
     if (p === "Set Price") { setBtn.classList.add("glow"); price.disabled = false; }
   }
-  priceSelected.innerText = "Selected: " + priceType;
 }
 
 function sendQuote() {
@@ -2697,10 +2701,6 @@ function sendFollowUp() {
 window.addEventListener("DOMContentLoaded", function() {
   initOperatorField();
   initializeFirebase();
-  timeSelected = document.getElementById("timeSelected");
-  vehicleSelected = document.getElementById("vehicleSelected");
-  paymentSelected = document.getElementById("paymentSelected");
-  priceSelected = document.getElementById("priceSelected");
   document.body.addEventListener("click", function() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }, { once: true });
