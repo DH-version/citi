@@ -124,9 +124,10 @@ button:disabled{
 .row button{flex:1}
 
 .twoCol{display:flex;gap:6px;align-items:stretch;margin:3px 0}
-.twoCol input,.twoCol .phoneInputWrap{flex:1;min-width:0;margin:0}
+.twoCol input,.twoCol .phoneInputWrap,.twoCol .nameInputWrap{flex:1;min-width:0;margin:0}
 .phoneInputWrap{position:relative;min-width:0}
-.phoneInputWrap input{width:100%;margin:0}
+.nameInputWrap{position:relative;min-width:0}
+.phoneInputWrap input,.nameInputWrap input{width:100%;margin:0}
 
 .threeCol{display:flex;gap:4px}
 .threeCol input{flex:1}
@@ -233,8 +234,23 @@ button:disabled{
   width:100%;margin-bottom:8px;background:#2563eb!important;
   font-weight:700;padding:12px;
 }
-.qbTimeRow{display:flex;gap:8px;margin-bottom:8px}
-.qbTimeRow button{flex:1;margin:0;font-weight:700;font-size:15px;padding:12px}
+.qbTimeRow{display:flex;gap:8px;margin-bottom:6px}
+.qbTimeRow button{flex:1;margin:0;font-weight:800;font-size:16px;padding:14px 12px}
+.qbTimeRow button.qbSelected{
+  background:linear-gradient(180deg,#fde047 0%,#facc15 100%)!important;
+  color:#000!important;font-weight:800;
+  box-shadow:0 0 14px rgba(250,204,21,.45), inset 0 1px 0 rgba(255,255,255,.3);
+}
+.qbHint{font-size:12px;color:#94a3b8;text-align:center;margin-bottom:8px;line-height:1.35}
+.qbTimeSelected{
+  text-align:center;font-size:15px;font-weight:800;color:#64748b;
+  margin:0 0 10px;min-height:20px;
+}
+.qbTimeSelected.active{color:#facc15}
+.qbFieldLabel{
+  font-size:11px;font-weight:700;color:#94a3b8;
+  text-transform:uppercase;letter-spacing:.4px;margin:4px 0 2px;
+}
 .qbField{width:100%;margin-bottom:8px}
 .qbNotes{
   width:100%;resize:vertical;margin-bottom:8px;
@@ -298,7 +314,10 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .jobCardAccepted{border-color:#facc15;background:linear-gradient(135deg,#1c2a1c,#1e293b)}
 .jobCardTop{display:flex;justify-content:space-between;gap:8px}
 .jobId{font-weight:700;color:#facc15;font-size:13px}
-.jobTime{font-size:11px;color:#94a3b8;text-align:right}
+.jobTime{font-size:12px;color:#e2e8f0;text-align:right;font-weight:800;line-height:1.3}
+.jobTagBold{font-weight:800;font-size:11px}
+.jobTagSchedule{background:#6366f133;color:#c7d2fe;font-weight:800}
+.jobTagVehicle{background:#0ea5e933;color:#67e8f9;font-weight:800}
 .jobName{font-size:14px;font-weight:600;margin:4px 0 2px}
 .jobRoute{margin:8px 0 4px;display:flex;flex-direction:column;gap:5px}
 .jobAddr{
@@ -438,7 +457,10 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <div id="bookingForm" class="locked">
   <button type="button" class="btnQuickBooking" onclick="openQuickBooking()">⚡ Quick Booking</button>
   <div class="twoCol">
-    <input id="name" placeholder="Passenger Name">
+    <div class="nameInputWrap">
+      <input id="name" placeholder="Passenger Name" autocomplete="off" autocapitalize="words">
+      <div id="nameList" class="phoneSuggestList"></div>
+    </div>
     <div class="phoneInputWrap">
       <input id="phone" type="tel" inputmode="numeric" placeholder="Phone Number" autocomplete="off">
       <div id="phoneList" class="phoneSuggestList"></div>
@@ -629,16 +651,24 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <!-- QUICK BOOKING MODAL -->
 <div id="quickBookingModal" class="modalOverlay" onclick="if(event.target===this)closeQuickBooking()">
   <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px;max-height:92vh">
-    <h3 style="color:#60a5fa;margin-bottom:10px;text-align:center">Quick Booking</h3>
+    <h3 style="color:#60a5fa;margin-bottom:6px;text-align:center;font-weight:800">Quick Booking</h3>
+    <p class="qbHint">Select time first · then name or addresses · Dispatch when ready</p>
     <div class="qbTimeRow">
       <button type="button" id="qbQuickBtn" onclick="setQuickTime('Quick')">Quick</button>
       <button type="button" id="qbReadyBtn" onclick="setQuickTime('Ready Now')">Ready Now</button>
     </div>
-    <input id="qbName" class="qbField" type="text" placeholder="Passenger Name" autocomplete="off" autocapitalize="words">
+    <div id="qbTimeSelected" class="qbTimeSelected">Tap Quick or Ready Now</div>
+    <div class="qbFieldLabel">Passenger</div>
+    <div class="nameInputWrap">
+      <input id="qbName" class="qbField" type="text" placeholder="Passenger Name" autocomplete="off" autocapitalize="words">
+      <div id="qbNameList" class="phoneSuggestList"></div>
+    </div>
+    <div class="qbFieldLabel">Phone <span style="font-weight:500;text-transform:none">(optional)</span></div>
     <div class="phoneInputWrap">
       <input id="qbPhone" class="qbField" type="tel" inputmode="numeric" placeholder="Phone Number (optional)" autocomplete="off">
       <div id="qbPhoneList" class="phoneSuggestList"></div>
     </div>
+    <div class="qbFieldLabel">Pickup &amp; Drop <span style="font-weight:500;text-transform:none">(or use name + notes)</span></div>
     <div class="autocomplete-container">
       <input id="qbPickup" class="qbField" placeholder="Pickup Location" autocomplete="off">
       <div id="qbPickupList" class="autocomplete-list"></div>
@@ -794,6 +824,13 @@ function bindOperatorFieldEvents() {
       hintEl: document.getElementById("phoneHint")
     });
   }
+  setupNameSuggestions("name", "nameList", {
+    nameEl: document.getElementById("name"),
+    phoneEl: phoneEl,
+    pickupEl: document.getElementById("pickup"),
+    dropEl: document.getElementById("drop"),
+    hintEl: document.getElementById("phoneHint")
+  });
 }
 
 function saveOperatorLocally(canonical) {
@@ -1187,8 +1224,9 @@ function subscribeCustomers() {
   customersUnsub = db.collection("customers").limit(400).onSnapshot(function(snap) {
     customersCache = snap.docs.map(function(d) {
       const data = d.data();
+      const isNameKey = d.id.indexOf("name:") === 0;
       return {
-        phone: d.id,
+        phone: isNameKey ? (data.phone || "") : d.id,
         name: data.name || "",
         pickup: data.pickup || "",
         drop: data.drop || ""
@@ -1204,6 +1242,58 @@ function applyCustomerData(c, fields) {
   if (fields.pickupEl && c.pickup) fields.pickupEl.value = c.pickup;
   if (fields.dropEl && c.drop) fields.dropEl.value = c.drop;
   if (fields.hintEl) fields.hintEl.classList.add("show");
+}
+
+function searchNameSuggestions(query, listEl, onPick) {
+  const q = query.trim().toLowerCase();
+  if (q.length < 1) {
+    listEl.classList.remove("active");
+    listEl.innerHTML = "";
+    return;
+  }
+  const seen = {};
+  const matches = [];
+  customersCache.forEach(function(c) {
+    if (!c.name || c.name.toLowerCase().indexOf(q) !== 0) return;
+    const key = c.name.toLowerCase() + "|" + normalizePhone(c.phone);
+    if (seen[key]) return;
+    seen[key] = true;
+    matches.push(c);
+  });
+  matches.sort(function(a, b) { return a.name.localeCompare(b.name); });
+  const top = matches.slice(0, 8);
+  if (!top.length) {
+    listEl.classList.remove("active");
+    listEl.innerHTML = "";
+    return;
+  }
+  listEl.innerHTML = top.map(function(c, i) {
+    const sub = formatPhoneDisplay(c.phone) || c.pickup || "Saved customer";
+    return '<div class="phoneSuggestItem" data-idx="' + i + '"><strong>' + escapeHtml(c.name) + '</strong><span>' + escapeHtml(sub) + '</span></div>';
+  }).join("");
+  listEl.querySelectorAll(".phoneSuggestItem").forEach(function(item) {
+    item.onclick = function() {
+      onPick(top[parseInt(item.dataset.idx, 10)]);
+      listEl.classList.remove("active");
+    };
+  });
+  listEl.classList.add("active");
+}
+
+function setupNameSuggestions(inputId, listId, fieldMap) {
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  if (!input || input.dataset.nameSuggestBound) return;
+  input.dataset.nameSuggestBound = "1";
+  input.addEventListener("input", function() {
+    if (fieldMap.hintEl) fieldMap.hintEl.classList.remove("show");
+    searchNameSuggestions(input.value, list, function(c) {
+      applyCustomerData(c, fieldMap);
+    });
+  });
+  input.addEventListener("blur", function() {
+    setTimeout(function() { list.classList.remove("active"); }, 200);
+  });
 }
 
 function searchPhoneSuggestions(query, listEl, onPick) {
@@ -1272,16 +1362,29 @@ async function lookupCustomerByPhone() {
 }
 
 async function saveCustomerRecord(job) {
-  if (!firebaseReady || !job.phone) return;
-  const phone = normalizePhone(job.phone);
-  if (phone.length < 8) return;
-  await db.collection("customers").doc(phone).set({
-    phone: phone,
-    name: job.name || "",
-    pickup: job.pickup || "",
-    drop: job.drop || "",
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  }, { merge: true });
+  if (!firebaseReady) return;
+  const phone = normalizePhone(job.phone || "");
+  const name = (job.name || "").trim();
+  if (phone.length >= 8) {
+    await db.collection("customers").doc(phone).set({
+      phone: phone,
+      name: name || "",
+      pickup: job.pickup || "",
+      drop: job.drop || "",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    return;
+  }
+  if (name && name.toLowerCase() !== "customer") {
+    const nameKey = "name:" + name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+    await db.collection("customers").doc(nameKey).set({
+      name: titleCase(name),
+      phone: job.phone || "",
+      pickup: job.pickup || "",
+      drop: job.drop || "",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  }
 }
 
 function renderOperatorFilterRow() {
@@ -1738,8 +1841,8 @@ function renderAvailableList() {
       jobRouteHtml(job) +
       '<div class="jobMeta">' +
         jobTimeMetaTag(job) +
-        (isCurrentJob(job) ? '<span class="jobTag asap">' + escapeHtml(job.time || "ASAP") + '</span>' : '<span class="jobTag">' + escapeHtml(job.time || "Future") + '</span>') +
-        '<span class="jobTag">' + escapeHtml(job.vehicle || "—") + '</span>' +
+        jobTimeTagHtml(job) +
+        jobVehicleTagHtml(job) +
         (job.operator ? '<span class="jobTag">Dispatched: ' + escapeHtml(job.operator) + '</span>' : '') +
         (job.notes ? '<span class="jobTag">📝 ' + escapeHtml(job.notes.slice(0, 40)) + '</span>' : '') +
       '</div>' + actionsHtml + '</div>';
@@ -1771,6 +1874,8 @@ function renderPreviousList() {
       jobRouteHtml(job) +
       '<div class="jobMeta">' +
         jobTimeMetaTag(job) +
+        jobTimeTagHtml(job) +
+        jobVehicleTagHtml(job) +
         typeTag +
         (job.operator ? '<span class="jobTag">Disp: ' + escapeHtml(job.operator) + '</span>' : '') +
         (job.notes ? '<span class="jobTag">📝 ' + escapeHtml(job.notes.slice(0, 40)) + '</span>' : '') +
@@ -1785,10 +1890,32 @@ function formatFareDisplay(fare) {
   return n % 1 === 0 ? "$" + n.toFixed(0) : "$" + n.toFixed(2);
 }
 
+function jobTimeTagHtml(job) {
+  if (isFutureJob(job)) {
+    let label = "";
+    if (job.date) label += formatDateDisplay(job.date);
+    if (job.timeInput) label += (label ? " · " : "") + job.timeInput;
+    if (job.ampm && job.ampm !== "None") label += " " + job.ampm;
+    if (!label) label = job.time || "Future";
+    return '<span class="jobTag jobTagBold jobTagSchedule">' + escapeHtml(label) + "</span>";
+  }
+  return '<span class="jobTag asap jobTagBold">' + escapeHtml(job.time || "ASAP") + "</span>";
+}
+
+function jobVehicleTagHtml(job) {
+  const v = job.vehicle && job.vehicle !== "None" ? job.vehicle : "—";
+  return '<span class="jobTag jobTagBold jobTagVehicle">' + escapeHtml(v) + "</span>";
+}
+
 function jobRouteHtml(job) {
+  const pickup = (job.pickup || "").trim();
+  const drop = (job.drop || "").trim();
+  if (!pickup && !drop && job.notes) {
+    return '<div class="jobRoute"><div class="jobAddr jobAddrPickup"><span class="jobAddrLbl">NOTES</span>' + escapeHtml(job.notes) + '</div></div>';
+  }
   return '<div class="jobRoute">' +
-    '<div class="jobAddr jobAddrPickup"><span class="jobAddrLbl">PICKUP</span>' + escapeHtml(job.pickup || "—") + '</div>' +
-    '<div class="jobAddr jobAddrDrop"><span class="jobAddrLbl">DROP</span>' + escapeHtml(job.drop || "—") + '</div>' +
+    '<div class="jobAddr jobAddrPickup"><span class="jobAddrLbl">PICKUP</span>' + escapeHtml(pickup || "—") + '</div>' +
+    '<div class="jobAddr jobAddrDrop"><span class="jobAddrLbl">DROP</span>' + escapeHtml(drop || "—") + '</div>' +
     '</div>';
 }
 
@@ -1876,10 +2003,17 @@ function buildDispatchMessage(job) {
   if ((job.payment || []).includes("Deposit")) payment += "\n💳 *Deposit Required - $" + job.depositAmount + "*";
   const op = job.operator ? "\n👤 Operator: " + job.operator : "";
   const notes = job.notes ? "\n📝 Notes: " + job.notes : "";
+  const phoneLine = job.phone ? "\n📞 " + job.phone : "";
+  let routeBlock = "";
+  if (job.pickup || job.drop) {
+    routeBlock = "\n\n📍 Pickup: " + (job.pickup || "—") + "\n📍 Drop: " + (job.drop || "—");
+  } else if (job.notes) {
+    routeBlock = "\n\n📝 " + job.notes;
+  }
   return "🚖 TAXI DISPATCH\n🆔 JOB-" + job.id + op + "\n⏰ " + new Date().toLocaleString() + "\n" + timeSection +
-    "\n\n👤 " + job.name + "\n📞 " + job.phone + "\n\n🚗 " + (job.vehicle || "None") + "\n" + payment +
+    "\n\n👤 " + job.name + phoneLine + "\n\n🚗 " + (job.vehicle || "None") + "\n" + payment +
     "\n💲 " + (job.priceType || "None") + " " + (job.price ? "$" + job.price : "") + "\n" + passengers + notes +
-    "\n\n📍 Pickup: " + job.pickup + "\n📍 Drop: " + job.drop;
+    routeBlock;
 }
 
 function copyToClipboard(text) {
@@ -2172,10 +2306,26 @@ async function dispatch() {
   }
 }
 
+function updateQuickTimeDisplay() {
+  const el = document.getElementById("qbTimeSelected");
+  if (!el) return;
+  if (quickSelectedTime === "None") {
+    el.textContent = "Tap Quick or Ready Now";
+    el.classList.remove("active");
+  } else {
+    el.textContent = "✓ " + quickSelectedTime + " selected";
+    el.classList.add("active");
+  }
+}
+
 function openQuickBooking() {
   if (!requireOperator("use quick booking")) return;
   quickSelectedTime = "None";
-  ["qbQuickBtn", "qbReadyBtn"].forEach(function(id) { document.getElementById(id).classList.remove("glow"); });
+  ["qbQuickBtn", "qbReadyBtn"].forEach(function(id) {
+    const btn = document.getElementById(id);
+    btn.classList.remove("glow", "qbSelected");
+  });
+  updateQuickTimeDisplay();
   document.getElementById("qbPhone").value = "";
   document.getElementById("qbName").value = "";
   document.getElementById("qbPickup").value = "";
@@ -2192,7 +2342,14 @@ function openQuickBooking() {
       hintEl: null
     });
   }
-  setTimeout(function() { document.getElementById("qbPhone").focus(); }, 150);
+  setupNameSuggestions("qbName", "qbNameList", {
+    nameEl: document.getElementById("qbName"),
+    phoneEl: document.getElementById("qbPhone"),
+    pickupEl: document.getElementById("qbPickup"),
+    dropEl: document.getElementById("qbDrop"),
+    hintEl: null
+  });
+  setTimeout(function() { document.getElementById("qbQuickBtn").focus(); }, 150);
 }
 
 function closeQuickBooking() {
@@ -2202,13 +2359,16 @@ function closeQuickBooking() {
 function setQuickTime(t) {
   if (quickSelectedTime === t) {
     quickSelectedTime = "None";
-    document.getElementById("qbQuickBtn").classList.remove("glow");
-    document.getElementById("qbReadyBtn").classList.remove("glow");
+    document.getElementById("qbQuickBtn").classList.remove("glow", "qbSelected");
+    document.getElementById("qbReadyBtn").classList.remove("glow", "qbSelected");
   } else {
     quickSelectedTime = t;
+    document.getElementById("qbQuickBtn").classList.toggle("qbSelected", t === "Quick");
+    document.getElementById("qbReadyBtn").classList.toggle("qbSelected", t === "Ready Now");
     document.getElementById("qbQuickBtn").classList.toggle("glow", t === "Quick");
     document.getElementById("qbReadyBtn").classList.toggle("glow", t === "Ready Now");
   }
+  updateQuickTimeDisplay();
 }
 
 function collectQuickJobData(jobId) {
@@ -2242,16 +2402,25 @@ function collectQuickJobData(jobId) {
 }
 
 function validateQuickDispatch() {
-  if (!document.getElementById("qbPickup").value.trim()) { alert("Enter pickup location"); return false; }
-  if (!document.getElementById("qbDrop").value.trim()) { alert("Enter drop-off location"); return false; }
-  if (quickSelectedTime === "None") { alert("Select Quick or Ready Now"); return false; }
-  return true;
+  if (quickSelectedTime === "None") {
+    alert("Select Quick or Ready Now first");
+    return false;
+  }
+  const name = document.getElementById("qbName").value.trim();
+  const notes = document.getElementById("qbNotes").value.trim();
+  const pickup = document.getElementById("qbPickup").value.trim();
+  const drop = document.getElementById("qbDrop").value.trim();
+  if (pickup && drop) return true;
+  if (name && notes) return true;
+  alert("Enter pickup & drop-off, OR passenger name + notes");
+  return false;
 }
 
 function validateQuickConfirmation() {
   const phone = normalizePhone(document.getElementById("qbPhone").value);
   if (phone.length < 8) { alert("Enter phone number for confirmation SMS"); return false; }
-  return validateQuickDispatch();
+  if (quickSelectedTime === "None") { alert("Select Quick or Ready Now first"); return false; }
+  return true;
 }
 
 async function dispatchQuick() {
