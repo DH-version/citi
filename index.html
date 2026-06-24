@@ -581,7 +581,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <!-- TAB 4: PROSPECT TRACKER -->
 <div id="tabProspect" class="tabPanel">
   <h3>Prospect Tracker</h3>
-  <div class="listHeader">Points from completed fares · Edit with PIN</div>
+  <div class="listHeader">Points: $90+ = 1 · $150+ = 2 · $210+ = 3 · $270+ = 4 · $400+ = 5</div>
   <div class="prospectToolbar">
     <button style="background:#2563eb" onclick="promptProspectEdit()">✏️ Edit Points (PIN)</button>
     <button id="prospectSaveBtn" style="background:#10b981;display:none" onclick="saveProspectScores()">Save Points</button>
@@ -1008,6 +1008,7 @@ function initializeFirebase() {
     subscribeCompletedJobs();
     subscribeCustomers();
     subscribeProspectScores();
+    repairProspectTierGap();
     renderOperatorFilterRow();
     restoreOperatorSession();
   } catch (err) {
@@ -1060,6 +1061,16 @@ function jobTimeMetaTag(job) {
 
 function computeProspectPoints(fare) {
   const f = parseFloat(fare);
+  if (isNaN(f) || f < 90) return 0;
+  if (f >= 400) return 5;
+  if (f >= 270) return 4;
+  if (f >= 210) return 3;
+  if (f >= 150) return 2;
+  return 1;
+}
+
+function computeProspectPointsLegacy(fare) {
+  const f = parseFloat(fare);
   if (isNaN(f)) return 0;
   if (f >= 400) return 5;
   if (f >= 270 && f <= 280) return 4;
@@ -1067,6 +1078,37 @@ function computeProspectPoints(fare) {
   if (f >= 150 && f <= 160) return 2;
   if (f >= 90 && f <= 100) return 1;
   return 0;
+}
+
+async function repairProspectTierGap() {
+  if (!firebaseReady || localStorage.getItem("prospectTierRepairV1") === "1") return;
+  try {
+    const snap = await db.collection("jobs")
+      .where("status", "==", "completed")
+      .orderBy("completedAt", "desc")
+      .limit(150)
+      .get();
+    for (let i = 0; i < snap.docs.length; i++) {
+      const doc = snap.docs[i];
+      const job = doc.data();
+      if (job.prospectPointsCredited) continue;
+      const legacy = computeProspectPointsLegacy(job.fare);
+      const current = computeProspectPoints(job.fare);
+      const gap = current - legacy;
+      const who = resolveOperator(job.completedBy || "");
+      if (gap > 0 && who && PROSPECT_ORDER.indexOf(who) !== -1) {
+        await addProspectPoints(who, gap);
+      }
+      await doc.ref.update({
+        prospectPointsCredited: true,
+        prospectPoints: current,
+        prospectPointsLegacy: legacy
+      });
+    }
+    localStorage.setItem("prospectTierRepairV1", "1");
+  } catch (e) {
+    console.error("Prospect tier repair failed", e);
+  }
 }
 
 function subscribeProspectScores() {
@@ -2166,14 +2208,23 @@ async function confirmCompleteJob() {
   if (!op) return;
   try {
     applyOptimisticComplete(docId, op, fare);
+    const pts = computeProspectPoints(fare);
     await db.collection("jobs").doc(docId).update({
       status: "completed",
       completedBy: op,
       completedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      fare: fare
+      fare: fare,
+      prospectPoints: pts,
+      prospectPointsCredited: true
     });
-    const pts = computeProspectPoints(fare);
-    if (pts > 0) await addProspectPoints(op, pts);
+    if (pts > 0) {
+      try {
+        await addProspectPoints(op, pts);
+      } catch (pe) {
+        console.error("Prospect points failed", pe);
+        alert("Job completed but points update failed — use Prospect tab to adjust");
+      }
+    }
     closeFareModal();
     closeJobModal();
   } catch (err) {
