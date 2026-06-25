@@ -241,14 +241,38 @@ button:disabled{
 }
 .teamToggle{display:flex;gap:6px;margin-bottom:10px}
 .teamToggle button{flex:1;margin:0;font-size:11px;padding:10px 6px}
+#tabTeam.active{
+  display:flex;flex-direction:column;
+  min-height:calc(100dvh - 70px - env(safe-area-inset-top));
+}
+#tabTeam h3{flex:0 0 auto;margin-bottom:4px}
+#tabTeam .teamToggle{flex:0 0 auto;margin-bottom:6px}
+.teamNoticeLayout{
+  display:flex;flex-direction:column;flex:1;min-height:0;
+}
 .noticeBoardHeader{
-  text-align:center;font-weight:900;color:#ffd700;
-  font-size:14px;padding:12px 10px;line-height:1.35;
+  overflow:hidden;position:relative;
   border:2px solid #0066ff;border-radius:8px;
-  margin-bottom:10px;text-transform:none;
+  margin-bottom:8px;background:#000;
+  height:44px;display:flex;align-items:center;
+  flex:0 0 auto;
+}
+.noticeMarquee{
+  width:100%;overflow:hidden;white-space:nowrap;
+}
+.noticeMarqueeText{
+  display:inline-block;padding-left:100%;
+  font-weight:900;color:#ffd700;font-size:14px;
+  white-space:nowrap;
+  animation:noticeMarquee 12s linear infinite;
+}
+@keyframes noticeMarquee{
+  0%{transform:translateX(0)}
+  83.33%{transform:translateX(-100%)}
+  83.33%,100%{transform:translateX(-100%)}
 }
 .noticeFeed{
-  min-height:280px;max-height:calc(100vh - 320px);
+  flex:1 1 auto;min-height:0;
   overflow-y:auto;display:flex;flex-direction:column;gap:8px;
   padding:10px;background:#0a0a0a;border:2px solid #333;border-radius:8px;
 }
@@ -264,7 +288,7 @@ button:disabled{
 .noticeOp{font-weight:900;color:#1e90ff;font-size:13px;text-transform:uppercase}
 .noticeTime{font-size:10px;color:#888;font-weight:700;white-space:nowrap}
 .noticeMsgBody{color:#fff;font-size:15px;font-weight:700;line-height:1.4;word-break:break-word}
-.noticeCompose{display:flex;gap:6px;margin-top:10px;align-items:stretch}
+.noticeCompose{display:flex;gap:6px;margin-top:8px;align-items:stretch;flex:0 0 auto}
 .noticeCompose input{
   flex:1;margin:0!important;padding:12px!important;
   background:#fff!important;color:#000!important;font-weight:800!important;
@@ -386,6 +410,8 @@ button:disabled{
 .jcAddrLblPickup{background:#008000}
 .jcAddrLblDrop{background:#0047ab}
 .jcAddrLblNotes{background:#008000}
+.jcAddrLblPass{background:#b45309}
+.jcAddrLblLug{background:#7c3aed}
 .jcAddrBox{
   flex:1;display:flex;align-items:center;
   background:#fff;padding:6px 8px;min-width:0;
@@ -779,8 +805,12 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <button id="teamProspectBtn" class="filterTypeBtn" onclick="setTeamView('prospect')">Prospect Tracker</button>
   </div>
 
-  <div id="teamNoticePanel">
-    <div class="noticeBoardHeader">Smile you are at Geelong Premium Network Notice board</div>
+  <div id="teamNoticePanel" class="teamNoticeLayout">
+    <div class="noticeBoardHeader">
+      <div class="noticeMarquee">
+        <span class="noticeMarqueeText">Smile You Are At Geelong Premium Network's Notice Board</span>
+      </div>
+    </div>
     <div id="noticeBoardFeed" class="noticeFeed">
       <div class="noticeFeedEmpty">No messages yet — be the first to post</div>
     </div>
@@ -1434,6 +1464,38 @@ async function postNoticeMessage() {
   }
 }
 
+function formatJobPassengers(job) {
+  const parts = [];
+  if (job.adults) parts.push(pluralize(job.adults, "Adult", "Adults"));
+  if (job.kids) parts.push(pluralize(job.kids, "Kid", "Kids"));
+  return parts.join(" · ");
+}
+
+function formatJobLuggage(job) {
+  if (!job.luggage) return "";
+  return pluralize(job.luggage, "Bag", "Bags");
+}
+
+function jobPassengerLuggageHtml(job) {
+  const pass = formatJobPassengers(job);
+  const lug = formatJobLuggage(job);
+  if (!pass && !lug) return "";
+  let html = "";
+  if (pass) {
+    html += '<div class="jcRoute"><div class="jcAddrRow">' +
+      '<div class="jcAddrLbl jcAddrLblPass">👥<br>PASSENGERS</div>' +
+      '<div class="jcAddrBox"><span class="jcAddrText">' + escapeHtml(pass.toUpperCase()) + '</span></div>' +
+      '</div></div>';
+  }
+  if (lug) {
+    html += '<div class="jcRoute"><div class="jcAddrRow">' +
+      '<div class="jcAddrLbl jcAddrLblLug">🧳<br>LUGGAGE</div>' +
+      '<div class="jcAddrBox"><span class="jcAddrText">' + escapeHtml(lug.toUpperCase()) + '</span></div>' +
+      '</div></div>';
+  }
+  return html;
+}
+
 function jdLineHtml(label, value, valueClass) {
   return '<div class="jdLine"><div class="jdLineLbl">' + escapeHtml(label) + '</div>' +
     '<div class="jdLineVal' + (valueClass ? " " + valueClass : "") + '">' + escapeHtml(value) + '</div></div>';
@@ -1455,6 +1517,7 @@ function buildJobDetailListHtml(job, docId, source) {
   html += '<div class="jdActionRow">' + jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>';
   html += jobCardPersonHtml(job);
   html += jobRouteHtml(job, true);
+  html += jobPassengerLuggageHtml(job);
 
   if (job.notes && (job.pickup || job.drop)) {
     html += '<div class="jcRoute"><div class="jcAddrRow">' +
@@ -1463,11 +1526,11 @@ function buildJobDetailListHtml(job, docId, source) {
       '</div></div>';
   }
 
-  if (job.adults || job.kids || job.luggage) {
-    html += jdLineHtml("Passengers",
-      "AD " + (job.adults || "0") +
-      (job.kids ? " · KD " + job.kids : "") +
-      (job.luggage ? " · LG " + job.luggage : ""), "gold");
+  if (job.adults || job.kids) {
+    html += jdLineHtml("Passengers", formatJobPassengers(job).toUpperCase() || "—", "gold");
+  }
+  if (job.luggage) {
+    html += jdLineHtml("Luggage", formatJobLuggage(job).toUpperCase(), "gold");
   }
   if ((job.payment || []).length) {
     html += jdLineHtml("Payment", (job.payment || []).join(", ").toUpperCase(), "blue");
@@ -2165,7 +2228,7 @@ function jobCardFooterHtml(job, source, options) {
 }
 
 function jobCardDetailSectionsHtml(job, full) {
-  let html = "";
+  let html = jobPassengerLuggageHtml(job);
   if (!full) {
     if (job.notes && (job.pickup || job.drop)) {
       const preview = job.notes.length > 60 ? job.notes.slice(0, 60) + "…" : job.notes;
@@ -2185,11 +2248,6 @@ function jobCardDetailSectionsHtml(job, full) {
   }
 
   const extras = [];
-  if (job.adults || job.kids || job.luggage) {
-    extras.push("ADULTS " + (job.adults || "0") +
-      (job.kids ? " · KIDS " + job.kids : "") +
-      (job.luggage ? " · LUGGAGE " + job.luggage : ""));
-  }
   if ((job.payment || []).length) extras.push("PAY " + (job.payment || []).join(", ").toUpperCase());
   if ((job.payment || []).includes("Deposit") && job.depositAmount) extras.push("DEPOSIT $" + job.depositAmount);
   if (job.depositLink) extras.push("DEP LINK " + job.depositLink);
