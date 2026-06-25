@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <base href="/citi/">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f172a">
+<meta name="theme-color" content="#2563eb">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,11 +14,12 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Geelong Premium Network</title>
 <style>
+:root{--black:#000;--blue:#2563eb;--yellow:#facc15;--white:#fff;--cancel-red:#dc2626}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
-  background:linear-gradient(145deg,#0b1220 0%,#111827 50%,#0f172a 100%);
+  background:#000;
   padding:6px;
   padding-top:max(6px, env(safe-area-inset-top));
   color:#fff;
@@ -45,10 +46,10 @@ h3{
   text-align:center;
   font-size:11px;
   margin-bottom:4px;
-  color:#94a3b8;
+  color:#fff;
 }
-.syncStatus.online{color:#34d399}
-.syncStatus.error{color:#f87171}
+.syncStatus.online{color:#facc15}
+.syncStatus.error{color:#facc15}
 
 .tabPanel{display:none}
 .tabPanel.active{display:block}
@@ -56,7 +57,7 @@ h3{
 .section{margin-top:6px}
 #bookingForm .formSection{
   padding-top:8px;margin-top:8px;
-  border-top:1px solid #334155;
+  border-top:2px solid #2563eb;
 }
 #bookingForm .formSection button{
   padding:14px 8px;font-size:15px;margin:1px;
@@ -175,23 +176,23 @@ button:disabled{
 
 .operatorRow{margin-bottom:4px}
 .operatorRow input{padding:10px;font-size:14px;width:100%}
-.operatorStatus{font-size:11px;color:#94a3b8;text-align:center;margin-top:4px;line-height:1.3}
+.operatorStatus{font-size:11px;color:#fff;text-align:center;margin-top:4px;line-height:1.3}
 .operatorStatus.ready{color:#4ade80;font-weight:700}
 .operatorStatus.invalid{color:#f87171}
 .btnSwitchOp{display:none!important}
 .notesBox{
   width:100%;min-height:72px;padding:12px;border-radius:10px;
-  border:1px solid #475569;background:#0f172a;color:#fff;
+  border:1px solid #2563eb;background:#fff;color:#000;
   font-size:15px;line-height:1.45;resize:vertical;margin-top:4px;
 }
 .notesInline{
   width:100%;padding:10px 12px;border-radius:10px;
-  border:1px solid #475569;background:#0f172a;color:#fff;
+  border:1px solid #2563eb;background:#fff;color:#000;
   font-size:15px;margin:3px 0;
 }
 .notesBox.qbNotes{
   min-height:110px;font-size:17px;line-height:1.5;
-  border:2px solid #3b82f6;background:#0c1528;
+  border:2px solid #2563eb;background:#fff;color:#000;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
 }
 .qbField{font-size:17px;padding:13px;margin-bottom:8px}
@@ -209,18 +210,18 @@ button:disabled{
 .prospectTable{
   width:100%;border-collapse:separate;border-spacing:0;
   border-radius:12px;overflow:hidden;
-  border:1px solid #334155;box-shadow:0 2px 12px rgba(0,0,0,.25);
+  border:2px solid #2563eb;box-shadow:0 2px 12px rgba(0,0,0,.5);
 }
 .prospectTable th,.prospectTable td{
   padding:12px 10px;text-align:left;border-bottom:1px solid #334155;
 }
-.prospectTable th{background:#0f172a;color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-.prospectTable td{background:#1e293b;color:#fff;font-size:15px;font-weight:600}
+.prospectTable th{background:#0f172a;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+.prospectTable td{background:#000;color:#fff;font-size:15px;font-weight:600}
 .prospectTable tr:last-child td{border-bottom:none}
 .prospectTable td.pointsCell{text-align:center;color:#facc15;font-size:18px;font-weight:800}
 .prospectTable input{
   width:60px;text-align:center;font-size:16px;font-weight:700;
-  padding:8px;margin:0;background:#0f172a;border:1px solid #3b82f6;color:#facc15;
+  padding:8px;margin:0;background:#fff;border:1px solid #2563eb;color:#000;
 }
 .prospectToolbar{display:flex;gap:8px;margin-bottom:10px}
 .prospectToolbar button{flex:1;margin:0;font-size:12px}
@@ -238,14 +239,14 @@ button:disabled{
   color:#000!important;font-weight:800;
   box-shadow:0 0 14px rgba(250,204,21,.45), inset 0 1px 0 rgba(255,255,255,.3);
 }
-.qbHint{font-size:12px;color:#94a3b8;text-align:center;margin-bottom:8px;line-height:1.35}
+.qbHint{font-size:12px;color:#fff;text-align:center;margin-bottom:8px;line-height:1.35}
 .qbTimeSelected{
   text-align:center;font-size:15px;font-weight:800;color:#64748b;
   margin:0 0 10px;min-height:20px;
 }
 .qbTimeSelected.active{color:#facc15}
 .qbFieldLabel{
-  font-size:11px;font-weight:700;color:#94a3b8;
+  font-size:11px;font-weight:700;color:#fff;
   text-transform:uppercase;letter-spacing:.4px;margin:4px 0 2px;
 }
 .qbField{width:100%;margin-bottom:8px}
@@ -287,14 +288,14 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   position:fixed;bottom:0;left:0;right:0;
   max-width:430px;margin:0 auto;
   display:flex;
-  background:#111827;
-  border-top:1px solid #334155;
+  background:#000;
+  border-top:2px solid #2563eb;
   z-index:200;
   padding-bottom:env(safe-area-inset-bottom,0);
 }
 .navTab{
   flex:1;padding:8px 4px 6px;
-  background:transparent;color:#94a3b8;
+  background:transparent;color:#fff;
   border-radius:0;font-size:10px;font-weight:700;
   display:flex;flex-direction:column;align-items:center;gap:2px;
   margin:0;
@@ -351,17 +352,17 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 }
 .jobPhone:active{opacity:.8}
 .detailPhone{color:#38bdf8;font-weight:700;text-decoration:none}
-.emptyState{text-align:center;padding:30px 16px;color:#94a3b8;font-size:13px}
-.listHeader{font-size:14px;color:#94a3b8;margin-bottom:4px}
+.emptyState{text-align:center;padding:30px 16px;color:#fff;font-size:13px}
+.listHeader{font-size:14px;color:#fff;margin-bottom:4px}
 .prevHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .prevHeader h3{margin:0}
 .btnFilter{background:#475569!important;padding:8px 14px;font-size:13px;margin:0}
 .filterPanel{
-  background:#1e293b;border:1px solid #334155;border-radius:10px;
+  background:#000;border:2px solid #2563eb;border-radius:10px;
   padding:10px;margin-bottom:8px;display:none;
 }
 .filterPanel.open{display:block}
-.filterLabel{font-size:11px;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;font-weight:700}
+.filterLabel{font-size:11px;color:#fff;margin-bottom:4px;text-transform:uppercase;font-weight:700}
 .filterRow{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
 .filterOpBtn{flex:1;min-width:28%;font-size:11px;padding:8px 4px;margin:0}
 .filterTypeBtn{flex:1;font-size:12px;padding:10px;margin:0}
@@ -402,7 +403,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 }
 .modalOverlay.open{display:flex}
 .modalSheet{
-  background:#1e293b;border-radius:16px 16px 0 0;
+  background:#000;border:2px solid #2563eb;border-radius:16px 16px 0 0;
   width:100%;max-width:430px;max-height:90vh;overflow-y:auto;
   padding:16px;animation:slideUp .25s ease;
 }
@@ -410,10 +411,10 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .modalHandle{width:40px;height:4px;background:#475569;border-radius:2px;margin:0 auto 12px}
 .modalHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .modalHeader h2{font-size:18px;color:#facc15}
-.modalClose{background:#334155;padding:8px 14px;font-size:13px}
+.modalClose{background:#2563eb;padding:8px 14px;font-size:13px}
 .detailGrid{display:grid;gap:8px}
-.detailRow{background:#0f172a;border-radius:8px;padding:10px 12px}
-.detailLabel{font-size:11px;color:#94a3b8;text-transform:uppercase;margin-bottom:2px}
+.detailRow{background:#000;border:1px solid #2563eb;border-radius:8px;padding:10px 12px}
+.detailLabel{font-size:11px;color:#fff;text-transform:uppercase;margin-bottom:2px}
 .detailValue{font-size:14px;line-height:1.4}
 .modalActions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .modalActions button{flex:1;min-width:100px}
@@ -431,15 +432,61 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 @keyframes popIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
 .alertToast h4{font-size:15px;margin-bottom:4px}
 .alertToast p{font-size:13px;opacity:.9}
+
+/* Dispatch card - 4-color high visibility */
+.dispatchCard{background:#000;border:2px solid #2563eb;border-radius:14px;margin-bottom:14px;overflow:hidden;cursor:pointer}
+.dispatchCardHeader{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid #2563eb}
+.dispatchJobId{font-size:1.1rem;font-weight:900;color:#facc15;letter-spacing:.06em}
+.dispatchHeaderActions{display:flex;align-items:center;gap:8px}
+.dispatchCard .jobEdit,.dispatchCard .jobDelete{background:transparent!important;border:1px solid #2563eb;color:#fff;width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;padding:0;margin:0}
+.vDivider{width:1px;height:28px;background:#2563eb;flex-shrink:0}
+.scheduleBlock{display:flex;align-items:center;gap:6px;text-align:right}
+.scheduleBlock .clockIcon{color:#facc15;font-size:1rem}
+.scheduleLabel{font-size:.6rem;font-weight:700;letter-spacing:.08em;color:#fff;text-transform:uppercase;line-height:1.1}
+.scheduleTime{font-size:1rem;font-weight:800;color:#facc15}
+.dispatchClientRow{display:flex;align-items:stretch;gap:10px;padding:12px;border-bottom:1px solid #2563eb}
+.clientAvatar{width:48px;height:48px;border-radius:50%;background:#2563eb;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem}
+.clientInfo{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px}
+.clientName{font-size:1.25rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.03em;line-height:1.15}
+.clientPhone{color:#2563eb;font-weight:700;font-size:.95rem;text-decoration:none}
+.clientVehicleCol{display:flex;align-items:center;gap:10px;padding-left:10px;border-left:1px solid #2563eb;flex-shrink:0}
+.clientVehicle{color:#fff;font-weight:800;font-size:.95rem;text-transform:uppercase;white-space:nowrap}
+.routeRow{display:grid;grid-template-columns:72px 1fr;gap:8px;padding:10px 12px;align-items:start;border-bottom:1px solid #2563eb}
+.routeLabel{font-size:.65rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#2563eb;padding-top:8px;line-height:1.2}
+.addressBox{background:#fff;color:#000;border-radius:8px;padding:10px 12px;font-size:.95rem;font-weight:600;line-height:1.35;word-break:break-word}
+.dispatchFooter{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:10px 12px;border-bottom:1px solid #2563eb}
+.footerCol{display:flex;flex-direction:column;gap:2px;min-width:0}
+.footerLabel{font-size:.55rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#2563eb}
+.footerValue{font-size:.8rem;font-weight:700;color:#2563eb;word-break:break-word}
+.footerValue.yellow{color:#facc15}
+.cancelBtn{background:#dc2626;color:#fff;border:none;border-radius:8px;padding:8px 6px;font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;width:100%}
+.dispatchActions{padding:10px 12px 12px}
+.dispatchCard .btnAccept{width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);color:#fff;font-weight:800;font-size:1rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.dispatchCard .actionRow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dispatchCard .btnComplete,.dispatchCard .btnRecall{padding:12px;border:none;border-radius:10px;background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);color:#fff;font-weight:800;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
+.dispatchCard .acceptedBanner{text-align:center;padding:10px;border:1px solid #2563eb;border-radius:8px;color:#facc15;font-weight:700;font-size:.85rem}
+.jobList{gap:10px}
+.emptyState{color:#fff;border:1px dashed #2563eb;border-radius:12px}
+input,select{background:#fff;color:#000;border:1px solid #2563eb}
+select{background:#2563eb;color:#fff}
+h2{color:#facc15}
+h3{color:#fff}
+.operatorStatus{color:#fff}
+.operatorStatus.ready{color:#facc15}
+.operatorStatus.invalid{color:#facc15}
+.qbHint,.qbTimeSelected{color:#fff}
+.qbTimeSelected.active{color:#facc15}
+.qbFieldLabel{color:#facc15}
+.listHeader,.prevHeader h3{color:#fff}
 </style>
 </head>
 <body>
 
 <h2>GEELONG PREMIUM NETWORK</h2>
-<div id="syncStatus" class="syncStatus">Connecting…</div>
+<div id="syncStatus" class="syncStatus">Connectingâ€¦</div>
 
 <div id="alertToast" class="alertToast" onclick="dismissAlert()">
-  <h4>🚖 New Job Arrived!</h4>
+  <h4>ðŸš– New Job Arrived!</h4>
   <p id="alertText">Tap to view</p>
 </div>
 
@@ -452,7 +499,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   </div>
 
   <div id="bookingForm" class="locked">
-  <button type="button" class="btnQuickBooking" onclick="openQuickBooking()">⚡ Quick Booking</button>
+  <button type="button" class="btnQuickBooking" onclick="openQuickBooking()">âš¡ Quick Booking</button>
   <div class="twoCol">
     <div class="nameInputWrap">
       <input id="name" placeholder="Passenger Name" autocomplete="off" autocapitalize="words">
@@ -463,7 +510,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <div id="phoneList" class="phoneSuggestList"></div>
     </div>
   </div>
-  <div id="phoneHint" class="phoneHint">Customer found — details filled</div>
+  <div id="phoneHint" class="phoneHint">Customer found â€” details filled</div>
 
   <div class="autocomplete-container">
     <input id="pickup" placeholder="Pickup Location" autocomplete="off">
@@ -551,7 +598,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
     <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Future Bookings</button>
   </div>
-  <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
+  <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs Â· Accept to take</div>
   <div id="availableList" class="jobList"></div>
 </div>
 
@@ -581,9 +628,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <!-- TAB 4: PROSPECT TRACKER -->
 <div id="tabProspect" class="tabPanel">
   <h3>Prospect Tracker</h3>
-  <div class="listHeader">Points: $90+ = 1 · $150+ = 2 · $210+ = 3 · $270+ = 4 · $400+ = 5</div>
+  <div class="listHeader">Points: $90+ = 1 Â· $150+ = 2 Â· $210+ = 3 Â· $270+ = 4 Â· $400+ = 5</div>
   <div class="prospectToolbar">
-    <button style="background:#2563eb" onclick="promptProspectEdit()">✏️ Edit Points (PIN)</button>
+    <button style="background:#2563eb" onclick="promptProspectEdit()">âœï¸ Edit Points (PIN)</button>
     <button id="prospectSaveBtn" style="background:#10b981;display:none" onclick="saveProspectScores()">Save Points</button>
   </div>
   <table class="prospectTable">
@@ -596,7 +643,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="pinModal" class="modalOverlay" onclick="if(event.target===this)closePinModal()">
   <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
     <h3 id="pinModalTitle" style="color:#facc15;margin-bottom:10px;text-align:center">Enter PIN</h3>
-    <input id="pinInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autocomplete="off" enterkeyhint="done" readonly>
+    <input id="pinInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="â€¢â€¢â€¢â€¢" autocomplete="off" enterkeyhint="done" readonly>
     <div class="pinActions">
       <button id="pinConfirmBtn" style="background:#2563eb" onclick="confirmPinAction()">Continue</button>
       <button style="background:#64748b" onclick="closePinModal()">Cancel</button>
@@ -626,7 +673,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="fareModal" class="modalOverlay" onclick="if(event.target===this)closeFareModal()">
   <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
     <h3 style="color:#4ade80;margin-bottom:4px;text-align:center">Enter Fare</h3>
-    <p style="text-align:center;color:#94a3b8;font-size:12px;margin-bottom:8px">Trip fare to complete this job</p>
+    <p style="text-align:center;color:#fff;font-size:12px;margin-bottom:8px">Trip fare to complete this job</p>
     <div class="fareInputWrap">
       <span class="farePrefix">$</span>
       <input id="fareInput" type="tel" inputmode="decimal" pattern="[0-9]*" placeholder="0.00" autocomplete="off" enterkeyhint="done" readonly>
@@ -642,7 +689,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="quickBookingModal" class="modalOverlay" onclick="if(event.target===this)closeQuickBooking()">
   <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px;max-height:92vh">
     <h3 style="color:#60a5fa;margin-bottom:6px;text-align:center;font-weight:800">Quick Booking</h3>
-    <p class="qbHint">Select time first · then name or addresses · Dispatch when ready</p>
+    <p class="qbHint">Select time first Â· then name or addresses Â· Dispatch when ready</p>
     <div class="qbTimeRow">
       <button type="button" id="qbQuickBtn" onclick="setQuickTime('Quick')">Quick</button>
       <button type="button" id="qbReadyBtn" onclick="setQuickTime('Ready Now')">Ready Now</button>
@@ -667,7 +714,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <input id="qbDrop" class="qbField" placeholder="Drop-off Location" autocomplete="off">
       <div id="qbDropList" class="autocomplete-list"></div>
     </div>
-    <textarea id="qbNotes" class="notesBox qbNotes" placeholder="Notes — driver instructions, special requests…"></textarea>
+    <textarea id="qbNotes" class="notesBox qbNotes" placeholder="Notes â€” driver instructions, special requestsâ€¦"></textarea>
     <div class="pinActions">
       <button style="background:#10b981;flex:1" onclick="dispatchQuick()">Dispatch</button>
       <button style="background:#2563eb;flex:1" onclick="sendQuickConfirmation()">Confirmation</button>
@@ -692,17 +739,17 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <!-- BOTTOM NAV -->
 <nav class="bottomNav">
   <button class="navTab active" data-tab="tabNew" onclick="switchTab('tabNew',this)">
-    <span class="icon">📝</span>New Booking
+    <span class="icon">ðŸ“</span>New Booking
   </button>
   <button class="navTab" data-tab="tabAvailable" onclick="switchTab('tabAvailable',this)">
-    <span class="icon">🚖</span>Available
+    <span class="icon">ðŸš–</span>Available
     <span id="availableBadge" class="badge" style="display:none">0</span>
   </button>
   <button class="navTab" data-tab="tabPrevious" onclick="switchTab('tabPrevious',this)">
-    <span class="icon">📋</span>Previous
+    <span class="icon">ðŸ“‹</span>Previous
   </button>
   <button class="navTab" data-tab="tabProspect" onclick="switchTab('tabProspect',this)">
-    <span class="icon">🏆</span>Prospect
+    <span class="icon">ðŸ†</span>Prospect
   </button>
 </nav>
 
@@ -724,7 +771,7 @@ const GEELONG_SUBURBS = [
   "mount duneed", "wandana heights", "st albans park", "rippleside", "drumcondra",
   "east geelong", "thomson", "ceres", "bannockburn", "inverleigh", "little river"
 ].map(function(s) { return s.trim().toLowerCase(); });
-const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 330 596\n🌎 www.geelongcitytaxicab.com.au";
+const SIGNATURE = "\n\nðŸš– Geelong City Cabs\nðŸ“ Bookings | Inquiries | Support\nðŸ“ž 0420 303 581\nðŸ“ž 0450 330 596\nðŸŒŽ www.geelongcitytaxicab.com.au";
 const AUTHORIZED_OPERATORS = ["Danial", "Najaf", "Mudassir", "Asif", "Khizar", "Tuqeer"];
 const PROSPECT_ORDER = ["Tuqeer", "Khizar", "Asif", "Mudassir", "Najaf", "Danial"];
 
@@ -737,6 +784,7 @@ let teamOperators = AUTHORIZED_OPERATORS.slice();
 let selectedFilterOperator = "", selectedFilterType = "";
 let previousFilterActive = false;
 let pendingDeleteDocId = null;
+let pendingCancelDocId = null;
 let pendingCompleteDocId = null;
 let pendingEditDocId = null;
 let pinAction = "";
@@ -984,7 +1032,7 @@ function updateOperatorAccess(isValid, showInvalid) {
     status.textContent = "Signed in as: " + getCurrentOperator();
     status.className = "operatorStatus ready";
   } else if (showInvalid && document.getElementById("operator").value.trim()) {
-    status.textContent = "Name not recognised — use Danial, Najaf, Mudassir, Asif, Khizar or Tuqeer";
+    status.textContent = "Name not recognised â€” use Danial, Najaf, Mudassir, Asif, Khizar or Tuqeer";
     status.className = "operatorStatus invalid";
   } else {
     status.textContent = "Enter your operator name to enable the app";
@@ -1003,7 +1051,7 @@ function initializeFirebase() {
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
     firebaseReady = true;
-    setSyncStatus("Connected — live sync active", false);
+    setSyncStatus("Connected â€” live sync active", false);
     subscribeAvailableJobs();
     subscribeCompletedJobs();
     subscribeCustomers();
@@ -1013,7 +1061,7 @@ function initializeFirebase() {
     restoreOperatorSession();
   } catch (err) {
     console.error(err);
-    setSyncStatus("Firebase error — check config", true);
+    setSyncStatus("Firebase error â€” check config", true);
   }
 }
 
@@ -1244,7 +1292,7 @@ function setAvailableView(view) {
   document.getElementById("availFutureBtn").classList.toggle("selected", view === "future");
   document.getElementById("availableListHint").textContent = view === "future"
     ? "Future scheduled jobs"
-    : "Quick & Ready Now jobs · Accept to take";
+    : "Quick & Ready Now jobs Â· Accept to take";
   scheduleRenderAvailable();
 }
 
@@ -1368,7 +1416,7 @@ function searchPhoneSuggestions(query, listEl, onPick) {
     return;
   }
   listEl.innerHTML = matches.map(function(c, i) {
-    return '<div class="phoneSuggestItem" data-idx="' + i + '"><strong>' + escapeHtml(formatPhoneDisplay(c.phone)) + '</strong><span>' + escapeHtml(c.name || "Unknown") + " · " + escapeHtml(c.pickup || "—") + '</span></div>';
+    return '<div class="phoneSuggestItem" data-idx="' + i + '"><strong>' + escapeHtml(formatPhoneDisplay(c.phone)) + '</strong><span>' + escapeHtml(c.name || "Unknown") + " Â· " + escapeHtml(c.pickup || "â€”") + '</span></div>';
   }).join("");
   listEl.querySelectorAll(".phoneSuggestItem").forEach(function(item) {
     item.onclick = function() {
@@ -1528,9 +1576,11 @@ function applyOptimisticComplete(docId, op, fare) {
 }
 
 function removeJobLocally(docId) {
+  availableJobs = availableJobs.filter(function(j) { return j.docId !== docId; });
   completedJobs = completedJobs.filter(function(j) { return j.docId !== docId; });
   filterResultJobs = filterResultJobs.filter(function(j) { return j.docId !== docId; });
   historyJobs = historyJobs.filter(function(j) { return j.docId !== docId; });
+  scheduleRenderAvailable();
   scheduleRenderPrevious();
 }
 
@@ -1648,22 +1698,27 @@ function focusModalInput(input, selectAll) {
 }
 
 function jobDeleteBtn(docId) {
-  return '<button type="button" class="jobDelete" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">🗑️</button>';
+  return '<button type="button" class="jobDelete" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">ðŸ—‘ï¸</button>';
 }
 
 function jobEditBtn(docId) {
-  return '<button type="button" class="jobEdit" onclick="promptEditJob(\'' + docId + '\', event)" title="Edit">✏️</button>';
+  return '<button type="button" class="jobEdit" onclick="promptEditJob(\'' + docId + '\', event)" title="Edit">âœï¸</button>';
 }
 
 function openPinModal(action, docId) {
   pinAction = action;
   pendingDeleteDocId = action === "delete" ? docId : null;
+  pendingCancelDocId = action === "cancel" ? docId : null;
   pendingEditDocId = action === "edit" ? docId : null;
   const title = document.getElementById("pinModalTitle");
   const btn = document.getElementById("pinConfirmBtn");
   if (action === "delete") {
     title.textContent = "Enter PIN to Delete";
     btn.textContent = "Delete";
+    btn.style.background = "#dc2626";
+  } else if (action === "cancel") {
+    title.textContent = "Enter PIN to Cancel Job";
+    btn.textContent = "Cancel Job";
     btn.style.background = "#dc2626";
   } else if (action === "edit") {
     title.textContent = "Enter PIN to Edit Job";
@@ -1691,6 +1746,12 @@ function promptEditJob(docId, e) {
   openPinModal("edit", docId);
 }
 
+
+function promptCancelJob(docId, e) {
+  if (e) e.stopPropagation();
+  if (!requireOperator("cancel jobs")) return;
+  openPinModal("cancel", docId);
+}
 function promptProspectEdit() {
   if (!requireOperator("edit prospect points")) return;
   openPinModal("prospect", null);
@@ -1702,6 +1763,7 @@ function confirmPinAction() {
     return;
   }
   if (pinAction === "delete") confirmDeleteJob();
+  else if (pinAction === "cancel") confirmCancelJob();
   else if (pinAction === "edit") {
     const docId = pendingEditDocId;
     closePinModal();
@@ -1716,6 +1778,7 @@ function closePinModal() {
   document.getElementById("pinModal").classList.remove("open");
   document.getElementById("pinInput").setAttribute("readonly", "readonly");
   pendingDeleteDocId = null;
+  pendingCancelDocId = null;
   pendingEditDocId = null;
   pinAction = "";
 }
@@ -1736,6 +1799,22 @@ async function confirmDeleteJob() {
   }
 }
 
+
+async function confirmCancelJob() {
+  if (document.getElementById("pinInput").value !== DELETE_PIN) {
+    alert("Wrong PIN");
+    return;
+  }
+  if (!pendingCancelDocId) return;
+  try {
+    await db.collection("jobs").doc(pendingCancelDocId).delete();
+    removeJobLocally(pendingCancelDocId);
+    closePinModal();
+    closeJobModal();
+  } catch (err) {
+    alert("Cancel failed: " + err.message);
+  }
+}
 function findJobById(docId) {
   let job = availableJobs.find(function(j) { return j.docId === docId; });
   if (job) return job;
@@ -1804,9 +1883,9 @@ function computeSortKey(timeType, date, timeInput, ampm) {
 
 function getJobTimeLabel(job) {
   if (isFutureJob(job) && job.date && job.timeInput) {
-    return formatDateDisplay(job.date) + " · " + job.timeInput + " " + (job.ampm !== "None" ? job.ampm : "");
+    return formatDateDisplay(job.date) + " Â· " + job.timeInput + " " + (job.ampm !== "None" ? job.ampm : "");
   }
-  if (job.time && job.time !== "None") return job.time + " · ASAP";
+  if (job.time && job.time !== "None") return job.time + " Â· ASAP";
   return "ASAP";
 }
 
@@ -1850,10 +1929,83 @@ function subscribeAvailableJobs() {
       jobsListenerReady = true;
     }, function(err) {
       console.error(err);
-      setSyncStatus("Firestore index needed for status — check console", true);
+      setSyncStatus("Firestore index needed for status â€” check console", true);
     });
 }
 
+function formatDispatchedTimeOnly(job) {
+  if (!job.dispatchedAt) return "—";
+  var d;
+  if (job.dispatchedAt.toDate) d = job.dispatchedAt.toDate();
+  else if (job.dispatchedAt.seconds) d = new Date(job.dispatchedAt.seconds * 1000);
+  else return "—";
+  return d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function getScheduleHeader(job) {
+  if (isFutureJob(job) && job.date && job.timeInput) {
+    var time = job.timeInput;
+    if (job.ampm && job.ampm !== "None") time += " " + job.ampm;
+    return { label: "SCHEDULED", time: formatDateDisplay(job.date) + " · " + time };
+  }
+  if (job.time && job.time !== "None") {
+    return { label: "SCHEDULED", time: job.time };
+  }
+  return { label: "SCHEDULED", time: "ASAP" };
+}
+
+function renderDispatchCard(job, source) {
+  var schedule = getScheduleHeader(job);
+  var initials = (job.name || "?").split(" ").map(function(w) { return w[0] || ""; }).join("").slice(0, 2).toUpperCase();
+  var isCompleted = job.status === "completed";
+  var isAccepted = job.status === "accepted";
+  var isAvailable = job.status === "available";
+  var phoneHtml = job.phone
+    ? '<a class="clientPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
+    : '<span class="clientPhone">—</span>';
+  var vehicle = job.vehicle && job.vehicle !== "None" ? job.vehicle : "—";
+  var footerCol3;
+  if (isCompleted) {
+    footerCol3 = '<div class="footerCol"><span class="footerLabel">Completed By</span><span class="footerValue yellow">' + escapeHtml(job.completedBy || "—") + '</span></div>';
+  } else {
+    footerCol3 = '<div class="footerCol"><button type="button" class="cancelBtn" onclick="promptCancelJob(\'' + job.docId + '\', event)">Cancel</button></div>';
+  }
+  var actionsHtml = "";
+  if (source === "available") {
+    if (isAvailable) {
+      actionsHtml = '<div class="dispatchActions" onclick="event.stopPropagation()"><button type="button" class="btnAccept" onclick="acceptJob(\'' + job.docId + '\')">✓ Accept Job</button></div>';
+    } else if (isAccepted && isJobAcceptedByMe(job)) {
+      actionsHtml = '<div class="dispatchActions" onclick="event.stopPropagation()"><div class="actionRow"><button type="button" class="btnComplete" onclick="completeJob(\'' + job.docId + '\')">Complete</button><button type="button" class="btnRecall" onclick="recallJob(\'' + job.docId + '\')">Recall</button></div></div>';
+    } else if (isAccepted) {
+      actionsHtml = '<div class="dispatchActions"><div class="acceptedBanner">Accepted by ' + escapeHtml(job.acceptedBy || "another operator") + '</div></div>';
+    }
+  }
+  var showEditDelete = !isCompleted;
+  var editDeleteHtml = showEditDelete ? jobEditBtn(job.docId) + jobDeleteBtn(job.docId) + '<div class="vDivider"></div>' : '';
+  var modalSource = source === "available" ? "available" : "previous";
+  var fareHtml = source === "previous" ? fareLineHtml(job) : "";
+  var pickup = (job.pickup || "").trim();
+  var drop = (job.drop || "").trim();
+  var routeHtml;
+  if (!pickup && !drop && job.notes) {
+    routeHtml = '<div class="routeRow"><div class="routeLabel">Notes</div><div class="addressBox">' + escapeHtml(job.notes) + '</div></div>';
+  } else {
+    routeHtml = '<div class="routeRow"><div class="routeLabel">Pick Up</div><div class="addressBox">' + escapeHtml(pickup || "—") + '</div></div>' +
+      '<div class="routeRow"><div class="routeLabel">Drop Off</div><div class="addressBox">' + escapeHtml(drop || "—") + '</div></div>';
+  }
+  return '<article class="dispatchCard" onclick="openJobModal(\'' + job.docId + '\',\'' + modalSource + '\')">' +
+    '<div class="dispatchCardHeader"><span class="dispatchJobId">📋 JOB-' + job.id + '</span>' +
+    '<div class="dispatchHeaderActions">' + editDeleteHtml +
+    '<div class="scheduleBlock"><span class="clockIcon">🕐</span><div><div class="scheduleLabel">' + escapeHtml(schedule.label) + '</div><div class="scheduleTime">' + escapeHtml(schedule.time) + '</div></div></div></div></div>' +
+    '<div class="dispatchClientRow"><div class="clientAvatar">' + escapeHtml(initials) + '</div>' +
+    '<div class="clientInfo"><div class="clientName">' + escapeHtml(job.name || "Unknown") + fareHtml + '</div>' + phoneHtml + '</div>' +
+    '<div class="clientVehicleCol"><span class="clientVehicle">🚗 ' + escapeHtml(vehicle) + '</span></div></div>' +
+    routeHtml +
+    '<div class="dispatchFooter">' +
+    '<div class="footerCol"><span class="footerLabel">Dispatched</span><span class="footerValue">' + escapeHtml(formatDispatchedTimeOnly(job)) + '</span></div>' +
+    '<div class="footerCol"><span class="footerLabel">Dispatched By</span><span class="footerValue">' + escapeHtml(job.operator || "—") + '</span></div>' +
+    footerCol3 + '</div>' + actionsHtml + '</article>';
+}
 function renderAvailableList() {
   const el = document.getElementById("availableList");
   const jobs = availableJobs.filter(function(job) {
@@ -1867,43 +2019,10 @@ function renderAvailableList() {
     return (a.sortKey || 0) - (b.sortKey || 0);
   });
   if (!jobs.length) {
-    el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No ' + (availableView === "future" ? "future" : "current") + ' bookings<br><span style="font-size:12px">' + (availableView === "future" ? "Future jobs appear here" : "Quick & Ready Now jobs appear here") + '</span></div>';
+    el.innerHTML = '<div class="emptyState"><div class="icon">ðŸš–</div>No ' + (availableView === "future" ? "future" : "current") + ' bookings<br><span style="font-size:12px">' + (availableView === "future" ? "Future jobs appear here" : "Quick & Ready Now jobs appear here") + '</span></div>';
     return;
   }
-  el.innerHTML = jobs.map(function(job) {
-    const dispatched = formatDispatchedAt(job);
-    const isAccepted = job.status === "accepted";
-    const cardClass = isAccepted ? "jobCardAccepted" : "jobCardAvailable";
-    const phoneHtml = job.phone
-      ? '<a class="jobPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
-      : "";
-    let actionsHtml = "";
-    if (!isAccepted) {
-      actionsHtml = '<div class="jobActions" onclick="event.stopPropagation()">' +
-        '<button class="btnAccept" onclick="acceptJob(\'' + job.docId + '\')">Accept</button></div>';
-    } else if (isJobAcceptedByMe(job)) {
-      actionsHtml = '<div class="acceptedBanner">Accepted (' + escapeHtml(job.acceptedBy) + ')</div>' +
-        '<div class="jobActions" onclick="event.stopPropagation()">' +
-        '<button class="btnComplete" onclick="completeJob(\'' + job.docId + '\')">Complete</button>' +
-        '<button class="btnRecall" onclick="recallJob(\'' + job.docId + '\')">Recall</button></div>';
-    } else {
-      actionsHtml = '<div class="acceptedBanner">Accepted (' + escapeHtml(job.acceptedBy || "Unknown") + ')</div>';
-    }
-    return '<div class="jobCard ' + cardClass + '" onclick="openJobModal(\'' + job.docId + '\',\'available\')">' +
-      '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span>' +
-      '<div class="jobCardTopRight">' + jobEditBtn(job.docId) + jobDeleteBtn(job.docId) +
-      '<span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div></div>' +
-      '<div class="jobName">' + escapeHtml(job.name || "Unknown") + '</div>' +
-      phoneHtml +
-      jobRouteHtml(job) +
-      '<div class="jobMeta">' +
-        jobTimeMetaTag(job) +
-        jobTimeTagHtml(job) +
-        jobVehicleTagHtml(job) +
-        (job.operator ? '<span class="jobTag">Dispatched: ' + escapeHtml(job.operator) + '</span>' : '') +
-        (job.notes ? '<span class="jobTag">📝 ' + escapeHtml(job.notes.slice(0, 40)) + '</span>' : '') +
-      '</div>' + actionsHtml + '</div>';
-  }).join("");
+  el.innerHTML = jobs.map(function(job) { return renderDispatchCard(job, "available"); }).join("");
 }
 
 function renderPreviousList() {
@@ -1911,33 +2030,10 @@ function renderPreviousList() {
   const jobs = getPreviousJobsToRender();
   previousJobs = jobs;
   if (!jobs.length) {
-    el.innerHTML = '<div class="emptyState"><div class="icon">📋</div>No jobs found</div>';
+    el.innerHTML = '<div class="emptyState"><div class="icon">ðŸ“‹</div>No jobs found</div>';
     return;
   }
-  el.innerHTML = jobs.map(function(job) {
-    const finisher = job.completedBy || job.acceptedBy || job.operator || "Unknown";
-    const phoneHtml = job.phone
-      ? '<a class="jobPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
-      : "";
-    const typeTag = job.status === "completed"
-      ? '<span class="jobTag completedBy">' + escapeHtml(finisher) + '</span>'
-      : '<span class="jobTag">' + escapeHtml(job.status || "—") + '</span>';
-    return '<div class="jobCard" onclick="openJobModal(\'' + job.docId + '\',\'previous\')">' +
-      '<div class="jobCardTop"><span class="jobId">JOB-' + job.id + '</span>' +
-      '<div class="jobCardTopRight">' + jobEditBtn(job.docId) + jobDeleteBtn(job.docId) +
-      '<span class="jobTime">' + escapeHtml(getJobTimeLabel(job)) + '</span></div></div>' +
-      '<div class="jobName">' + escapeHtml(job.name || "Unknown") + fareLineHtml(job) + '</div>' +
-      phoneHtml +
-      jobRouteHtml(job) +
-      '<div class="jobMeta">' +
-        jobTimeMetaTag(job) +
-        jobTimeTagHtml(job) +
-        jobVehicleTagHtml(job) +
-        typeTag +
-        (job.operator ? '<span class="jobTag">Disp: ' + escapeHtml(job.operator) + '</span>' : '') +
-        (job.notes ? '<span class="jobTag">📝 ' + escapeHtml(job.notes.slice(0, 40)) + '</span>' : '') +
-      '</div></div>';
-  }).join("");
+  el.innerHTML = jobs.map(function(job) { return renderDispatchCard(job, "previous"); }).join("");
 }
 
 function formatFareDisplay(fare) {
@@ -1951,7 +2047,7 @@ function jobTimeTagHtml(job) {
   if (isFutureJob(job)) {
     let label = "";
     if (job.date) label += formatDateDisplay(job.date);
-    if (job.timeInput) label += (label ? " · " : "") + job.timeInput;
+    if (job.timeInput) label += (label ? " Â· " : "") + job.timeInput;
     if (job.ampm && job.ampm !== "None") label += " " + job.ampm;
     if (!label) label = job.time || "Future";
     return '<span class="jobTag jobTagBold jobTagSchedule">' + escapeHtml(label) + "</span>";
@@ -1960,7 +2056,7 @@ function jobTimeTagHtml(job) {
 }
 
 function jobVehicleTagHtml(job) {
-  const v = job.vehicle && job.vehicle !== "None" ? job.vehicle : "—";
+  const v = job.vehicle && job.vehicle !== "None" ? job.vehicle : "â€”";
   return '<span class="jobTag jobTagBold jobTagVehicle">' + escapeHtml(v) + "</span>";
 }
 
@@ -1971,8 +2067,8 @@ function jobRouteHtml(job) {
     return '<div class="jobRoute"><div class="jobAddr jobAddrPickup"><span class="jobAddrLbl">NOTES</span>' + escapeHtml(job.notes) + '</div></div>';
   }
   return '<div class="jobRoute">' +
-    '<div class="jobAddr jobAddrPickup"><span class="jobAddrLbl">PICKUP</span>' + escapeHtml(pickup || "—") + '</div>' +
-    '<div class="jobAddr jobAddrDrop"><span class="jobAddrLbl">DROP</span>' + escapeHtml(drop || "—") + '</div>' +
+    '<div class="jobAddr jobAddrPickup"><span class="jobAddrLbl">PICKUP</span>' + escapeHtml(pickup || "â€”") + '</div>' +
+    '<div class="jobAddr jobAddrDrop"><span class="jobAddrLbl">DROP</span>' + escapeHtml(drop || "â€”") + '</div>' +
     '</div>';
 }
 
@@ -1991,24 +2087,24 @@ function openJobModal(docId, source) {
   if (!job) return;
 
   document.getElementById("modalJobTitle").textContent = "JOB-" + job.id;
-  const phoneDisplay = job.phone ? formatPhoneDisplay(job.phone) : "—";
+  const phoneDisplay = job.phone ? formatPhoneDisplay(job.phone) : "â€”";
   const phoneLink = job.phone
-    ? '<a class="detailPhone" href="tel:' + normalizePhone(job.phone) + '">📞 ' + escapeHtml(phoneDisplay) + ' — Tap to call</a>'
+    ? '<a class="detailPhone" href="tel:' + normalizePhone(job.phone) + '">ðŸ“ž ' + escapeHtml(phoneDisplay) + ' â€” Tap to call</a>'
     : escapeHtml(phoneDisplay);
   const rows = [
     ["Passenger", escapeHtml(job.name || "Unknown") + "<br>" + phoneLink],
-    ["Pickup", job.pickup || "—"],
-    ["Drop-off", job.drop || "—"],
+    ["Pickup", job.pickup || "â€”"],
+    ["Drop-off", job.drop || "â€”"],
     ["Pickup Time", getJobTimeLabel(job)],
     ["Vehicle", job.vehicle || "None"],
-    ["Passengers", "Adults: " + (job.adults || "—") + (job.kids ? " · Kids: " + job.kids : "") + (job.luggage ? " · Luggage: " + job.luggage : "")],
+    ["Passengers", "Adults: " + (job.adults || "â€”") + (job.kids ? " Â· Kids: " + job.kids : "") + (job.luggage ? " Â· Luggage: " + job.luggage : "")],
     ["Payment", (job.payment || []).join(", ") || "None"],
-    ["Price", (job.priceType || "None") + (job.price ? " · $" + job.price : "")],
-    ["Operator", job.operator || "—"]
+    ["Price", (job.priceType || "None") + (job.price ? " Â· $" + job.price : "")],
+    ["Operator", job.operator || "â€”"]
   ];
   if (job.notes) rows.push(["Notes", job.notes]);
   if ((job.payment || []).includes("Deposit")) {
-    rows.push(["Deposit", "$" + (job.depositAmount || "—") + (job.depositLink ? "\n" + job.depositLink : "")]);
+    rows.push(["Deposit", "$" + (job.depositAmount || "â€”") + (job.depositLink ? "\n" + job.depositLink : "")]);
   }
   const dispatched = formatDispatchedAt(job);
   if (dispatched) rows.splice(3, 0, ["Dispatched", dispatched]);
@@ -2051,25 +2147,25 @@ function buildDispatchMessage(job) {
   if (isFutureJob(job) && !date && job.timeInput) date = getTodayDate();
   const dateFormatted = formatDateDisplay(date);
   const timeSection = isFutureJob(job) && date && job.timeInput
-    ? "🪧 *Pickup Time - " + (job.time === "Later" ? "Future" : job.time) + "*\n📅 *Date: " + dateFormatted + "*\n⏱️ *Time: " + job.timeInput + " " + job.ampm + "*"
-    : "🪧 *Pickup Time - " + job.time + "*";
-  let passengers = "👥 Adults: " + (job.adults || "None");
-  if (job.kids) passengers += "\n👥 Kids: " + job.kids;
-  if (job.luggage) passengers += "\n👜 Luggage: " + job.luggage;
-  let payment = "💳 " + ((job.payment || []).join(", ") || "None");
-  if ((job.payment || []).includes("Deposit")) payment += "\n💳 *Deposit Required - $" + job.depositAmount + "*";
-  const op = job.operator ? "\n👤 Operator: " + job.operator : "";
-  const notes = job.notes ? "\n📝 Notes: " + job.notes : "";
-  const phoneLine = job.phone ? "\n📞 " + job.phone : "";
+    ? "ðŸª§ *Pickup Time - " + (job.time === "Later" ? "Future" : job.time) + "*\nðŸ“… *Date: " + dateFormatted + "*\nâ±ï¸ *Time: " + job.timeInput + " " + job.ampm + "*"
+    : "ðŸª§ *Pickup Time - " + job.time + "*";
+  let passengers = "ðŸ‘¥ Adults: " + (job.adults || "None");
+  if (job.kids) passengers += "\nðŸ‘¥ Kids: " + job.kids;
+  if (job.luggage) passengers += "\nðŸ‘œ Luggage: " + job.luggage;
+  let payment = "ðŸ’³ " + ((job.payment || []).join(", ") || "None");
+  if ((job.payment || []).includes("Deposit")) payment += "\nðŸ’³ *Deposit Required - $" + job.depositAmount + "*";
+  const op = job.operator ? "\nðŸ‘¤ Operator: " + job.operator : "";
+  const notes = job.notes ? "\nðŸ“ Notes: " + job.notes : "";
+  const phoneLine = job.phone ? "\nðŸ“ž " + job.phone : "";
   let routeBlock = "";
   if (job.pickup || job.drop) {
-    routeBlock = "\n\n📍 Pickup: " + (job.pickup || "—") + "\n📍 Drop: " + (job.drop || "—");
+    routeBlock = "\n\nðŸ“ Pickup: " + (job.pickup || "â€”") + "\nðŸ“ Drop: " + (job.drop || "â€”");
   } else if (job.notes) {
-    routeBlock = "\n\n📝 " + job.notes;
+    routeBlock = "\n\nðŸ“ " + job.notes;
   }
-  return "🚖 TAXI DISPATCH\n🆔 JOB-" + job.id + op + "\n⏰ " + new Date().toLocaleString() + "\n" + timeSection +
-    "\n\n👤 " + job.name + phoneLine + "\n\n🚗 " + (job.vehicle || "None") + "\n" + payment +
-    "\n💲 " + (job.priceType || "None") + " " + (job.price ? "$" + job.price : "") + "\n" + passengers + notes +
+  return "ðŸš– TAXI DISPATCH\nðŸ†” JOB-" + job.id + op + "\nâ° " + new Date().toLocaleString() + "\n" + timeSection +
+    "\n\nðŸ‘¤ " + job.name + phoneLine + "\n\nðŸš— " + (job.vehicle || "None") + "\n" + payment +
+    "\nðŸ’² " + (job.priceType || "None") + " " + (job.price ? "$" + job.price : "") + "\n" + passengers + notes +
     routeBlock;
 }
 
@@ -2120,7 +2216,7 @@ function copyJobMessage(docId) {
   const job = findJobById(docId);
   if (!job) return;
   copyToClipboard(buildDispatchMessage(job)).then(function(ok) {
-    alert(ok ? "Copied ✔" : "Could not copy — select text manually");
+    alert(ok ? "Copied âœ”" : "Could not copy â€” select text manually");
   });
 }
 
@@ -2222,7 +2318,7 @@ async function confirmCompleteJob() {
         await addProspectPoints(op, pts);
       } catch (pe) {
         console.error("Prospect points failed", pe);
-        alert("Job completed but points update failed — use Prospect tab to adjust");
+        alert("Job completed but points update failed â€” use Prospect tab to adjust");
       }
     }
     closeFareModal();
@@ -2301,7 +2397,7 @@ function showNewJobAlert(job) {
   playNewJobTune();
   const toast = document.getElementById("alertToast");
   document.getElementById("alertText").textContent =
-    "JOB-" + job.id + " · " + (job.name || "New passenger") + " · " + (job.pickup || "");
+    "JOB-" + job.id + " Â· " + (job.name || "New passenger") + " Â· " + (job.pickup || "");
   toast.classList.add("show");
   toast.dataset.docId = job.docId;
   if (alertTimeout) clearTimeout(alertTimeout);
@@ -2358,9 +2454,9 @@ async function dispatch() {
 
     const copied = await copyToClipboard(message);
     if (copied) {
-      alert("Dispatched ✔ JOB-" + jobId + " — copied!");
+      alert("Dispatched âœ” JOB-" + jobId + " â€” copied!");
     } else {
-      alert("Dispatched ✔ JOB-" + jobId + "\n\nTap Available → job card → Copy Dispatch");
+      alert("Dispatched âœ” JOB-" + jobId + "\n\nTap Available â†’ job card â†’ Copy Dispatch");
     }
     openWhatsAppGroup();
   } catch (err) {
@@ -2378,7 +2474,7 @@ function updateQuickTimeDisplay() {
     el.textContent = "Tap Quick or Ready Now";
     el.classList.remove("active");
   } else {
-    el.textContent = "✓ " + quickSelectedTime + " selected";
+    el.textContent = "âœ“ " + quickSelectedTime + " selected";
     el.classList.add("active");
   }
 }
@@ -2501,7 +2597,7 @@ async function dispatchQuick() {
     setAvailableView("current");
     switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
     const copied = await copyToClipboard(message);
-    alert(copied ? "Quick dispatch ✔ JOB-" + jobId : "Dispatched ✔ JOB-" + jobId);
+    alert(copied ? "Quick dispatch âœ” JOB-" + jobId : "Dispatched âœ” JOB-" + jobId);
     openWhatsAppGroup();
   } catch (err) {
     alert("Dispatch failed: " + err.message);
@@ -2549,7 +2645,7 @@ function setupAutocomplete(inputId, listId) {
           const local = isLocalArea(p.description);
           const item = document.createElement("div");
           item.className = "autocomplete-item" + (local ? " geelong-highlight" : "");
-          item.innerHTML = '<span class="pac-icon">📍</span>' + p.description;
+          item.innerHTML = '<span class="pac-icon">ðŸ“</span>' + p.description;
           item.onclick = function() {
             input.value = p.description.replace(/\s*,?\s*Australia\s*$/i, "").replace(/\s*,?\s*$/, "");
             list.classList.remove("active");
