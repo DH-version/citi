@@ -356,7 +356,7 @@ button:disabled{
 }
 .jcHeadFare{color:#4ade80;font-weight:900}
 .jcHeadMid{
-  display:flex;align-items:center;gap:2px;
+  display:flex;align-items:center;gap:4px;
   padding:0 6px;border-left:1px solid #333;border-right:1px solid #333;
 }
 .jcHeadRight{
@@ -366,12 +366,19 @@ button:disabled{
 }
 .jcHeadLbl{font-size:9px;color:#fff;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
 .jcHeadTime{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
-.jcIconBtn{
-  background:transparent!important;border:none!important;
-  padding:4px 6px!important;margin:0!important;
-  font-size:15px!important;box-shadow:none!important;
-  color:#ffd700!important;
+.jcActBox{
+  width:30px;height:30px;min-width:30px;
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid #0066ff;border-radius:5px;
+  background:#111!important;
+  padding:0!important;margin:0!important;
+  font-size:14px!important;line-height:1!important;
+  box-shadow:none!important;cursor:pointer;
 }
+.jcActEdit{color:#ffd700!important;border-color:#ffd700!important}
+.jcActDel{color:#ff4444!important;border-color:#cc0000!important}
+.jcActBox:active{transform:scale(.95)}
+.jdActionRow .jcActBox{width:34px;height:34px;min-width:34px;font-size:15px!important}
 .jcPerson{
   display:flex;align-items:center;
   border-bottom:1px solid #333;min-height:56px;
@@ -981,6 +988,7 @@ let pendingDeleteDocId = null;
 let pendingCancelDocId = null;
 let pendingCompleteDocId = null;
 let pendingEditDocId = null;
+let editingDocId = null;
 let pinAction = "";
 let prospectScores = {};
 let prospectEditMode = false;
@@ -1361,7 +1369,7 @@ function setTeamView(view) {
   teamView = view;
   document.getElementById("teamNoticeBtn").classList.toggle("selected", view === "notice");
   document.getElementById("teamProspectBtn").classList.toggle("selected", view === "prospect");
-  document.getElementById("teamNoticePanel").style.display = view === "notice" ? "block" : "none";
+  document.getElementById("teamNoticePanel").style.display = view === "notice" ? "flex" : "none";
   document.getElementById("teamProspectPanel").style.display = view === "prospect" ? "block" : "none";
   if (view === "notice") scrollNoticeFeedToBottom();
 }
@@ -1378,6 +1386,7 @@ function subscribeNoticeBoard() {
       renderNoticeBoard();
     }, function(err) {
       console.error("Notice board index may be needed:", err);
+      if (noticeUnsub) noticeUnsub();
       noticeUnsub = db.collection("noticeBoard")
         .limit(100)
         .onSnapshot(function(snap) {
@@ -2052,7 +2061,8 @@ function applyPreviousFilterClient(op) {
     if (selectedFilterType === "completed") {
       return j.status === "completed" && (j.completedBy || "").trim().toLowerCase() === key;
     }
-    return (j.operator || "").trim().toLowerCase() === key;
+    return (j.operator || "").trim().toLowerCase() === key &&
+      j.status !== "available" && j.status !== "accepted";
   });
   document.getElementById("previousListHint").textContent =
     "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + op;
@@ -2083,7 +2093,13 @@ function applyPreviousFilter() {
   }
 
   filterUnsub = query.onSnapshot(function(snap) {
-    filterResultJobs = docsToJobs(snap.docs);
+    let jobs = docsToJobs(snap.docs);
+    if (selectedFilterType === "dispatched") {
+      jobs = jobs.filter(function(j) {
+        return j.status !== "available" && j.status !== "accepted";
+      });
+    }
+    filterResultJobs = jobs;
     document.getElementById("previousListHint").textContent =
       "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + op;
     scheduleRenderPrevious();
@@ -2138,11 +2154,11 @@ function focusModalInput(input, selectAll) {
 }
 
 function jobDeleteBtn(docId) {
-  return '<button type="button" class="jcIconBtn" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">🗑</button>';
+  return '<button type="button" class="jcActBox jcActDel" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">🗑</button>';
 }
 
 function jobEditBtn(docId) {
-  return '<button type="button" class="jcIconBtn" onclick="promptEditJob(\'' + docId + '\', event)" title="Edit">✏</button>';
+  return '<button type="button" class="jcActBox jcActEdit" onclick="editJobInForm(\'' + docId + '\', event)" title="Edit">✏</button>';
 }
 
 function googleMapsUrl(address) {
@@ -2228,7 +2244,7 @@ function jobCardFooterHtml(job, source, options) {
 }
 
 function jobCardDetailSectionsHtml(job, full) {
-  let html = jobPassengerLuggageHtml(job);
+  let html = full ? jobPassengerLuggageHtml(job) : "";
   if (!full) {
     if (job.notes && (job.pickup || job.drop)) {
       const preview = job.notes.length > 60 ? job.notes.slice(0, 60) + "…" : job.notes;
@@ -2345,7 +2361,7 @@ function promptCancelJob(docId, e) {
   openPinModal("cancel", docId);
 }
 
-function promptEditJob(docId, e) {
+function editJobInForm(docId, e) {
   if (e) e.stopPropagation();
   if (!requireOperator("edit jobs")) return;
   openPinModal("edit", docId);
@@ -2366,7 +2382,7 @@ function confirmPinAction() {
   else if (pinAction === "edit") {
     const docId = pendingEditDocId;
     closePinModal();
-    openEditJobModal(docId);
+    loadJobIntoForm(docId);
   } else if (pinAction === "prospect") {
     closePinModal();
     enableProspectEdit();
@@ -2401,6 +2417,8 @@ async function confirmCancelJob() {
     closeJobModal();
   } catch (err) {
     alert("Cancel failed: " + err.message);
+    subscribeAvailableJobs();
+    subscribeCompletedJobs();
   }
 }
 
@@ -2450,7 +2468,7 @@ function collectJobData(jobId, status) {
     id: jobId,
     status: status,
     operator: getCurrentOperator(),
-    name: titleCase(document.getElementById("name").value),
+    name: titleCase(document.getElementById("name").value.trim()) || "Customer",
     phone: formatPhoneDisplay(document.getElementById("phone").value) || document.getElementById("phone").value,
     pickup: titleCase(document.getElementById("pickup").value),
     drop: titleCase(document.getElementById("drop").value),
@@ -2610,7 +2628,7 @@ function openJobModal(docId, source) {
   document.getElementById("modalJobBody").innerHTML = buildJobDetailListHtml(job, docId, source);
 
   let actions = '<button onclick="copyJobMessage(\'' + docId + '\')">Copy Dispatch</button>';
-  actions += '<button onclick="loadJobIntoForm(\'' + docId + '\')">Load Form</button>';
+  actions += '<button onclick="editJobInForm(\'' + docId + '\')">Edit Booking</button>';
   if (source === "available" && job.status === "available") {
     actions += '<button class="btnAccept btnAcceptJob" onclick="acceptJob(\'' + docId + '\');closeJobModal()">✓ ACCEPT JOB</button>';
   }
@@ -2707,9 +2725,56 @@ function copyJobMessage(docId) {
 function loadJobIntoForm(docId) {
   const job = findJobById(docId);
   if (!job) return;
+  editingDocId = docId;
   closeJobModal();
   applyJobToForm(job);
+  setDispatchEditMode(job);
   switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
+  window.scrollTo(0, 0);
+}
+
+function setDispatchEditMode(job) {
+  const btn = document.getElementById("dispatchBtn");
+  if (job && editingDocId) {
+    btn.textContent = "UPDATE JOB-" + job.id;
+    btn.style.background = "#2563eb";
+    btn.style.borderColor = "#2563eb";
+  } else {
+    btn.textContent = "DISPATCH";
+    btn.style.background = "#1b8a44";
+    btn.style.borderColor = "#1b8a44";
+  }
+}
+
+function buildJobUpdatePayload() {
+  let date = document.getElementById("date").value;
+  const timeInput = document.getElementById("time").value;
+  if (selectedTime === "Future" && !date && timeInput) date = getTodayDate();
+  const op = getCurrentOperator();
+  return {
+    name: titleCase(document.getElementById("name").value.trim()) || "Customer",
+    phone: formatPhoneDisplay(document.getElementById("phone").value) || document.getElementById("phone").value,
+    pickup: titleCase(document.getElementById("pickup").value),
+    drop: titleCase(document.getElementById("drop").value),
+    adults: document.getElementById("adults").value,
+    kids: document.getElementById("kids").value,
+    luggage: document.getElementById("luggage").value,
+    vehicle: selectedVehicle,
+    payment: paymentArray.slice(),
+    time: selectedTime,
+    date: date,
+    timeInput: timeInput,
+    ampm: selectedAMPM,
+    priceType: priceType,
+    price: document.getElementById("price").value,
+    depositLink: document.getElementById("depositLink").value,
+    depositAmount: document.getElementById("depositAmount").value,
+    notes: document.getElementById("jobNotes").value.trim(),
+    sortKey: computeSortKey(selectedTime, date, timeInput, selectedAMPM),
+    edited: true,
+    editedBy: op,
+    editedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
 }
 
 async function acceptJob(docId) {
@@ -2809,6 +2874,7 @@ async function confirmCompleteJob() {
     closeJobModal();
   } catch (err) {
     alert("Complete failed: " + err.message);
+    subscribeAvailableJobs();
     subscribeCompletedJobs();
     if (previousFilterActive) applyPreviousFilter();
   }
@@ -2908,6 +2974,7 @@ function clearFormRefresh() {
 }
 
 function clearForm() {
+  editingDocId = null;
   ["name","phone","pickup","drop","jobNotes","adults","kids","luggage","date","time","price","depositLink","depositAmount"].forEach(function(id) {
     document.getElementById(id).value = "";
   });
@@ -2920,6 +2987,7 @@ function clearForm() {
   });
   document.getElementById("depositLink").disabled = true;
   document.getElementById("depositAmount").disabled = true;
+  setDispatchEditMode(null);
 }
 
 async function dispatch() {
@@ -2928,6 +2996,27 @@ async function dispatch() {
   const btn = document.getElementById("dispatchBtn");
   btn.disabled = true;
   try {
+    if (editingDocId) {
+      const existing = findJobById(editingDocId);
+      if (!existing) {
+        alert("Job not found — it may have been removed");
+        editingDocId = null;
+        setDispatchEditMode(null);
+        return;
+      }
+      const updates = buildJobUpdatePayload();
+      await db.collection("jobs").doc(editingDocId).update(updates);
+      await saveCustomerRecord(Object.assign({}, existing, updates));
+      const updatedJob = Object.assign({}, existing, updates, { id: existing.id });
+      const message = buildDispatchMessage(updatedJob);
+      const jobId = existing.id;
+      clearForm();
+      switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
+      const copied = await copyToClipboard(message);
+      alert(copied ? "Updated ✔ JOB-" + jobId + " — copied!" : "Updated ✔ JOB-" + jobId);
+      return;
+    }
+
     const jobId = await getNextJobId();
     const job = collectJobData(jobId, "available");
     const message = buildDispatchMessage(job);
