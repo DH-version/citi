@@ -80,6 +80,23 @@ h3{
 #bookingForm .btnQuickBooking{margin-bottom:5px}
 #bookingForm .twoCol{margin:2px 0}
 #bookingForm .autocomplete-container{margin:0}
+#bookingForm input:not([type="date"]),
+#bookingForm textarea,
+#bookingForm select{
+  background:#fff!important;
+  color:#000!important;
+  font-weight:800!important;
+}
+#bookingForm input:disabled{
+  background:#eee!important;
+  color:#666!important;
+}
+#bookingForm input::placeholder{color:#888!important;font-weight:600!important}
+#bookingForm select{
+  background:#fff!important;
+  color:#000!important;
+  text-transform:uppercase;
+}
 
 input,select{
   width:100%;
@@ -233,8 +250,10 @@ button:disabled{
 .jcHeadLeft{
   flex:1;display:flex;align-items:center;gap:5px;
   padding:8px 10px;color:#ffd700;
-  font-weight:800;font-size:12px;text-transform:uppercase;
+  font-weight:900;font-size:13px;text-transform:uppercase;
+  line-height:1.15;word-break:break-word;
 }
+.jcHeadFare{color:#4ade80;font-weight:900}
 .jcHeadMid{
   display:flex;align-items:center;gap:2px;
   padding:0 6px;border-left:1px solid #333;border-right:1px solid #333;
@@ -245,7 +264,7 @@ button:disabled{
   padding:6px 10px;min-width:88px;
 }
 .jcHeadLbl{font-size:8px;color:#fff;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-.jcHeadTime{font-size:13px;color:#ffd700;font-weight:800;text-transform:uppercase;line-height:1.1}
+.jcHeadTime{font-size:14px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
 .jcIconBtn{
   background:transparent!important;border:none!important;
   padding:4px 6px!important;margin:0!important;
@@ -262,20 +281,20 @@ button:disabled{
 }
 .jcPersonInfo{flex:1;min-width:0;padding:6px 0}
 .jcName{
-  font-size:18px;font-weight:800;color:#fff;
+  font-size:20px;font-weight:900;color:#fff;
   text-transform:uppercase;line-height:1.1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .jcPhone{
   display:flex;align-items:center;gap:4px;
-  color:#1e90ff;font-size:13px;font-weight:700;
+  color:#1e90ff;font-size:14px;font-weight:800;
   text-decoration:none;margin-top:3px;
 }
 .jcPhone:active{opacity:.8}
 .jcVehicle{
   flex:0 0 auto;display:flex;align-items:center;gap:5px;
   padding:8px 10px;border-left:1px solid #333;
-  font-size:13px;font-weight:800;color:#fff;text-transform:uppercase;
+  font-size:14px;font-weight:900;color:#fff;text-transform:uppercase;
 }
 .jcRoute{border-bottom:1px solid #333}
 .jcAddrRow{display:flex;align-items:stretch;min-height:40px}
@@ -294,9 +313,10 @@ button:disabled{
   background:#fff;padding:6px 8px;min-width:0;
 }
 .jcAddrText{
-  flex:1;font-size:11px;font-weight:800;color:#000;
-  text-transform:uppercase;line-height:1.25;
+  flex:1;font-size:13px;font-weight:900;color:#000;
+  text-transform:uppercase;line-height:1.2;
   word-break:break-word;
+  overflow:hidden;
 }
 .jcMapsBtn{
   flex:0 0 28px;display:flex;align-items:center;justify-content:center;
@@ -314,16 +334,26 @@ button:disabled{
   border-right:1px solid #333;
 }
 .jcFootCol:last-child{border-right:none}
-.jcFootLbl{font-size:7px;color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
-.jcFootVal{font-size:11px;font-weight:800;text-transform:uppercase;line-height:1.2}
+.jcFootLbl{font-size:8px;color:#fff;font-weight:800;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.jcFootVal{font-size:12px;font-weight:900;text-transform:uppercase;line-height:1.15}
+.jcFootCancel{display:flex;align-items:center;justify-content:center;padding:4px 6px!important}
+.btnCancelJob{
+  width:100%;margin:0!important;padding:7px 4px!important;
+  font-size:11px!important;font-weight:900!important;
+  background:#dc2626!important;color:#fff!important;
+  border:none!important;border-radius:4px!important;
+  letter-spacing:.3px!important;box-shadow:none!important;
+}
 .jcFootVal.blue{color:#1e90ff}
 .jcFootVal.gold{color:#ffd700}
 .jcFootVal.white{color:#fff}
 .jcExtra{
-  padding:6px 10px;font-size:10px;font-weight:700;
+  padding:6px 10px;font-size:11px;font-weight:800;
   color:#888;text-transform:uppercase;border-bottom:1px solid #333;
+  line-height:1.3;
 }
-.jcExtra span{color:#ffd700}
+.jcExtra span{color:#ffd700;font-weight:900}
+.jcExtraFull{color:#ccc;font-size:12px;font-weight:800;line-height:1.35;word-break:break-word}
 .acceptedBanner{
   padding:8px;text-align:center;
   background:#ffd70022;border-top:1px solid #ffd700;
@@ -822,6 +852,7 @@ let teamOperators = AUTHORIZED_OPERATORS.slice();
 let selectedFilterOperator = "", selectedFilterType = "";
 let previousFilterActive = false;
 let pendingDeleteDocId = null;
+let pendingCancelDocId = null;
 let pendingCompleteDocId = null;
 let pendingEditDocId = null;
 let pinAction = "";
@@ -1567,14 +1598,26 @@ function stopFilterSubscription() {
   }
 }
 
+function getJobClosedTime(job) {
+  const ts = job.completedAt || job.canceledAt || job.dispatchedAt;
+  if (!ts) return 0;
+  if (ts.seconds) return ts.seconds * 1000;
+  if (ts.toDate) return ts.toDate().getTime();
+  return 0;
+}
+
+function sortPreviousJobs(jobs) {
+  return jobs.slice().sort(function(a, b) { return getJobClosedTime(b) - getJobClosedTime(a); });
+}
+
 function subscribeCompletedJobs() {
   if (completedUnsub) completedUnsub();
   completedUnsub = db.collection("jobs")
-    .where("status", "==", "completed")
-    .orderBy("completedAt", "desc")
-    .limit(80)
+    .where("status", "in", ["completed", "cancelled"])
+    .orderBy("dispatchedAt", "desc")
+    .limit(150)
     .onSnapshot(function(snap) {
-      completedJobs = docsToJobs(snap.docs);
+      completedJobs = sortPreviousJobs(docsToJobs(snap.docs)).slice(0, 80);
       if (!previousFilterActive) scheduleRenderPrevious();
     }, function(err) {
       console.error("Completed jobs index may be needed:", err);
@@ -1589,7 +1632,9 @@ function subscribePreviousJobsFallback() {
     .limit(150)
     .onSnapshot(function(snap) {
       historyJobs = docsToJobs(snap.docs);
-      completedJobs = historyJobs.filter(function(j) { return j.status === "completed"; }).slice(0, 80);
+      completedJobs = sortPreviousJobs(historyJobs.filter(function(j) {
+        return j.status === "completed" || j.status === "cancelled";
+      })).slice(0, 80);
       if (!previousFilterActive) scheduleRenderPrevious();
     });
 }
@@ -1597,18 +1642,37 @@ function subscribePreviousJobsFallback() {
 function applyOptimisticComplete(docId, op, fare) {
   const job = findJobById(docId);
   if (!job) return;
+  availableJobs = availableJobs.filter(function(j) { return j.docId !== docId; });
+  scheduleRenderAvailable();
   const updated = Object.assign({}, job, {
     status: "completed",
     completedBy: op,
     fare: fare,
     completedAt: { seconds: Date.now() / 1000, toDate: function() { return new Date(); } }
   });
-  completedJobs = [updated].concat(completedJobs.filter(function(j) { return j.docId !== docId; })).slice(0, 80);
+  completedJobs = sortPreviousJobs([updated].concat(completedJobs.filter(function(j) { return j.docId !== docId; }))).slice(0, 80);
   if (previousFilterActive && selectedFilterType === "completed" && selectedFilterOperator === op) {
     filterResultJobs = [updated].concat(filterResultJobs.filter(function(j) { return j.docId !== docId; }));
     document.getElementById("previousListHint").textContent =
       "Showing " + filterResultJobs.length + " completed job(s) for " + op;
   }
+  scheduleRenderPrevious();
+}
+
+function applyOptimisticCancel(docId, op) {
+  const job = findJobById(docId);
+  if (!job) return;
+  availableJobs = availableJobs.filter(function(j) { return j.docId !== docId; });
+  scheduleRenderAvailable();
+  const openCount = availableJobs.filter(function(j) { return j.status === "available" && isCurrentJob(j); }).length;
+  document.getElementById("availableBadge").textContent = openCount;
+  document.getElementById("availableBadge").style.display = openCount ? "inline" : "none";
+  const updated = Object.assign({}, job, {
+    status: "cancelled",
+    canceledBy: op,
+    canceledAt: { seconds: Date.now() / 1000, toDate: function() { return new Date(); } }
+  });
+  completedJobs = sortPreviousJobs([updated].concat(completedJobs.filter(function(j) { return j.docId !== docId; }))).slice(0, 80);
   scheduleRenderPrevious();
 }
 
@@ -1794,27 +1858,72 @@ function jobRouteHtml(job, inModal) {
   return html;
 }
 
-function jobCardFooterHtml(job, source) {
-  const schedule = getJobScheduleHeader(job);
+function jobCardFooterHtml(job, source, options) {
+  options = options || {};
   const dispatched = formatDispatchedTimeOnly(job);
   const dispatchBy = (job.operator || "—").toUpperCase();
-  let col3Label = schedule.label;
-  let col3Val = schedule.time;
-  let col3Class = "gold";
+  const docId = options.docId || job.docId || "";
+  const isActive = job.status === "available" || job.status === "accepted";
+  let col3Html;
+
   if (source === "previous" && job.status === "completed") {
-    col3Label = "COMPLETED";
-    col3Val = (formatFareDisplay(job.fare) || (job.completedBy || "—")).toUpperCase();
-    col3Class = "blue";
-  } else if (source === "previous") {
-    col3Label = (job.status || "—").toUpperCase();
-    col3Val = schedule.time;
-    col3Class = "white";
+    col3Html = '<div class="jcFootCol"><div class="jcFootLbl">✓ COMPLETED BY</div><div class="jcFootVal blue">' +
+      escapeHtml((job.completedBy || "—").toUpperCase()) + '</div></div>';
+  } else if (source === "previous" && job.status === "cancelled") {
+    col3Html = '<div class="jcFootCol"><div class="jcFootLbl">✕ CANCELED BY</div><div class="jcFootVal white">' +
+      escapeHtml((job.canceledBy || "—").toUpperCase()) + '</div></div>';
+  } else if (isActive && (source === "available" || options.inModal) && docId) {
+    col3Html = '<div class="jcFootCol jcFootCancel" onclick="event.stopPropagation()">' +
+      '<button type="button" class="btnCancelJob" onclick="promptCancelJob(\'' + docId + '\', event)">CANCEL</button></div>';
+  } else {
+    col3Html = '<div class="jcFootCol"><div class="jcFootLbl">&nbsp;</div><div class="jcFootVal white">—</div></div>';
   }
+
   return '<div class="jcFooter">' +
     '<div class="jcFootCol"><div class="jcFootLbl">🕐 DISPATCHED</div><div class="jcFootVal blue">' + escapeHtml(dispatched) + '</div></div>' +
     '<div class="jcFootCol"><div class="jcFootLbl">👤 DISPATCHED BY</div><div class="jcFootVal blue">' + escapeHtml(dispatchBy) + '</div></div>' +
-    '<div class="jcFootCol"><div class="jcFootLbl">📅 ' + escapeHtml(col3Label) + '</div><div class="jcFootVal ' + col3Class + '">' + escapeHtml(col3Val) + '</div></div>' +
+    col3Html +
     '</div>';
+}
+
+function jobCardDetailSectionsHtml(job, full) {
+  let html = "";
+  if (!full) {
+    if (job.notes && (job.pickup || job.drop)) {
+      const preview = job.notes.length > 60 ? job.notes.slice(0, 60) + "…" : job.notes;
+      html += '<div class="jcExtra">📝 <span>' + escapeHtml(preview) + '</span></div>';
+    }
+    if (job.edited) {
+      html += '<div class="jcExtra">✏ EDITED · ' + escapeHtml(formatEditedAt(job)) + '</div>';
+    }
+    return html;
+  }
+
+  if (job.notes && (job.pickup || job.drop)) {
+    html += '<div class="jcRoute"><div class="jcAddrRow">' +
+      '<div class="jcAddrLbl jcAddrLblNotes">📝<br>NOTES</div>' +
+      '<div class="jcAddrBox"><span class="jcAddrText">' + escapeHtml(job.notes) + '</span></div>' +
+      '</div></div>';
+  }
+
+  const extras = [];
+  if (job.adults || job.kids || job.luggage) {
+    extras.push("ADULTS " + (job.adults || "0") +
+      (job.kids ? " · KIDS " + job.kids : "") +
+      (job.luggage ? " · LUGGAGE " + job.luggage : ""));
+  }
+  if ((job.payment || []).length) extras.push("PAY " + (job.payment || []).join(", ").toUpperCase());
+  if ((job.payment || []).includes("Deposit") && job.depositAmount) extras.push("DEPOSIT $" + job.depositAmount);
+  if (job.depositLink) extras.push("DEP LINK " + job.depositLink);
+  if (job.priceType && job.priceType !== "None") {
+    extras.push((job.priceType + (job.price ? " $" + job.price : "")).toUpperCase());
+  }
+  if (job.status === "accepted" && job.acceptedBy) extras.push("ACCEPTED · " + job.acceptedBy.toUpperCase());
+  if (job.status === "completed" && job.completedBy) extras.push("COMPLETED · " + job.completedBy.toUpperCase());
+  if (job.status === "cancelled" && job.canceledBy) extras.push("CANCELED · " + job.canceledBy.toUpperCase());
+  if (extras.length) html += '<div class="jcExtra jcExtraFull">' + escapeHtml(extras.join(" · ")) + '</div>';
+  if (job.edited) html += '<div class="jcExtra">✏ EDITED · ' + escapeHtml(formatEditedAt(job)) + '</div>';
+  return html;
 }
 
 function jobCardPersonHtml(job) {
@@ -1830,10 +1939,15 @@ function jobCardPersonHtml(job) {
     '</div>';
 }
 
-function jobCardHeaderHtml(job, docId) {
+function jobCardHeaderHtml(job, docId, source) {
   const schedule = getJobScheduleHeader(job);
+  let left = '📋 JOB-' + job.id;
+  const fareLabel = formatFareDisplay(job.fare);
+  if (fareLabel && (job.status === "completed" || source === "previous")) {
+    left += ' · <span class="jcHeadFare">FARE ' + escapeHtml(fareLabel.toUpperCase()) + '</span>';
+  }
   return '<div class="jcHead">' +
-    '<div class="jcHeadLeft">📋 JOB-' + job.id + '</div>' +
+    '<div class="jcHeadLeft">' + left + '</div>' +
     '<div class="jcHeadMid">' + jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>' +
     '<div class="jcHeadRight"><div class="jcHeadLbl">' + escapeHtml(schedule.label) + '</div>' +
     '<div class="jcHeadTime">' + escapeHtml(schedule.time) + '</div></div>' +
@@ -1843,19 +1957,12 @@ function jobCardHeaderHtml(job, docId) {
 function buildJobCardHtml(job, docId, source, actionsHtml, extraHtml) {
   const isAccepted = job.status === "accepted";
   const cardClass = "jobCard" + (source === "available" && isAccepted ? " jobCardAccepted" : "");
-  let notesHtml = "";
-  if (job.notes && (job.pickup || job.drop)) {
-    notesHtml = '<div class="jcExtra">📝 <span>' + escapeHtml(job.notes.slice(0, 60)) + '</span></div>';
-  }
-  if (job.edited) {
-    notesHtml += '<div class="jcExtra">✏ EDITED · ' + escapeHtml(formatEditedAt(job)) + '</div>';
-  }
   return '<div class="' + cardClass + '" onclick="openJobModal(\'' + docId + '\',\'' + source + '\')">' +
-    jobCardHeaderHtml(job, docId) +
+    jobCardHeaderHtml(job, docId, source) +
     jobCardPersonHtml(job) +
     jobRouteHtml(job) +
-    jobCardFooterHtml(job, source) +
-    notesHtml +
+    jobCardFooterHtml(job, source, { docId: docId }) +
+    jobCardDetailSectionsHtml(job, false) +
     (extraHtml || "") +
     (actionsHtml || "") +
     '</div>';
@@ -1864,12 +1971,17 @@ function buildJobCardHtml(job, docId, source, actionsHtml, extraHtml) {
 function openPinModal(action, docId) {
   pinAction = action;
   pendingDeleteDocId = action === "delete" ? docId : null;
+  pendingCancelDocId = action === "cancel" ? docId : null;
   pendingEditDocId = action === "edit" ? docId : null;
   const title = document.getElementById("pinModalTitle");
   const btn = document.getElementById("pinConfirmBtn");
   if (action === "delete") {
     title.textContent = "Enter PIN to Delete";
     btn.textContent = "Delete";
+    btn.style.background = "#dc2626";
+  } else if (action === "cancel") {
+    title.textContent = "Enter PIN to Cancel Job";
+    btn.textContent = "Cancel Job";
     btn.style.background = "#dc2626";
   } else if (action === "edit") {
     title.textContent = "Enter PIN to Edit Job";
@@ -1891,6 +2003,12 @@ function promptDeleteJob(docId, e) {
   openPinModal("delete", docId);
 }
 
+function promptCancelJob(docId, e) {
+  if (e) e.stopPropagation();
+  if (!requireOperator("cancel jobs")) return;
+  openPinModal("cancel", docId);
+}
+
 function promptEditJob(docId, e) {
   if (e) e.stopPropagation();
   if (!requireOperator("edit jobs")) return;
@@ -1908,6 +2026,7 @@ function confirmPinAction() {
     return;
   }
   if (pinAction === "delete") confirmDeleteJob();
+  else if (pinAction === "cancel") confirmCancelJob();
   else if (pinAction === "edit") {
     const docId = pendingEditDocId;
     closePinModal();
@@ -1922,8 +2041,31 @@ function closePinModal() {
   document.getElementById("pinModal").classList.remove("open");
   document.getElementById("pinInput").setAttribute("readonly", "readonly");
   pendingDeleteDocId = null;
+  pendingCancelDocId = null;
   pendingEditDocId = null;
   pinAction = "";
+}
+
+async function confirmCancelJob() {
+  if (document.getElementById("pinInput").value !== DELETE_PIN) {
+    alert("Wrong PIN");
+    return;
+  }
+  if (!pendingCancelDocId) return;
+  const op = requireOperator("cancel jobs");
+  if (!op) return;
+  try {
+    applyOptimisticCancel(pendingCancelDocId, op);
+    await db.collection("jobs").doc(pendingCancelDocId).update({
+      status: "cancelled",
+      canceledBy: op,
+      canceledAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closePinModal();
+    closeJobModal();
+  } catch (err) {
+    alert("Cancel failed: " + err.message);
+  }
 }
 
 async function confirmDeleteJob() {
@@ -2129,25 +2271,13 @@ function openJobModal(docId, source) {
   if (!job) return;
 
   document.getElementById("modalJobTitle").textContent = "JOB-" + job.id;
-  let extra = "";
-  const bits = [];
-  if (job.adults || job.kids || job.luggage) {
-    bits.push("AD " + (job.adults || "0") + (job.kids ? " · KD " + job.kids : "") + (job.luggage ? " · LG " + job.luggage : ""));
-  }
-  if ((job.payment || []).length) bits.push(((job.payment || []).join(", ")).toUpperCase());
-  if (job.priceType && job.priceType !== "None") bits.push((job.priceType + (job.price ? " $" + job.price : "")).toUpperCase());
-  if (job.status === "accepted" && job.acceptedBy) bits.push("ACCEPTED · " + job.acceptedBy.toUpperCase());
-  if (job.status === "completed" && job.completedBy) bits.push("DONE · " + job.completedBy.toUpperCase());
-  if (job.fare) bits.push("FARE " + formatFareDisplay(job.fare));
-  if (bits.length) extra = '<div class="jcExtra">' + escapeHtml(bits.join(" · ")) + '</div>';
-
   document.getElementById("modalJobBody").innerHTML =
     '<div class="jcModal">' +
-    jobCardHeaderHtml(job, docId) +
+    jobCardHeaderHtml(job, docId, source) +
     jobCardPersonHtml(job) +
-    jobRouteHtml(job) +
-    jobCardFooterHtml(job, source) +
-    extra +
+    jobRouteHtml(job, true) +
+    jobCardFooterHtml(job, source, { docId: docId, inModal: true }) +
+    jobCardDetailSectionsHtml(job, true) +
     '</div>';
 
   let actions = '<button onclick="copyJobMessage(\'' + docId + '\')">Copy Dispatch</button>';
