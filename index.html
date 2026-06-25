@@ -225,8 +225,85 @@ button:disabled{
 }
 .notesBox.qbNotes{
   min-height:110px;font-size:17px;line-height:1.5;
-  border:2px solid #0066ff;background:#0a0a0a;
+  border:2px solid #0066ff;
 }
+#quickBookingModal input,
+#quickBookingModal textarea{
+  background:#fff!important;
+  color:#000!important;
+  font-weight:800!important;
+}
+#quickBookingModal input::placeholder,
+#quickBookingModal textarea::placeholder{color:#888!important;font-weight:600!important}
+#quickBookingModal .notesBox.qbNotes{
+  background:#fff!important;
+  color:#000!important;
+}
+.teamToggle{display:flex;gap:6px;margin-bottom:10px}
+.teamToggle button{flex:1;margin:0;font-size:11px;padding:10px 6px}
+.noticeBoardHeader{
+  text-align:center;font-weight:900;color:#ffd700;
+  font-size:14px;padding:12px 10px;line-height:1.35;
+  border:2px solid #0066ff;border-radius:8px;
+  margin-bottom:10px;text-transform:none;
+}
+.noticeFeed{
+  min-height:280px;max-height:calc(100vh - 320px);
+  overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+  padding:10px;background:#0a0a0a;border:2px solid #333;border-radius:8px;
+}
+.noticeFeedEmpty{
+  text-align:center;color:#666;font-size:12px;font-weight:700;
+  padding:40px 12px;text-transform:uppercase;
+}
+.noticeMsg{
+  background:#111;border:1px solid #333;border-radius:10px;
+  padding:10px 12px;align-self:stretch;
+}
+.noticeMsgHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
+.noticeOp{font-weight:900;color:#1e90ff;font-size:13px;text-transform:uppercase}
+.noticeTime{font-size:10px;color:#888;font-weight:700;white-space:nowrap}
+.noticeMsgBody{color:#fff;font-size:15px;font-weight:700;line-height:1.4;word-break:break-word}
+.noticeCompose{display:flex;gap:6px;margin-top:10px;align-items:stretch}
+.noticeCompose input{
+  flex:1;margin:0!important;padding:12px!important;
+  background:#fff!important;color:#000!important;font-weight:800!important;
+  border:2px solid #0066ff!important;border-radius:8px!important;
+}
+.noticeCompose button{
+  flex:0 0 auto;margin:0!important;padding:12px 16px!important;
+  background:#1b8a44!important;border-color:#1b8a44!important;
+}
+.jdList{background:#000}
+.jdMetaRow{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 12px;border-bottom:1px solid #333;
+}
+.jdMetaLeft{color:#ffd700;font-weight:900;font-size:14px;text-transform:uppercase;line-height:1.2}
+.jdMetaRight{text-align:right;flex:0 0 auto;min-width:88px}
+.jdMetaLbl{font-size:9px;color:#fff;font-weight:900;text-transform:uppercase}
+.jdMetaVal{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
+.jdActionRow{
+  display:flex;justify-content:center;gap:4px;padding:4px 6px;
+  border-bottom:1px solid #333;
+}
+.jdLine{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:9px 12px;border-bottom:1px solid #333;min-height:38px;gap:10px;
+}
+.jdLineLbl{
+  font-size:10px;font-weight:900;color:#888;text-transform:uppercase;
+  flex:0 0 auto;white-space:nowrap;
+}
+.jdLineVal{
+  font-size:13px;font-weight:900;color:#fff;text-transform:uppercase;
+  text-align:right;flex:1;word-break:break-word;
+}
+.jdLineVal.blue{color:#1e90ff}
+.jdLineVal.gold{color:#ffd700}
+.jdLineVal.white{color:#fff}
+.jdCancelRow{padding:10px 12px;border-bottom:1px solid #333;text-align:center}
+.jdList .jcPerson,.jdList .jcRoute,.jdList .jcFooter{border-left:none;border-right:none}
 .qbField{font-size:17px;padding:13px;margin-bottom:8px}
 .jobList{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 
@@ -250,7 +327,7 @@ button:disabled{
 .jcHeadLeft{
   flex:1;display:flex;align-items:center;gap:5px;
   padding:8px 10px;color:#ffd700;
-  font-weight:900;font-size:13px;text-transform:uppercase;
+  font-weight:900;font-size:14px;text-transform:uppercase;
   line-height:1.15;word-break:break-word;
 }
 .jcHeadFare{color:#4ade80;font-weight:900}
@@ -263,8 +340,8 @@ button:disabled{
   justify-content:center;align-items:flex-end;
   padding:6px 10px;min-width:88px;
 }
-.jcHeadLbl{font-size:8px;color:#fff;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
-.jcHeadTime{font-size:14px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
+.jcHeadLbl{font-size:9px;color:#fff;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
+.jcHeadTime{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
 .jcIconBtn{
   background:transparent!important;border:none!important;
   padding:4px 6px!important;margin:0!important;
@@ -281,29 +358,30 @@ button:disabled{
 }
 .jcPersonInfo{flex:1;min-width:0;padding:6px 0}
 .jcName{
-  font-size:20px;font-weight:900;color:#fff;
+  font-size:21px;font-weight:900;color:#fff;
   text-transform:uppercase;line-height:1.1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .jcPhone{
   display:flex;align-items:center;gap:4px;
-  color:#1e90ff;font-size:14px;font-weight:800;
+  color:#1e90ff;font-size:15px;font-weight:900;
   text-decoration:none;margin-top:3px;
 }
 .jcPhone:active{opacity:.8}
 .jcVehicle{
   flex:0 0 auto;display:flex;align-items:center;gap:5px;
   padding:8px 10px;border-left:1px solid #333;
-  font-size:14px;font-weight:900;color:#fff;text-transform:uppercase;
+  font-size:15px;font-weight:900;color:#fff;text-transform:uppercase;
 }
 .jcRoute{border-bottom:1px solid #333}
 .jcAddrRow{display:flex;align-items:stretch;min-height:40px}
 .jcAddrRow+.jcAddrRow{border-top:1px solid #333}
 .jcAddrLbl{
-  flex:0 0 72px;display:flex;flex-direction:column;
+  flex:0 0 78px;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:2px;
-  padding:4px 6px;font-size:8px;font-weight:800;
-  color:#fff;text-transform:uppercase;text-align:center;line-height:1.1;
+  padding:4px 6px;font-size:11px;font-weight:900;
+  color:#fff;text-transform:uppercase;text-align:center;line-height:1.05;
+  letter-spacing:.2px;
 }
 .jcAddrLblPickup{background:#008000}
 .jcAddrLblDrop{background:#0047ab}
@@ -313,8 +391,8 @@ button:disabled{
   background:#fff;padding:6px 8px;min-width:0;
 }
 .jcAddrText{
-  flex:1;font-size:13px;font-weight:900;color:#000;
-  text-transform:uppercase;line-height:1.2;
+  flex:1;font-size:14px;font-weight:900;color:#000;
+  text-transform:uppercase;line-height:1.15;
   word-break:break-word;
   overflow:hidden;
 }
@@ -334,8 +412,8 @@ button:disabled{
   border-right:1px solid #333;
 }
 .jcFootCol:last-child{border-right:none}
-.jcFootLbl{font-size:8px;color:#fff;font-weight:800;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
-.jcFootVal{font-size:12px;font-weight:900;text-transform:uppercase;line-height:1.15}
+.jcFootLbl{font-size:9px;color:#fff;font-weight:900;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.jcFootVal{font-size:13px;font-weight:900;text-transform:uppercase;line-height:1.15}
 .jcFootCancel{display:flex;align-items:center;justify-content:center;padding:4px 6px!important}
 .btnCancelJob{
   width:100%;margin:0!important;padding:7px 4px!important;
@@ -348,7 +426,7 @@ button:disabled{
 .jcFootVal.gold{color:#ffd700}
 .jcFootVal.white{color:#fff}
 .jcExtra{
-  padding:6px 10px;font-size:11px;font-weight:800;
+  padding:6px 10px;font-size:12px;font-weight:900;
   color:#888;text-transform:uppercase;border-bottom:1px solid #333;
   line-height:1.3;
 }
@@ -693,18 +771,36 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <div id="previousList" class="jobList"></div>
 </div>
 
-<!-- TAB 4: PROSPECT TRACKER -->
-<div id="tabProspect" class="tabPanel">
-  <h3>Prospect Tracker</h3>
-  <div class="listHeader">Points: $90+ = 1 · $150+ = 2 · $210+ = 3 · $270+ = 4 · $400+ = 5</div>
-  <div class="prospectToolbar">
-    <button style="background:#2563eb" onclick="promptProspectEdit()">✏️ Edit Points (PIN)</button>
-    <button id="prospectSaveBtn" style="background:#10b981;display:none" onclick="saveProspectScores()">Save Points</button>
+<!-- TAB 4: TEAM INFO -->
+<div id="tabTeam" class="tabPanel">
+  <h3>Team Info</h3>
+  <div class="teamToggle availToggle">
+    <button id="teamNoticeBtn" class="filterTypeBtn selected" onclick="setTeamView('notice')">Notice Board</button>
+    <button id="teamProspectBtn" class="filterTypeBtn" onclick="setTeamView('prospect')">Prospect Tracker</button>
   </div>
-  <table class="prospectTable">
-    <thead><tr><th>Operator</th><th style="text-align:center">Points</th></tr></thead>
-    <tbody id="prospectTableBody"></tbody>
-  </table>
+
+  <div id="teamNoticePanel">
+    <div class="noticeBoardHeader">Smile you are at Geelong Premium Network Notice board</div>
+    <div id="noticeBoardFeed" class="noticeFeed">
+      <div class="noticeFeedEmpty">No messages yet — be the first to post</div>
+    </div>
+    <div class="noticeCompose">
+      <input id="noticeInput" type="text" placeholder="Type a message…" autocomplete="off" autocapitalize="sentences" onkeydown="if(event.key==='Enter')postNoticeMessage()">
+      <button type="button" onclick="postNoticeMessage()">Send</button>
+    </div>
+  </div>
+
+  <div id="teamProspectPanel" style="display:none">
+    <div class="listHeader">Points: $90+ = 1 · $150+ = 2 · $210+ = 3 · $270+ = 4 · $400+ = 5</div>
+    <div class="prospectToolbar">
+      <button style="background:#2563eb" onclick="promptProspectEdit()">✏️ Edit Points (PIN)</button>
+      <button id="prospectSaveBtn" style="background:#10b981;display:none" onclick="saveProspectScores()">Save Points</button>
+    </div>
+    <table class="prospectTable">
+      <thead><tr><th>Operator</th><th style="text-align:center">Points</th></tr></thead>
+      <tbody id="prospectTableBody"></tbody>
+    </table>
+  </div>
 </div>
 
 <!-- PIN MODAL -->
@@ -816,8 +912,8 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <button class="navTab" data-tab="tabPrevious" onclick="switchTab('tabPrevious',this)">
     <span class="icon">📋</span>Previous
   </button>
-  <button class="navTab" data-tab="tabProspect" onclick="switchTab('tabProspect',this)">
-    <span class="icon">🏆</span>Prospect
+  <button class="navTab" data-tab="tabTeam" onclick="switchTab('tabTeam',this)">
+    <span class="icon">👥</span>Team Info
   </button>
 </nav>
 
@@ -859,6 +955,9 @@ let pinAction = "";
 let prospectScores = {};
 let prospectEditMode = false;
 let prospectUnsub = null;
+let noticeUnsub = null;
+let noticeMessages = [];
+let teamView = "notice";
 const DELETE_PIN = "2814";
 let availableUnsub = null, completedUnsub = null, filterUnsub = null, operatorSessionUnsub = null;
 let renderPreviousScheduled = false, renderAvailableScheduled = false;
@@ -1124,6 +1223,7 @@ function initializeFirebase() {
     subscribeCompletedJobs();
     subscribeCustomers();
     subscribeProspectScores();
+    subscribeNoticeBoard();
     repairProspectTierGap();
     renderOperatorFilterRow();
     restoreOperatorSession();
@@ -1225,6 +1325,184 @@ async function repairProspectTierGap() {
   } catch (e) {
     console.error("Prospect tier repair failed", e);
   }
+}
+
+function setTeamView(view) {
+  teamView = view;
+  document.getElementById("teamNoticeBtn").classList.toggle("selected", view === "notice");
+  document.getElementById("teamProspectBtn").classList.toggle("selected", view === "prospect");
+  document.getElementById("teamNoticePanel").style.display = view === "notice" ? "block" : "none";
+  document.getElementById("teamProspectPanel").style.display = view === "prospect" ? "block" : "none";
+  if (view === "notice") scrollNoticeFeedToBottom();
+}
+
+function subscribeNoticeBoard() {
+  if (noticeUnsub) noticeUnsub();
+  noticeUnsub = db.collection("noticeBoard")
+    .orderBy("createdAt", "asc")
+    .limit(100)
+    .onSnapshot(function(snap) {
+      noticeMessages = snap.docs.map(function(doc) {
+        return Object.assign({ id: doc.id }, doc.data());
+      });
+      renderNoticeBoard();
+    }, function(err) {
+      console.error("Notice board index may be needed:", err);
+      noticeUnsub = db.collection("noticeBoard")
+        .limit(100)
+        .onSnapshot(function(snap) {
+          noticeMessages = snap.docs.map(function(doc) {
+            return Object.assign({ id: doc.id }, doc.data());
+          }).sort(function(a, b) {
+            return getNoticeTime(a) - getNoticeTime(b);
+          });
+          renderNoticeBoard();
+        });
+    });
+}
+
+function getNoticeTime(msg) {
+  const ts = msg.createdAt;
+  if (!ts) return 0;
+  if (ts.seconds) return ts.seconds * 1000;
+  if (ts.toDate) return ts.toDate().getTime();
+  return 0;
+}
+
+function formatNoticeTime(msg) {
+  const ts = msg.createdAt;
+  if (!ts) return "";
+  let d;
+  if (ts.toDate) d = ts.toDate();
+  else if (ts.seconds) d = new Date(ts.seconds * 1000);
+  else return "";
+  const now = new Date();
+  const isToday = d.toDateString() === now.toDateString();
+  if (isToday) {
+    return d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
+  }
+  return d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }) + " " +
+    d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
+}
+
+function renderNoticeBoard() {
+  const feed = document.getElementById("noticeBoardFeed");
+  if (!feed) return;
+  if (!noticeMessages.length) {
+    feed.innerHTML = '<div class="noticeFeedEmpty">No messages yet — be the first to post</div>';
+    return;
+  }
+  feed.innerHTML = noticeMessages.map(function(msg) {
+    return '<div class="noticeMsg">' +
+      '<div class="noticeMsgHead">' +
+      '<span class="noticeOp">' + escapeHtml((msg.operator || "Unknown").toUpperCase()) + '</span>' +
+      '<span class="noticeTime">' + escapeHtml(formatNoticeTime(msg)) + '</span>' +
+      '</div>' +
+      '<div class="noticeMsgBody">' + escapeHtml(msg.message || "") + '</div>' +
+      '</div>';
+  }).join("");
+  scrollNoticeFeedToBottom();
+}
+
+function scrollNoticeFeedToBottom() {
+  const feed = document.getElementById("noticeBoardFeed");
+  if (!feed) return;
+  requestAnimationFrame(function() {
+    feed.scrollTop = feed.scrollHeight;
+  });
+}
+
+async function postNoticeMessage() {
+  const op = requireOperator("post on the notice board");
+  if (!op) return;
+  const input = document.getElementById("noticeInput");
+  const text = (input.value || "").trim();
+  if (!text) {
+    alert("Type a message first");
+    return;
+  }
+  try {
+    await db.collection("noticeBoard").add({
+      operator: op,
+      message: text,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    input.value = "";
+    input.focus();
+  } catch (err) {
+    alert("Could not post message: " + err.message);
+  }
+}
+
+function jdLineHtml(label, value, valueClass) {
+  return '<div class="jdLine"><div class="jdLineLbl">' + escapeHtml(label) + '</div>' +
+    '<div class="jdLineVal' + (valueClass ? " " + valueClass : "") + '">' + escapeHtml(value) + '</div></div>';
+}
+
+function buildJobDetailListHtml(job, docId, source) {
+  const schedule = getJobScheduleHeader(job);
+  let headLine = "JOB-" + job.id;
+  const fareLabel = formatFareDisplay(job.fare);
+  if (fareLabel && (job.status === "completed" || source === "previous")) {
+    headLine += " · FARE " + fareLabel.toUpperCase();
+  }
+
+  let html = '<div class="jdList">';
+  html += '<div class="jdMetaRow">' +
+    '<div class="jdMetaLeft">📋 ' + escapeHtml(headLine) + '</div>' +
+    '<div class="jdMetaRight"><div class="jdMetaLbl">' + escapeHtml(schedule.label) + '</div>' +
+    '<div class="jdMetaVal">' + escapeHtml(schedule.time) + '</div></div></div>';
+  html += '<div class="jdActionRow">' + jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>';
+  html += jobCardPersonHtml(job);
+  html += jobRouteHtml(job, true);
+
+  if (job.notes && (job.pickup || job.drop)) {
+    html += '<div class="jcRoute"><div class="jcAddrRow">' +
+      '<div class="jcAddrLbl jcAddrLblNotes">📝<br>NOTES</div>' +
+      '<div class="jcAddrBox"><span class="jcAddrText">' + escapeHtml(job.notes) + '</span></div>' +
+      '</div></div>';
+  }
+
+  if (job.adults || job.kids || job.luggage) {
+    html += jdLineHtml("Passengers",
+      "AD " + (job.adults || "0") +
+      (job.kids ? " · KD " + job.kids : "") +
+      (job.luggage ? " · LG " + job.luggage : ""), "gold");
+  }
+  if ((job.payment || []).length) {
+    html += jdLineHtml("Payment", (job.payment || []).join(", ").toUpperCase(), "blue");
+  }
+  if ((job.payment || []).includes("Deposit") && job.depositAmount) {
+    html += jdLineHtml("Deposit", "$" + job.depositAmount, "gold");
+  }
+  if (job.depositLink) {
+    html += jdLineHtml("Dep Link", job.depositLink, "blue");
+  }
+  if (job.priceType && job.priceType !== "None") {
+    html += jdLineHtml("Price", (job.priceType + (job.price ? " $" + job.price : "")).toUpperCase(), "gold");
+  }
+  if (job.status === "accepted" && job.acceptedBy) {
+    html += jdLineHtml("Accepted By", job.acceptedBy.toUpperCase(), "blue");
+  }
+  if (job.edited) {
+    html += jdLineHtml("Edited", formatEditedAt(job), "gold");
+  }
+
+  html += jdLineHtml("Dispatched", formatDispatchedTimeOnly(job), "blue");
+  html += jdLineHtml("Dispatched By", (job.operator || "—").toUpperCase(), "blue");
+
+  const isActive = job.status === "available" || job.status === "accepted";
+  if (source === "previous" && job.status === "completed") {
+    html += jdLineHtml("Completed By", (job.completedBy || "—").toUpperCase(), "blue");
+  } else if (source === "previous" && job.status === "cancelled") {
+    html += jdLineHtml("Canceled By", (job.canceledBy || "—").toUpperCase(), "white");
+  } else if (isActive) {
+    html += '<div class="jdCancelRow" onclick="event.stopPropagation()">' +
+      '<button type="button" class="btnCancelJob" style="max-width:160px" onclick="promptCancelJob(\'' + docId + '\', event)">CANCEL</button></div>';
+  }
+
+  html += '</div>';
+  return html;
 }
 
 function subscribeProspectScores() {
@@ -2271,14 +2549,7 @@ function openJobModal(docId, source) {
   if (!job) return;
 
   document.getElementById("modalJobTitle").textContent = "JOB-" + job.id;
-  document.getElementById("modalJobBody").innerHTML =
-    '<div class="jcModal">' +
-    jobCardHeaderHtml(job, docId, source) +
-    jobCardPersonHtml(job) +
-    jobRouteHtml(job, true) +
-    jobCardFooterHtml(job, source, { docId: docId, inModal: true }) +
-    jobCardDetailSectionsHtml(job, true) +
-    '</div>';
+  document.getElementById("modalJobBody").innerHTML = buildJobDetailListHtml(job, docId, source);
 
   let actions = '<button onclick="copyJobMessage(\'' + docId + '\')">Copy Dispatch</button>';
   actions += '<button onclick="loadJobIntoForm(\'' + docId + '\')">Load Form</button>';
