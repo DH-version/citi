@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <base href="/citi/">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="#000000">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,11 +14,10 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Geelong Premium Network</title>
 <style>
-:root{--black:#000;--blue:#2563eb;--yellow:#facc15;--white:#fff;--cancel-red:#dc2626}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
   background:#000;
   padding:6px;
   padding-top:max(6px, env(safe-area-inset-top));
@@ -32,24 +31,32 @@ body{
 h2{
   text-align:center;
   margin-bottom:4px;
-  font-size:17px;
-  font-weight:700;
+  font-size:16px;
+  font-weight:800;
+  color:#ffd700;
+  text-transform:uppercase;
+  letter-spacing:.5px;
 }
 
 h3{
   margin:3px 0;
-  font-size:14px;
-  font-weight:600;
+  font-size:13px;
+  font-weight:800;
+  color:#ffd700;
+  text-transform:uppercase;
+  letter-spacing:.4px;
 }
 
 .syncStatus{
   text-align:center;
   font-size:11px;
   margin-bottom:4px;
-  color:#fff;
+  color:#888;
+  text-transform:uppercase;
+  font-weight:700;
 }
-.syncStatus.online{color:#facc15}
-.syncStatus.error{color:#facc15}
+.syncStatus.online{color:#1e90ff}
+.syncStatus.error{color:#ff4444}
 
 .tabPanel{display:none}
 .tabPanel.active{display:block}
@@ -57,7 +64,7 @@ h3{
 .section{margin-top:6px}
 #bookingForm .formSection{
   padding-top:8px;margin-top:8px;
-  border-top:2px solid #2563eb;
+  border-top:1px solid #333;
 }
 #bookingForm .formSection button{
   padding:14px 8px;font-size:15px;margin:1px;
@@ -79,47 +86,56 @@ input,select{
   padding:12px;
   margin:3px 0;
   font-size:16px;
-  border-radius:10px;
-  border:none;
+  border-radius:6px;
+  border:1px solid #0066ff;
   box-sizing:border-box;
+  background:#111;
+  color:#fff;
+  font-weight:600;
 }
 select{
-  background:#2563eb;
+  background:#0047ab;
   color:#fff;
   cursor:pointer;
-  font-weight:700;
+  font-weight:800;
+  text-transform:uppercase;
 }
 input:disabled{
-  background:#e5e7eb;
-  color:#9ca3af;
+  background:#1a1a1a;
+  color:#666;
+  border-color:#333;
   cursor:not-allowed;
 }
-input::placeholder{color:#9ca3af}
+input::placeholder{color:#666;text-transform:none;font-weight:500}
 
 button{
   padding:12px;
   margin:2px;
-  font-size:15px;
-  border-radius:10px;
-  border:none;
-  background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);
+  font-size:14px;
+  border-radius:6px;
+  border:1px solid #0066ff;
+  background:#0047ab;
   color:#fff;
-  font-weight:bold;
+  font-weight:800;
   cursor:pointer;
-  box-shadow:0 2px 8px rgba(37,99,235,.35), inset 0 1px 0 rgba(255,255,255,.12);
-  transition:transform .1s ease, box-shadow .1s ease;
+  text-transform:uppercase;
+  letter-spacing:.3px;
+  box-shadow:none;
+  transition:transform .1s ease;
 }
-button:active:not(:disabled){transform:scale(.98);box-shadow:0 1px 4px rgba(37,99,235,.3)}
+button:active:not(:disabled){transform:scale(.98)}
 button:disabled{
-  background:#d1d5db;
-  color:#9ca3af;
+  background:#222;
+  color:#555;
+  border-color:#333;
   cursor:not-allowed;
 }
 
 .glow{
-  background:#facc15!important;
+  background:#ffd700!important;
   color:#000!important;
-  box-shadow:0 0 8px #facc15;
+  border-color:#ffd700!important;
+  box-shadow:0 0 10px rgba(255,215,0,.45)!important;
 }
 
 .row{display:flex;gap:4px}
@@ -143,7 +159,7 @@ button:disabled{
 
 .depositAmountBox{
   display:flex;align-items:center;
-  background:#fff;border-radius:10px;padding:0 8px;flex:1;
+  background:#fff;border-radius:6px;padding:0 8px;flex:1;border:1px solid #0066ff;
 }
 .depositAmountBox span{color:#000;font-weight:bold;margin-right:4px}
 .depositAmountBox input{
@@ -162,7 +178,7 @@ button:disabled{
 
 .priceBox{
   display:flex;align-items:center;
-  background:#fff;border-radius:10px;padding:0 8px;flex:1;
+  background:#fff;border-radius:6px;padding:0 8px;flex:1;border:1px solid #0066ff;
 }
 .priceBox span{color:#000;font-weight:bold;margin-right:4px}
 .priceBox input{
@@ -176,77 +192,194 @@ button:disabled{
 
 .operatorRow{margin-bottom:4px}
 .operatorRow input{padding:10px;font-size:14px;width:100%}
-.operatorStatus{font-size:11px;color:#fff;text-align:center;margin-top:4px;line-height:1.3}
+.operatorStatus{font-size:11px;color:#94a3b8;text-align:center;margin-top:4px;line-height:1.3}
 .operatorStatus.ready{color:#4ade80;font-weight:700}
 .operatorStatus.invalid{color:#f87171}
 .btnSwitchOp{display:none!important}
 .notesBox{
-  width:100%;min-height:72px;padding:12px;border-radius:10px;
-  border:1px solid #2563eb;background:#fff;color:#000;
+  width:100%;min-height:72px;padding:12px;border-radius:6px;
+  border:1px solid #0066ff;background:#111;color:#fff;
   font-size:15px;line-height:1.45;resize:vertical;margin-top:4px;
 }
 .notesInline{
-  width:100%;padding:10px 12px;border-radius:10px;
-  border:1px solid #2563eb;background:#fff;color:#000;
+  width:100%;padding:10px 12px;border-radius:6px;
+  border:1px solid #0066ff;background:#111;color:#fff;
   font-size:15px;margin:3px 0;
 }
 .notesBox.qbNotes{
   min-height:110px;font-size:17px;line-height:1.5;
-  border:2px solid #2563eb;background:#fff;color:#000;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  border:2px solid #0066ff;background:#0a0a0a;
 }
 .qbField{font-size:17px;padding:13px;margin-bottom:8px}
+.jobList{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+
+/* —— Job card (dispatch theme) —— */
 .jobCard{
-  background:linear-gradient(180deg,#1e293b 0%,#172033 100%);
-  border:1px solid #475569;border-radius:12px;
-  padding:12px;cursor:pointer;
-  box-shadow:0 3px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+  background:#000;
+  border:2px solid #0066ff;
+  border-radius:8px;
+  overflow:hidden;
+  cursor:pointer;
+  padding:0;
+  margin:0;
+  box-shadow:none;
 }
-.jobEdit{
-  background:transparent!important;padding:0 4px;margin:0;
-  font-size:14px;box-shadow:none;border:none;cursor:pointer;line-height:1;
+.jobCardAccepted{border-color:#ffd700}
+.jcHead{
+  display:flex;align-items:stretch;
+  border-bottom:1px solid #333;
+  min-height:42px;
 }
-.jobTag.edited{background:#7c3aed33;color:#c4b5fd;font-weight:700}
+.jcHeadLeft{
+  flex:1;display:flex;align-items:center;gap:5px;
+  padding:8px 10px;color:#ffd700;
+  font-weight:800;font-size:12px;text-transform:uppercase;
+}
+.jcHeadMid{
+  display:flex;align-items:center;gap:2px;
+  padding:0 6px;border-left:1px solid #333;border-right:1px solid #333;
+}
+.jcHeadRight{
+  flex:0 0 auto;display:flex;flex-direction:column;
+  justify-content:center;align-items:flex-end;
+  padding:6px 10px;min-width:88px;
+}
+.jcHeadLbl{font-size:8px;color:#fff;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.jcHeadTime{font-size:13px;color:#ffd700;font-weight:800;text-transform:uppercase;line-height:1.1}
+.jcIconBtn{
+  background:transparent!important;border:none!important;
+  padding:4px 6px!important;margin:0!important;
+  font-size:15px!important;box-shadow:none!important;
+  color:#ffd700!important;
+}
+.jcPerson{
+  display:flex;align-items:center;
+  border-bottom:1px solid #333;min-height:56px;
+}
+.jcAvatar{
+  flex:0 0 52px;display:flex;align-items:center;justify-content:center;
+  font-size:28px;color:#1e90ff;
+}
+.jcPersonInfo{flex:1;min-width:0;padding:6px 0}
+.jcName{
+  font-size:18px;font-weight:800;color:#fff;
+  text-transform:uppercase;line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.jcPhone{
+  display:flex;align-items:center;gap:4px;
+  color:#1e90ff;font-size:13px;font-weight:700;
+  text-decoration:none;margin-top:3px;
+}
+.jcPhone:active{opacity:.8}
+.jcVehicle{
+  flex:0 0 auto;display:flex;align-items:center;gap:5px;
+  padding:8px 10px;border-left:1px solid #333;
+  font-size:13px;font-weight:800;color:#fff;text-transform:uppercase;
+}
+.jcRoute{border-bottom:1px solid #333}
+.jcAddrRow{display:flex;align-items:stretch;min-height:40px}
+.jcAddrRow+.jcAddrRow{border-top:1px solid #333}
+.jcAddrLbl{
+  flex:0 0 72px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  padding:4px 6px;font-size:8px;font-weight:800;
+  color:#fff;text-transform:uppercase;text-align:center;line-height:1.1;
+}
+.jcAddrLblPickup{background:#008000}
+.jcAddrLblDrop{background:#0047ab}
+.jcAddrLblNotes{background:#008000}
+.jcAddrBox{
+  flex:1;display:flex;align-items:center;
+  background:#fff;padding:6px 8px;min-width:0;
+}
+.jcAddrText{
+  flex:1;font-size:11px;font-weight:800;color:#000;
+  text-transform:uppercase;line-height:1.25;
+  word-break:break-word;
+}
+.jcMapsBtn{
+  flex:0 0 28px;display:flex;align-items:center;justify-content:center;
+  width:28px;height:28px;margin-left:4px;
+  background:#e8f0fe;border-radius:4px;
+  text-decoration:none;font-size:16px;line-height:1;
+  border:1px solid #1e90ff;
+}
+.jcMapsBtn:active{background:#1e90ff}
+.jcFooter{
+  display:flex;border-bottom:1px solid #333;
+}
+.jcFootCol{
+  flex:1;padding:8px 6px;text-align:center;
+  border-right:1px solid #333;
+}
+.jcFootCol:last-child{border-right:none}
+.jcFootLbl{font-size:7px;color:#fff;font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
+.jcFootVal{font-size:11px;font-weight:800;text-transform:uppercase;line-height:1.2}
+.jcFootVal.blue{color:#1e90ff}
+.jcFootVal.gold{color:#ffd700}
+.jcFootVal.white{color:#fff}
+.jcExtra{
+  padding:6px 10px;font-size:10px;font-weight:700;
+  color:#888;text-transform:uppercase;border-bottom:1px solid #333;
+}
+.jcExtra span{color:#ffd700}
+.acceptedBanner{
+  padding:8px;text-align:center;
+  background:#ffd70022;border-top:1px solid #ffd700;
+  color:#ffd700;font-size:12px;font-weight:800;text-transform:uppercase;
+}
+.jobActions{display:flex;gap:0;margin:0}
+.jobActions button{
+  flex:1;margin:0!important;border-radius:0!important;
+  border:none!important;padding:14px 8px!important;
+  font-size:14px!important;font-weight:800!important;
+}
+.btnAccept,.btnAcceptJob{background:#1b8a44!important;color:#fff!important}
+.btnComplete{background:#1b8a44!important;color:#fff!important}
+.btnRecall{background:#cc0000!important;color:#fff!important;flex:0.85}
+.detailPhone{color:#1e90ff;font-weight:700;text-decoration:none}
+.emptyState{text-align:center;padding:30px 16px;color:#888;font-size:13px;font-weight:700;text-transform:uppercase}
+.listHeader{font-size:11px;color:#888;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
 .prospectTable{
   width:100%;border-collapse:separate;border-spacing:0;
-  border-radius:12px;overflow:hidden;
-  border:2px solid #2563eb;box-shadow:0 2px 12px rgba(0,0,0,.5);
+  border-radius:8px;overflow:hidden;
+  border:2px solid #0066ff;
 }
 .prospectTable th,.prospectTable td{
-  padding:12px 10px;text-align:left;border-bottom:1px solid #334155;
+  padding:12px 10px;text-align:left;border-bottom:1px solid #333;
 }
-.prospectTable th{background:#0f172a;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
-.prospectTable td{background:#000;color:#fff;font-size:15px;font-weight:600}
+.prospectTable th{background:#000;color:#888;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.prospectTable td{background:#111;color:#fff;font-size:15px;font-weight:800;text-transform:uppercase}
 .prospectTable tr:last-child td{border-bottom:none}
-.prospectTable td.pointsCell{text-align:center;color:#facc15;font-size:18px;font-weight:800}
+.prospectTable td.pointsCell{text-align:center;color:#ffd700;font-size:18px;font-weight:800}
 .prospectTable input{
-  width:60px;text-align:center;font-size:16px;font-weight:700;
-  padding:8px;margin:0;background:#fff;border:1px solid #2563eb;color:#000;
+  width:60px;text-align:center;font-size:16px;font-weight:800;
+  padding:8px;margin:0;background:#000;border:1px solid #0066ff;color:#ffd700;
 }
 .prospectToolbar{display:flex;gap:8px;margin-bottom:10px}
-.prospectToolbar button{flex:1;margin:0;font-size:12px}
+.prospectToolbar button{flex:1;margin:0;font-size:11px}
 .navTab{font-size:9px;padding:7px 2px 5px}
 .availToggle{display:flex;gap:6px;margin-bottom:8px}
-.availToggle button{flex:1;margin:0;font-size:12px;padding:10px 6px}
+.availToggle button{flex:1;margin:0;font-size:11px;padding:10px 6px}
 .btnQuickBooking{
-  width:100%;margin-bottom:8px;background:#2563eb!important;
-  font-weight:700;padding:12px;
+  width:100%;margin-bottom:8px;background:#0047ab!important;
+  font-weight:800;padding:12px;border:2px solid #0066ff!important;
 }
 .qbTimeRow{display:flex;gap:8px;margin-bottom:6px}
 .qbTimeRow button{flex:1;margin:0;font-weight:800;font-size:16px;padding:14px 12px}
 .qbTimeRow button.qbSelected{
-  background:linear-gradient(180deg,#fde047 0%,#facc15 100%)!important;
-  color:#000!important;font-weight:800;
-  box-shadow:0 0 14px rgba(250,204,21,.45), inset 0 1px 0 rgba(255,255,255,.3);
+  background:#ffd700!important;color:#000!important;border-color:#ffd700!important;
+  box-shadow:0 0 10px rgba(255,215,0,.4)!important;
 }
-.qbHint{font-size:12px;color:#fff;text-align:center;margin-bottom:8px;line-height:1.35}
+.qbHint{font-size:11px;color:#888;text-align:center;margin-bottom:8px;line-height:1.35;font-weight:700;text-transform:uppercase}
 .qbTimeSelected{
-  text-align:center;font-size:15px;font-weight:800;color:#64748b;
-  margin:0 0 10px;min-height:20px;
+  text-align:center;font-size:14px;font-weight:800;color:#555;
+  margin:0 0 10px;min-height:20px;text-transform:uppercase;
 }
-.qbTimeSelected.active{color:#facc15}
+.qbTimeSelected.active{color:#ffd700}
 .qbFieldLabel{
-  font-size:11px;font-weight:700;color:#fff;
+  font-size:10px;font-weight:800;color:#888;
   text-transform:uppercase;letter-spacing:.4px;margin:4px 0 2px;
 }
 .qbField{width:100%;margin-bottom:8px}
@@ -289,204 +422,109 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   max-width:430px;margin:0 auto;
   display:flex;
   background:#000;
-  border-top:2px solid #2563eb;
+  border-top:2px solid #0066ff;
   z-index:200;
   padding-bottom:env(safe-area-inset-bottom,0);
 }
 .navTab{
   flex:1;padding:8px 4px 6px;
-  background:transparent;color:#fff;
-  border-radius:0;font-size:10px;font-weight:700;
+  background:transparent;color:#888;
+  border-radius:0;font-size:9px;font-weight:800;
   display:flex;flex-direction:column;align-items:center;gap:2px;
-  margin:0;
+  margin:0;border:none;box-shadow:none;text-transform:uppercase;
 }
 .navTab .icon{font-size:18px;line-height:1}
-.navTab.active{color:#facc15;background:#ffffff08}
+.navTab.active{color:#ffd700;background:#111}
 .navTab .badge{
-  background:#ef4444;color:#fff;font-size:10px;
+  background:#cc0000;color:#fff;font-size:10px;
   padding:1px 6px;border-radius:10px;min-width:18px;
 }
 
-.jobList{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.jobCardAvailable{border-color:#2563eb;background:linear-gradient(135deg,#1a2744,#1e293b)}
-.jobCardAccepted{border-color:#facc15;background:linear-gradient(135deg,#1c2a1c,#1e293b)}
-.jobCardTop{display:flex;justify-content:space-between;gap:8px}
-.jobId{font-weight:700;color:#facc15;font-size:13px}
-.jobTime{font-size:12px;color:#e2e8f0;text-align:right;font-weight:800;line-height:1.3}
-.jobTagBold{font-weight:800;font-size:11px}
-.jobTagSchedule{background:#6366f133;color:#c7d2fe;font-weight:800}
-.jobTagVehicle{background:#0ea5e933;color:#67e8f9;font-weight:800}
-.jobName{font-size:14px;font-weight:600;margin:4px 0 2px}
-.jobRoute{margin:8px 0 4px;display:flex;flex-direction:column;gap:5px}
-.jobAddr{
-  font-size:17px;font-weight:800;line-height:1.3;
-  color:#f8fafc;letter-spacing:-.01em;
-}
-.jobAddrPickup{color:#fff}
-.jobAddrDrop{color:#e2e8f0}
-.jobAddrLbl{
-  display:inline-block;font-size:10px;font-weight:800;
-  letter-spacing:.6px;color:#38bdf8;margin-right:4px;vertical-align:1px;
-}
-.detailValue.routeBig{font-size:18px;font-weight:800;color:#f8fafc;line-height:1.35}
-.jobMeta{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
-.jobTag{font-size:10px;padding:2px 8px;border-radius:6px;background:#334155;color:#cbd5e1}
-.jobTag.asap{background:#10b98133;color:#34d399}
-.jobTag.dispatched{background:#3b82f633;color:#93c5fd}
-.jobTag.accepted{background:#facc1533;color:#facc15;font-weight:700}
-.jobTag.completedBy{background:#64748b;color:#e2e8f0}
-.acceptedBanner{
-  margin-top:8px;padding:7px 10px;border-radius:8px;
-  background:#facc1522;border:1px solid #facc1555;
-  color:#facc15;font-size:13px;font-weight:800;text-align:center;
-}
-.jobActions{display:flex;gap:6px;margin-top:10px}
-.jobActions button{flex:1;margin:0;padding:10px;font-size:13px}
-.btnAccept{background:#10b981!important}
-.btnComplete{background:#059669!important}
-.btnRecall{background:#dc2626!important;flex:0.85}
-.jobPhone{
-  display:inline-block;margin:4px 0 2px;
-  color:#38bdf8;font-size:13px;font-weight:700;
-  text-decoration:none;padding:4px 0;
-}
-.jobPhone:active{opacity:.8}
-.detailPhone{color:#38bdf8;font-weight:700;text-decoration:none}
-.emptyState{text-align:center;padding:30px 16px;color:#fff;font-size:13px}
-.listHeader{font-size:14px;color:#fff;margin-bottom:4px}
 .prevHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .prevHeader h3{margin:0}
-.btnFilter{background:#475569!important;padding:8px 14px;font-size:13px;margin:0}
+.btnFilter{background:#0047ab!important;padding:8px 14px;font-size:12px;margin:0}
 .filterPanel{
-  background:#000;border:2px solid #2563eb;border-radius:10px;
+  background:#000;border:2px solid #0066ff;border-radius:8px;
   padding:10px;margin-bottom:8px;display:none;
 }
 .filterPanel.open{display:block}
-.filterLabel{font-size:11px;color:#fff;margin-bottom:4px;text-transform:uppercase;font-weight:700}
+.filterLabel{font-size:10px;color:#888;margin-bottom:4px;text-transform:uppercase;font-weight:800}
 .filterRow{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
-.filterOpBtn{flex:1;min-width:28%;font-size:11px;padding:8px 4px;margin:0}
-.filterTypeBtn{flex:1;font-size:12px;padding:10px;margin:0}
+.filterOpBtn{flex:1;min-width:28%;font-size:10px;padding:8px 4px;margin:0}
+.filterTypeBtn{flex:1;font-size:11px;padding:10px;margin:0}
 .filterOpBtn.selected,.filterTypeBtn.selected{
-  background:#facc15!important;color:#000!important;
-  box-shadow:0 0 8px #facc15;
+  background:#ffd700!important;color:#000!important;
+  border-color:#ffd700!important;
+  box-shadow:0 0 8px rgba(255,215,0,.4);
 }
 .filterSearchRow{display:flex;gap:6px}
 .filterSearchRow button{flex:1;margin:0}
-.jobCardTopRight{display:flex;align-items:flex-start;gap:4px}
-.jobDelete{
-  background:transparent!important;padding:0 4px;margin:0;
-  font-size:15px;box-shadow:none;border:none;cursor:pointer;line-height:1;
-}
+.operatorStatus.ready{color:#1e90ff;font-weight:800}
+.phoneHint{color:#1e90ff}
 #pinModal.open{align-items:center;justify-content:center;padding:16px}
 #fareModal.open{align-items:center;justify-content:center;padding:16px}
 #quickBookingModal.open{align-items:center;justify-content:center;padding:16px}
 .pinModalSheet input{text-align:center;font-size:22px;letter-spacing:6px}
 .fareInputWrap{
-  display:flex;align-items:center;background:#0f172a;
-  border:2px solid #334155;border-radius:10px;padding:6px 12px;margin:10px 0;
+  display:flex;align-items:center;background:#111;
+  border:2px solid #0066ff;border-radius:8px;padding:6px 12px;margin:10px 0;
 }
-.farePrefix{font-size:32px;color:#4ade80;font-weight:700;padding-right:4px}
+.farePrefix{font-size:32px;color:#ffd700;font-weight:800;padding-right:4px}
 .fareInputWrap input{
   border:none;background:transparent;font-size:32px;color:#fff;
   flex:1;padding:10px 4px;outline:none;width:100%;
 }
-.jobTag.fareTag{background:#15803d;color:#fff;font-weight:700}
-.jobFare{display:block;margin-top:4px;font-size:16px;font-weight:700;color:#4ade80}
 .pinActions{display:flex;gap:8px;margin-top:10px}
 .pinActions button{flex:1;margin:0}
-.btnPinDelete{background:#dc2626!important}
+.btnPinDelete{background:#cc0000!important}
 
 .modalOverlay{
   display:none;position:fixed;inset:0;
-  background:#000000cc;z-index:300;
+  background:#000000dd;z-index:300;
   align-items:flex-end;justify-content:center;
 }
 .modalOverlay.open{display:flex}
 .modalSheet{
-  background:#000;border:2px solid #2563eb;border-radius:16px 16px 0 0;
+  background:#000;border:2px solid #0066ff;border-radius:12px 12px 0 0;
   width:100%;max-width:430px;max-height:90vh;overflow-y:auto;
-  padding:16px;animation:slideUp .25s ease;
+  padding:0;animation:slideUp .25s ease;
 }
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modalHandle{width:40px;height:4px;background:#475569;border-radius:2px;margin:0 auto 12px}
-.modalHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.modalHeader h2{font-size:18px;color:#facc15}
-.modalClose{background:#2563eb;padding:8px 14px;font-size:13px}
-.detailGrid{display:grid;gap:8px}
-.detailRow{background:#000;border:1px solid #2563eb;border-radius:8px;padding:10px 12px}
-.detailLabel{font-size:11px;color:#fff;text-transform:uppercase;margin-bottom:2px}
-.detailValue{font-size:14px;line-height:1.4}
-.modalActions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.modalActions button{flex:1;min-width:100px}
+.modalHandle{width:40px;height:4px;background:#333;border-radius:2px;margin:12px auto}
+.modalHeader{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 12px;border-bottom:1px solid #333;
+}
+.modalHeader h2{font-size:16px;color:#ffd700;font-weight:800;text-transform:uppercase;margin:0}
+.modalClose{background:#0047ab;padding:8px 14px;font-size:11px;border:1px solid #0066ff!important}
+.detailGrid{display:block;padding:0}
+.modalActions{display:flex;gap:0;margin:0;flex-wrap:wrap;border-top:1px solid #333}
+.modalActions button{
+  flex:1;min-width:100px;margin:0!important;border-radius:0!important;
+  border:none!important;border-top:1px solid #333!important;
+}
+.jcModal .jobCard{border:none;border-radius:0}
 
 .alertToast{
   display:none;position:fixed;top:10px;left:10px;right:10px;
   max-width:410px;margin:0 auto;
-  background:linear-gradient(135deg,#059669,#047857);
-  border:1px solid #34d399;border-radius:10px;
+  background:#000;border:2px solid #1b8a44;border-radius:8px;
   padding:14px 16px;z-index:400;
-  box-shadow:0 8px 32px #0008;
   animation:popIn .3s ease;cursor:pointer;
 }
 .alertToast.show{display:block}
 @keyframes popIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.alertToast h4{font-size:15px;margin-bottom:4px}
-.alertToast p{font-size:13px;opacity:.9}
-
-/* Dispatch card - 4-color high visibility */
-.dispatchCard{background:#000;border:2px solid #2563eb;border-radius:14px;margin-bottom:14px;overflow:hidden;cursor:pointer}
-.dispatchCardHeader{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid #2563eb}
-.dispatchJobId{font-size:1.1rem;font-weight:900;color:#facc15;letter-spacing:.06em}
-.dispatchHeaderActions{display:flex;align-items:center;gap:8px}
-.dispatchCard .jobEdit,.dispatchCard .jobDelete{background:transparent!important;border:1px solid #2563eb;color:#fff;width:32px;height:32px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;font-size:14px;padding:0;margin:0}
-.vDivider{width:1px;height:28px;background:#2563eb;flex-shrink:0}
-.scheduleBlock{display:flex;align-items:center;gap:6px;text-align:right}
-.scheduleBlock .clockIcon{color:#facc15;font-size:1rem}
-.scheduleLabel{font-size:.6rem;font-weight:700;letter-spacing:.08em;color:#fff;text-transform:uppercase;line-height:1.1}
-.scheduleTime{font-size:1rem;font-weight:800;color:#facc15}
-.dispatchClientRow{display:flex;align-items:stretch;gap:10px;padding:12px;border-bottom:1px solid #2563eb}
-.clientAvatar{width:48px;height:48px;border-radius:50%;background:#2563eb;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.1rem}
-.clientInfo{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:4px}
-.clientName{font-size:1.25rem;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.03em;line-height:1.15}
-.clientPhone{color:#2563eb;font-weight:700;font-size:.95rem;text-decoration:none}
-.clientVehicleCol{display:flex;align-items:center;gap:10px;padding-left:10px;border-left:1px solid #2563eb;flex-shrink:0}
-.clientVehicle{color:#fff;font-weight:800;font-size:.95rem;text-transform:uppercase;white-space:nowrap}
-.routeRow{display:grid;grid-template-columns:72px 1fr;gap:8px;padding:10px 12px;align-items:start;border-bottom:1px solid #2563eb}
-.routeLabel{font-size:.65rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#2563eb;padding-top:8px;line-height:1.2}
-.addressBox{background:#fff;color:#000;border-radius:8px;padding:10px 12px;font-size:.95rem;font-weight:600;line-height:1.35;word-break:break-word}
-.dispatchFooter{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:10px 12px;border-bottom:1px solid #2563eb}
-.footerCol{display:flex;flex-direction:column;gap:2px;min-width:0}
-.footerLabel{font-size:.55rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#2563eb}
-.footerValue{font-size:.8rem;font-weight:700;color:#2563eb;word-break:break-word}
-.footerValue.yellow{color:#facc15}
-.cancelBtn{background:#dc2626;color:#fff;border:none;border-radius:8px;padding:8px 6px;font-size:.7rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;width:100%}
-.dispatchActions{padding:10px 12px 12px}
-.dispatchCard .btnAccept{width:100%;padding:14px;border:none;border-radius:10px;background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);color:#fff;font-weight:800;font-size:1rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
-.dispatchCard .actionRow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.dispatchCard .btnComplete,.dispatchCard .btnRecall{padding:12px;border:none;border-radius:10px;background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);color:#fff;font-weight:800;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;cursor:pointer}
-.dispatchCard .acceptedBanner{text-align:center;padding:10px;border:1px solid #2563eb;border-radius:8px;color:#facc15;font-weight:700;font-size:.85rem}
-.jobList{gap:10px}
-.emptyState{color:#fff;border:1px dashed #2563eb;border-radius:12px}
-input,select{background:#fff;color:#000;border:1px solid #2563eb}
-select{background:#2563eb;color:#fff}
-h2{color:#facc15}
-h3{color:#fff}
-.operatorStatus{color:#fff}
-.operatorStatus.ready{color:#facc15}
-.operatorStatus.invalid{color:#facc15}
-.qbHint,.qbTimeSelected{color:#fff}
-.qbTimeSelected.active{color:#facc15}
-.qbFieldLabel{color:#facc15}
-.listHeader,.prevHeader h3{color:#fff}
+.alertToast h4{font-size:14px;margin-bottom:4px;color:#ffd700;font-weight:800;text-transform:uppercase}
+.alertToast p{font-size:12px;color:#fff;font-weight:700;text-transform:uppercase}
 </style>
 </head>
 <body>
 
 <h2>GEELONG PREMIUM NETWORK</h2>
-<div id="syncStatus" class="syncStatus">Connectingâ€¦</div>
+<div id="syncStatus" class="syncStatus">Connecting…</div>
 
 <div id="alertToast" class="alertToast" onclick="dismissAlert()">
-  <h4>ðŸš– New Job Arrived!</h4>
+  <h4>🚖 New Job Arrived!</h4>
   <p id="alertText">Tap to view</p>
 </div>
 
@@ -499,7 +537,7 @@ h3{color:#fff}
   </div>
 
   <div id="bookingForm" class="locked">
-  <button type="button" class="btnQuickBooking" onclick="openQuickBooking()">âš¡ Quick Booking</button>
+  <button type="button" class="btnQuickBooking" onclick="openQuickBooking()">⚡ Quick Booking</button>
   <div class="twoCol">
     <div class="nameInputWrap">
       <input id="name" placeholder="Passenger Name" autocomplete="off" autocapitalize="words">
@@ -510,7 +548,7 @@ h3{color:#fff}
       <div id="phoneList" class="phoneSuggestList"></div>
     </div>
   </div>
-  <div id="phoneHint" class="phoneHint">Customer found â€” details filled</div>
+  <div id="phoneHint" class="phoneHint">Customer found — details filled</div>
 
   <div class="autocomplete-container">
     <input id="pickup" placeholder="Pickup Location" autocomplete="off">
@@ -580,7 +618,7 @@ h3{color:#fff}
   </div>
 
   <div class="section formSection">
-    <button id="dispatchBtn" style="width:100%;background:#10b981;" onclick="dispatch()">DISPATCH</button>
+    <button id="dispatchBtn" style="width:100%;background:#1b8a44;border-color:#1b8a44;" onclick="dispatch()">DISPATCH</button>
     <div style="display:flex;gap:8px;">
       <button style="flex:1;" onclick="sendQuote()">Send Quote</button>
       <button style="flex:1;" onclick="sendConfirmation()">Send Confirmation</button>
@@ -598,7 +636,7 @@ h3{color:#fff}
     <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
     <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Future Bookings</button>
   </div>
-  <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs Â· Accept to take</div>
+  <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
   <div id="availableList" class="jobList"></div>
 </div>
 
@@ -628,9 +666,9 @@ h3{color:#fff}
 <!-- TAB 4: PROSPECT TRACKER -->
 <div id="tabProspect" class="tabPanel">
   <h3>Prospect Tracker</h3>
-  <div class="listHeader">Points: $90+ = 1 Â· $150+ = 2 Â· $210+ = 3 Â· $270+ = 4 Â· $400+ = 5</div>
+  <div class="listHeader">Points: $90+ = 1 · $150+ = 2 · $210+ = 3 · $270+ = 4 · $400+ = 5</div>
   <div class="prospectToolbar">
-    <button style="background:#2563eb" onclick="promptProspectEdit()">âœï¸ Edit Points (PIN)</button>
+    <button style="background:#2563eb" onclick="promptProspectEdit()">✏️ Edit Points (PIN)</button>
     <button id="prospectSaveBtn" style="background:#10b981;display:none" onclick="saveProspectScores()">Save Points</button>
   </div>
   <table class="prospectTable">
@@ -643,7 +681,7 @@ h3{color:#fff}
 <div id="pinModal" class="modalOverlay" onclick="if(event.target===this)closePinModal()">
   <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
     <h3 id="pinModalTitle" style="color:#facc15;margin-bottom:10px;text-align:center">Enter PIN</h3>
-    <input id="pinInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="â€¢â€¢â€¢â€¢" autocomplete="off" enterkeyhint="done" readonly>
+    <input id="pinInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autocomplete="off" enterkeyhint="done" readonly>
     <div class="pinActions">
       <button id="pinConfirmBtn" style="background:#2563eb" onclick="confirmPinAction()">Continue</button>
       <button style="background:#64748b" onclick="closePinModal()">Cancel</button>
@@ -673,7 +711,7 @@ h3{color:#fff}
 <div id="fareModal" class="modalOverlay" onclick="if(event.target===this)closeFareModal()">
   <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
     <h3 style="color:#4ade80;margin-bottom:4px;text-align:center">Enter Fare</h3>
-    <p style="text-align:center;color:#fff;font-size:12px;margin-bottom:8px">Trip fare to complete this job</p>
+    <p style="text-align:center;color:#94a3b8;font-size:12px;margin-bottom:8px">Trip fare to complete this job</p>
     <div class="fareInputWrap">
       <span class="farePrefix">$</span>
       <input id="fareInput" type="tel" inputmode="decimal" pattern="[0-9]*" placeholder="0.00" autocomplete="off" enterkeyhint="done" readonly>
@@ -689,7 +727,7 @@ h3{color:#fff}
 <div id="quickBookingModal" class="modalOverlay" onclick="if(event.target===this)closeQuickBooking()">
   <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px;max-height:92vh">
     <h3 style="color:#60a5fa;margin-bottom:6px;text-align:center;font-weight:800">Quick Booking</h3>
-    <p class="qbHint">Select time first Â· then name or addresses Â· Dispatch when ready</p>
+    <p class="qbHint">Select time first · then name or addresses · Dispatch when ready</p>
     <div class="qbTimeRow">
       <button type="button" id="qbQuickBtn" onclick="setQuickTime('Quick')">Quick</button>
       <button type="button" id="qbReadyBtn" onclick="setQuickTime('Ready Now')">Ready Now</button>
@@ -714,7 +752,7 @@ h3{color:#fff}
       <input id="qbDrop" class="qbField" placeholder="Drop-off Location" autocomplete="off">
       <div id="qbDropList" class="autocomplete-list"></div>
     </div>
-    <textarea id="qbNotes" class="notesBox qbNotes" placeholder="Notes â€” driver instructions, special requestsâ€¦"></textarea>
+    <textarea id="qbNotes" class="notesBox qbNotes" placeholder="Notes — driver instructions, special requests…"></textarea>
     <div class="pinActions">
       <button style="background:#10b981;flex:1" onclick="dispatchQuick()">Dispatch</button>
       <button style="background:#2563eb;flex:1" onclick="sendQuickConfirmation()">Confirmation</button>
@@ -739,17 +777,17 @@ h3{color:#fff}
 <!-- BOTTOM NAV -->
 <nav class="bottomNav">
   <button class="navTab active" data-tab="tabNew" onclick="switchTab('tabNew',this)">
-    <span class="icon">ðŸ“</span>New Booking
+    <span class="icon">📝</span>New Booking
   </button>
   <button class="navTab" data-tab="tabAvailable" onclick="switchTab('tabAvailable',this)">
-    <span class="icon">ðŸš–</span>Available
+    <span class="icon">🚖</span>Available
     <span id="availableBadge" class="badge" style="display:none">0</span>
   </button>
   <button class="navTab" data-tab="tabPrevious" onclick="switchTab('tabPrevious',this)">
-    <span class="icon">ðŸ“‹</span>Previous
+    <span class="icon">📋</span>Previous
   </button>
   <button class="navTab" data-tab="tabProspect" onclick="switchTab('tabProspect',this)">
-    <span class="icon">ðŸ†</span>Prospect
+    <span class="icon">🏆</span>Prospect
   </button>
 </nav>
 
@@ -771,7 +809,7 @@ const GEELONG_SUBURBS = [
   "mount duneed", "wandana heights", "st albans park", "rippleside", "drumcondra",
   "east geelong", "thomson", "ceres", "bannockburn", "inverleigh", "little river"
 ].map(function(s) { return s.trim().toLowerCase(); });
-const SIGNATURE = "\n\nðŸš– Geelong City Cabs\nðŸ“ Bookings | Inquiries | Support\nðŸ“ž 0420 303 581\nðŸ“ž 0450 330 596\nðŸŒŽ www.geelongcitytaxicab.com.au";
+const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 330 596\n🌎 www.geelongcitytaxicab.com.au";
 const AUTHORIZED_OPERATORS = ["Danial", "Najaf", "Mudassir", "Asif", "Khizar", "Tuqeer"];
 const PROSPECT_ORDER = ["Tuqeer", "Khizar", "Asif", "Mudassir", "Najaf", "Danial"];
 
@@ -784,7 +822,6 @@ let teamOperators = AUTHORIZED_OPERATORS.slice();
 let selectedFilterOperator = "", selectedFilterType = "";
 let previousFilterActive = false;
 let pendingDeleteDocId = null;
-let pendingCancelDocId = null;
 let pendingCompleteDocId = null;
 let pendingEditDocId = null;
 let pinAction = "";
@@ -1032,7 +1069,7 @@ function updateOperatorAccess(isValid, showInvalid) {
     status.textContent = "Signed in as: " + getCurrentOperator();
     status.className = "operatorStatus ready";
   } else if (showInvalid && document.getElementById("operator").value.trim()) {
-    status.textContent = "Name not recognised â€” use Danial, Najaf, Mudassir, Asif, Khizar or Tuqeer";
+    status.textContent = "Name not recognised — use Danial, Najaf, Mudassir, Asif, Khizar or Tuqeer";
     status.className = "operatorStatus invalid";
   } else {
     status.textContent = "Enter your operator name to enable the app";
@@ -1051,7 +1088,7 @@ function initializeFirebase() {
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
     firebaseReady = true;
-    setSyncStatus("Connected â€” live sync active", false);
+    setSyncStatus("Connected — live sync active", false);
     subscribeAvailableJobs();
     subscribeCompletedJobs();
     subscribeCustomers();
@@ -1061,7 +1098,7 @@ function initializeFirebase() {
     restoreOperatorSession();
   } catch (err) {
     console.error(err);
-    setSyncStatus("Firebase error â€” check config", true);
+    setSyncStatus("Firebase error — check config", true);
   }
 }
 
@@ -1292,7 +1329,7 @@ function setAvailableView(view) {
   document.getElementById("availFutureBtn").classList.toggle("selected", view === "future");
   document.getElementById("availableListHint").textContent = view === "future"
     ? "Future scheduled jobs"
-    : "Quick & Ready Now jobs Â· Accept to take";
+    : "Quick & Ready Now jobs · Accept to take";
   scheduleRenderAvailable();
 }
 
@@ -1416,7 +1453,7 @@ function searchPhoneSuggestions(query, listEl, onPick) {
     return;
   }
   listEl.innerHTML = matches.map(function(c, i) {
-    return '<div class="phoneSuggestItem" data-idx="' + i + '"><strong>' + escapeHtml(formatPhoneDisplay(c.phone)) + '</strong><span>' + escapeHtml(c.name || "Unknown") + " Â· " + escapeHtml(c.pickup || "â€”") + '</span></div>';
+    return '<div class="phoneSuggestItem" data-idx="' + i + '"><strong>' + escapeHtml(formatPhoneDisplay(c.phone)) + '</strong><span>' + escapeHtml(c.name || "Unknown") + " · " + escapeHtml(c.pickup || "—") + '</span></div>';
   }).join("");
   listEl.querySelectorAll(".phoneSuggestItem").forEach(function(item) {
     item.onclick = function() {
@@ -1576,11 +1613,9 @@ function applyOptimisticComplete(docId, op, fare) {
 }
 
 function removeJobLocally(docId) {
-  availableJobs = availableJobs.filter(function(j) { return j.docId !== docId; });
   completedJobs = completedJobs.filter(function(j) { return j.docId !== docId; });
   filterResultJobs = filterResultJobs.filter(function(j) { return j.docId !== docId; });
   historyJobs = historyJobs.filter(function(j) { return j.docId !== docId; });
-  scheduleRenderAvailable();
   scheduleRenderPrevious();
 }
 
@@ -1698,27 +1733,143 @@ function focusModalInput(input, selectAll) {
 }
 
 function jobDeleteBtn(docId) {
-  return '<button type="button" class="jobDelete" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">ðŸ—‘ï¸</button>';
+  return '<button type="button" class="jcIconBtn" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">🗑</button>';
 }
 
 function jobEditBtn(docId) {
-  return '<button type="button" class="jobEdit" onclick="promptEditJob(\'' + docId + '\', event)" title="Edit">âœï¸</button>';
+  return '<button type="button" class="jcIconBtn" onclick="promptEditJob(\'' + docId + '\', event)" title="Edit">✏</button>';
+}
+
+function googleMapsUrl(address) {
+  if (!address || !String(address).trim()) return "";
+  return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(String(address).trim());
+}
+
+function mapsLinkHtml(address) {
+  const url = googleMapsUrl(address);
+  if (!url) return "";
+  return '<a class="jcMapsBtn" href="' + url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Google Maps">🗺</a>';
+}
+
+function formatDispatchedTimeOnly(job) {
+  if (!job.dispatchedAt) return "—";
+  let d;
+  if (job.dispatchedAt.toDate) d = job.dispatchedAt.toDate();
+  else if (job.dispatchedAt.seconds) d = new Date(job.dispatchedAt.seconds * 1000);
+  else return "—";
+  return d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true }).toUpperCase();
+}
+
+function getJobScheduleHeader(job) {
+  if (isFutureJob(job) && job.timeInput) {
+    let t = job.timeInput;
+    if (job.ampm && job.ampm !== "None") t += " " + job.ampm;
+    return { label: "SCHEDULED", time: t.toUpperCase() };
+  }
+  if (isFutureJob(job) && job.date) {
+    return { label: "SCHEDULED", time: formatDateDisplay(job.date).toUpperCase() };
+  }
+  return { label: (job.time || "QUICK").toUpperCase(), time: "ASAP" };
+}
+
+function jobRouteHtml(job, inModal) {
+  const pickup = (job.pickup || "").trim();
+  const drop = (job.drop || "").trim();
+  if (!pickup && !drop && job.notes) {
+    return '<div class="jcRoute"><div class="jcAddrRow">' +
+      '<div class="jcAddrLbl jcAddrLblNotes">📝<br>NOTES</div>' +
+      '<div class="jcAddrBox"><span class="jcAddrText">' + escapeHtml(job.notes) + '</span></div>' +
+      '</div></div>';
+  }
+  let html = '<div class="jcRoute">';
+  html += '<div class="jcAddrRow">' +
+    '<div class="jcAddrLbl jcAddrLblPickup">📍<br>PICK UP</div>' +
+    '<div class="jcAddrBox"><span class="jcAddrText">' + escapeHtml(pickup || "—") + '</span>' +
+    mapsLinkHtml(pickup) + '</div></div>';
+  html += '<div class="jcAddrRow">' +
+    '<div class="jcAddrLbl jcAddrLblDrop">📍<br>DROP OFF</div>' +
+    '<div class="jcAddrBox"><span class="jcAddrText">' + escapeHtml(drop || "—") + '</span>' +
+    mapsLinkHtml(drop) + '</div></div>';
+  html += '</div>';
+  return html;
+}
+
+function jobCardFooterHtml(job, source) {
+  const schedule = getJobScheduleHeader(job);
+  const dispatched = formatDispatchedTimeOnly(job);
+  const dispatchBy = (job.operator || "—").toUpperCase();
+  let col3Label = schedule.label;
+  let col3Val = schedule.time;
+  let col3Class = "gold";
+  if (source === "previous" && job.status === "completed") {
+    col3Label = "COMPLETED";
+    col3Val = (formatFareDisplay(job.fare) || (job.completedBy || "—")).toUpperCase();
+    col3Class = "blue";
+  } else if (source === "previous") {
+    col3Label = (job.status || "—").toUpperCase();
+    col3Val = schedule.time;
+    col3Class = "white";
+  }
+  return '<div class="jcFooter">' +
+    '<div class="jcFootCol"><div class="jcFootLbl">🕐 DISPATCHED</div><div class="jcFootVal blue">' + escapeHtml(dispatched) + '</div></div>' +
+    '<div class="jcFootCol"><div class="jcFootLbl">👤 DISPATCHED BY</div><div class="jcFootVal blue">' + escapeHtml(dispatchBy) + '</div></div>' +
+    '<div class="jcFootCol"><div class="jcFootLbl">📅 ' + escapeHtml(col3Label) + '</div><div class="jcFootVal ' + col3Class + '">' + escapeHtml(col3Val) + '</div></div>' +
+    '</div>';
+}
+
+function jobCardPersonHtml(job) {
+  const name = (job.name || "UNKNOWN").toUpperCase();
+  const vehicle = (job.vehicle && job.vehicle !== "None" ? job.vehicle : "—").toUpperCase();
+  const phoneHtml = job.phone
+    ? '<a class="jcPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
+    : "";
+  return '<div class="jcPerson">' +
+    '<div class="jcAvatar">👤</div>' +
+    '<div class="jcPersonInfo"><div class="jcName">' + escapeHtml(name) + '</div>' + phoneHtml + '</div>' +
+    '<div class="jcVehicle">🚗 ' + escapeHtml(vehicle) + '</div>' +
+    '</div>';
+}
+
+function jobCardHeaderHtml(job, docId) {
+  const schedule = getJobScheduleHeader(job);
+  return '<div class="jcHead">' +
+    '<div class="jcHeadLeft">📋 JOB-' + job.id + '</div>' +
+    '<div class="jcHeadMid">' + jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>' +
+    '<div class="jcHeadRight"><div class="jcHeadLbl">' + escapeHtml(schedule.label) + '</div>' +
+    '<div class="jcHeadTime">' + escapeHtml(schedule.time) + '</div></div>' +
+    '</div>';
+}
+
+function buildJobCardHtml(job, docId, source, actionsHtml, extraHtml) {
+  const isAccepted = job.status === "accepted";
+  const cardClass = "jobCard" + (source === "available" && isAccepted ? " jobCardAccepted" : "");
+  let notesHtml = "";
+  if (job.notes && (job.pickup || job.drop)) {
+    notesHtml = '<div class="jcExtra">📝 <span>' + escapeHtml(job.notes.slice(0, 60)) + '</span></div>';
+  }
+  if (job.edited) {
+    notesHtml += '<div class="jcExtra">✏ EDITED · ' + escapeHtml(formatEditedAt(job)) + '</div>';
+  }
+  return '<div class="' + cardClass + '" onclick="openJobModal(\'' + docId + '\',\'' + source + '\')">' +
+    jobCardHeaderHtml(job, docId) +
+    jobCardPersonHtml(job) +
+    jobRouteHtml(job) +
+    jobCardFooterHtml(job, source) +
+    notesHtml +
+    (extraHtml || "") +
+    (actionsHtml || "") +
+    '</div>';
 }
 
 function openPinModal(action, docId) {
   pinAction = action;
   pendingDeleteDocId = action === "delete" ? docId : null;
-  pendingCancelDocId = action === "cancel" ? docId : null;
   pendingEditDocId = action === "edit" ? docId : null;
   const title = document.getElementById("pinModalTitle");
   const btn = document.getElementById("pinConfirmBtn");
   if (action === "delete") {
     title.textContent = "Enter PIN to Delete";
     btn.textContent = "Delete";
-    btn.style.background = "#dc2626";
-  } else if (action === "cancel") {
-    title.textContent = "Enter PIN to Cancel Job";
-    btn.textContent = "Cancel Job";
     btn.style.background = "#dc2626";
   } else if (action === "edit") {
     title.textContent = "Enter PIN to Edit Job";
@@ -1746,12 +1897,6 @@ function promptEditJob(docId, e) {
   openPinModal("edit", docId);
 }
 
-
-function promptCancelJob(docId, e) {
-  if (e) e.stopPropagation();
-  if (!requireOperator("cancel jobs")) return;
-  openPinModal("cancel", docId);
-}
 function promptProspectEdit() {
   if (!requireOperator("edit prospect points")) return;
   openPinModal("prospect", null);
@@ -1763,7 +1908,6 @@ function confirmPinAction() {
     return;
   }
   if (pinAction === "delete") confirmDeleteJob();
-  else if (pinAction === "cancel") confirmCancelJob();
   else if (pinAction === "edit") {
     const docId = pendingEditDocId;
     closePinModal();
@@ -1778,7 +1922,6 @@ function closePinModal() {
   document.getElementById("pinModal").classList.remove("open");
   document.getElementById("pinInput").setAttribute("readonly", "readonly");
   pendingDeleteDocId = null;
-  pendingCancelDocId = null;
   pendingEditDocId = null;
   pinAction = "";
 }
@@ -1799,22 +1942,6 @@ async function confirmDeleteJob() {
   }
 }
 
-
-async function confirmCancelJob() {
-  if (document.getElementById("pinInput").value !== DELETE_PIN) {
-    alert("Wrong PIN");
-    return;
-  }
-  if (!pendingCancelDocId) return;
-  try {
-    await db.collection("jobs").doc(pendingCancelDocId).delete();
-    removeJobLocally(pendingCancelDocId);
-    closePinModal();
-    closeJobModal();
-  } catch (err) {
-    alert("Cancel failed: " + err.message);
-  }
-}
 function findJobById(docId) {
   let job = availableJobs.find(function(j) { return j.docId === docId; });
   if (job) return job;
@@ -1883,9 +2010,9 @@ function computeSortKey(timeType, date, timeInput, ampm) {
 
 function getJobTimeLabel(job) {
   if (isFutureJob(job) && job.date && job.timeInput) {
-    return formatDateDisplay(job.date) + " Â· " + job.timeInput + " " + (job.ampm !== "None" ? job.ampm : "");
+    return formatDateDisplay(job.date) + " · " + job.timeInput + " " + (job.ampm !== "None" ? job.ampm : "");
   }
-  if (job.time && job.time !== "None") return job.time + " Â· ASAP";
+  if (job.time && job.time !== "None") return job.time + " · ASAP";
   return "ASAP";
 }
 
@@ -1929,83 +2056,10 @@ function subscribeAvailableJobs() {
       jobsListenerReady = true;
     }, function(err) {
       console.error(err);
-      setSyncStatus("Firestore index needed for status â€” check console", true);
+      setSyncStatus("Firestore index needed for status — check console", true);
     });
 }
 
-function formatDispatchedTimeOnly(job) {
-  if (!job.dispatchedAt) return "—";
-  var d;
-  if (job.dispatchedAt.toDate) d = job.dispatchedAt.toDate();
-  else if (job.dispatchedAt.seconds) d = new Date(job.dispatchedAt.seconds * 1000);
-  else return "—";
-  return d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true });
-}
-
-function getScheduleHeader(job) {
-  if (isFutureJob(job) && job.date && job.timeInput) {
-    var time = job.timeInput;
-    if (job.ampm && job.ampm !== "None") time += " " + job.ampm;
-    return { label: "SCHEDULED", time: formatDateDisplay(job.date) + " · " + time };
-  }
-  if (job.time && job.time !== "None") {
-    return { label: "SCHEDULED", time: job.time };
-  }
-  return { label: "SCHEDULED", time: "ASAP" };
-}
-
-function renderDispatchCard(job, source) {
-  var schedule = getScheduleHeader(job);
-  var initials = (job.name || "?").split(" ").map(function(w) { return w[0] || ""; }).join("").slice(0, 2).toUpperCase();
-  var isCompleted = job.status === "completed";
-  var isAccepted = job.status === "accepted";
-  var isAvailable = job.status === "available";
-  var phoneHtml = job.phone
-    ? '<a class="clientPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
-    : '<span class="clientPhone">—</span>';
-  var vehicle = job.vehicle && job.vehicle !== "None" ? job.vehicle : "—";
-  var footerCol3;
-  if (isCompleted) {
-    footerCol3 = '<div class="footerCol"><span class="footerLabel">Completed By</span><span class="footerValue yellow">' + escapeHtml(job.completedBy || "—") + '</span></div>';
-  } else {
-    footerCol3 = '<div class="footerCol"><button type="button" class="cancelBtn" onclick="promptCancelJob(\'' + job.docId + '\', event)">Cancel</button></div>';
-  }
-  var actionsHtml = "";
-  if (source === "available") {
-    if (isAvailable) {
-      actionsHtml = '<div class="dispatchActions" onclick="event.stopPropagation()"><button type="button" class="btnAccept" onclick="acceptJob(\'' + job.docId + '\')">✓ Accept Job</button></div>';
-    } else if (isAccepted && isJobAcceptedByMe(job)) {
-      actionsHtml = '<div class="dispatchActions" onclick="event.stopPropagation()"><div class="actionRow"><button type="button" class="btnComplete" onclick="completeJob(\'' + job.docId + '\')">Complete</button><button type="button" class="btnRecall" onclick="recallJob(\'' + job.docId + '\')">Recall</button></div></div>';
-    } else if (isAccepted) {
-      actionsHtml = '<div class="dispatchActions"><div class="acceptedBanner">Accepted by ' + escapeHtml(job.acceptedBy || "another operator") + '</div></div>';
-    }
-  }
-  var showEditDelete = !isCompleted;
-  var editDeleteHtml = showEditDelete ? jobEditBtn(job.docId) + jobDeleteBtn(job.docId) + '<div class="vDivider"></div>' : '';
-  var modalSource = source === "available" ? "available" : "previous";
-  var fareHtml = source === "previous" ? fareLineHtml(job) : "";
-  var pickup = (job.pickup || "").trim();
-  var drop = (job.drop || "").trim();
-  var routeHtml;
-  if (!pickup && !drop && job.notes) {
-    routeHtml = '<div class="routeRow"><div class="routeLabel">Notes</div><div class="addressBox">' + escapeHtml(job.notes) + '</div></div>';
-  } else {
-    routeHtml = '<div class="routeRow"><div class="routeLabel">Pick Up</div><div class="addressBox">' + escapeHtml(pickup || "—") + '</div></div>' +
-      '<div class="routeRow"><div class="routeLabel">Drop Off</div><div class="addressBox">' + escapeHtml(drop || "—") + '</div></div>';
-  }
-  return '<article class="dispatchCard" onclick="openJobModal(\'' + job.docId + '\',\'' + modalSource + '\')">' +
-    '<div class="dispatchCardHeader"><span class="dispatchJobId">📋 JOB-' + job.id + '</span>' +
-    '<div class="dispatchHeaderActions">' + editDeleteHtml +
-    '<div class="scheduleBlock"><span class="clockIcon">🕐</span><div><div class="scheduleLabel">' + escapeHtml(schedule.label) + '</div><div class="scheduleTime">' + escapeHtml(schedule.time) + '</div></div></div></div></div>' +
-    '<div class="dispatchClientRow"><div class="clientAvatar">' + escapeHtml(initials) + '</div>' +
-    '<div class="clientInfo"><div class="clientName">' + escapeHtml(job.name || "Unknown") + fareHtml + '</div>' + phoneHtml + '</div>' +
-    '<div class="clientVehicleCol"><span class="clientVehicle">🚗 ' + escapeHtml(vehicle) + '</span></div></div>' +
-    routeHtml +
-    '<div class="dispatchFooter">' +
-    '<div class="footerCol"><span class="footerLabel">Dispatched</span><span class="footerValue">' + escapeHtml(formatDispatchedTimeOnly(job)) + '</span></div>' +
-    '<div class="footerCol"><span class="footerLabel">Dispatched By</span><span class="footerValue">' + escapeHtml(job.operator || "—") + '</span></div>' +
-    footerCol3 + '</div>' + actionsHtml + '</article>';
-}
 function renderAvailableList() {
   const el = document.getElementById("availableList");
   const jobs = availableJobs.filter(function(job) {
@@ -2019,10 +2073,25 @@ function renderAvailableList() {
     return (a.sortKey || 0) - (b.sortKey || 0);
   });
   if (!jobs.length) {
-    el.innerHTML = '<div class="emptyState"><div class="icon">ðŸš–</div>No ' + (availableView === "future" ? "future" : "current") + ' bookings<br><span style="font-size:12px">' + (availableView === "future" ? "Future jobs appear here" : "Quick & Ready Now jobs appear here") + '</span></div>';
+    el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No ' + (availableView === "future" ? "future" : "current") + ' bookings<br><span style="font-size:11px;font-weight:700">Quick & Ready Now jobs appear here</span></div>';
     return;
   }
-  el.innerHTML = jobs.map(function(job) { return renderDispatchCard(job, "available"); }).join("");
+  el.innerHTML = jobs.map(function(job) {
+    const isAccepted = job.status === "accepted";
+    let actionsHtml = "";
+    if (!isAccepted) {
+      actionsHtml = '<div class="jobActions" onclick="event.stopPropagation()">' +
+        '<button class="btnAccept btnAcceptJob" onclick="acceptJob(\'' + job.docId + '\')">✓ ACCEPT JOB</button></div>';
+    } else if (isJobAcceptedByMe(job)) {
+      actionsHtml = '<div class="acceptedBanner">ACCEPTED · ' + escapeHtml((job.acceptedBy || "").toUpperCase()) + '</div>' +
+        '<div class="jobActions" onclick="event.stopPropagation()">' +
+        '<button class="btnComplete" onclick="completeJob(\'' + job.docId + '\')">✓ COMPLETE</button>' +
+        '<button class="btnRecall" onclick="recallJob(\'' + job.docId + '\')">RECALL</button></div>';
+    } else {
+      actionsHtml = '<div class="acceptedBanner">ACCEPTED · ' + escapeHtml((job.acceptedBy || "UNKNOWN").toUpperCase()) + '</div>';
+    }
+    return buildJobCardHtml(job, job.docId, "available", actionsHtml, "");
+  }).join("");
 }
 
 function renderPreviousList() {
@@ -2030,10 +2099,12 @@ function renderPreviousList() {
   const jobs = getPreviousJobsToRender();
   previousJobs = jobs;
   if (!jobs.length) {
-    el.innerHTML = '<div class="emptyState"><div class="icon">ðŸ“‹</div>No jobs found</div>';
+    el.innerHTML = '<div class="emptyState"><div class="icon">📋</div>No jobs found</div>';
     return;
   }
-  el.innerHTML = jobs.map(function(job) { return renderDispatchCard(job, "previous"); }).join("");
+  el.innerHTML = jobs.map(function(job) {
+    return buildJobCardHtml(job, job.docId, "previous", "", "");
+  }).join("");
 }
 
 function formatFareDisplay(fare) {
@@ -2041,35 +2112,6 @@ function formatFareDisplay(fare) {
   const n = parseFloat(String(fare).replace(/[^0-9.]/g, ""));
   if (isNaN(n)) return "";
   return n % 1 === 0 ? "$" + n.toFixed(0) : "$" + n.toFixed(2);
-}
-
-function jobTimeTagHtml(job) {
-  if (isFutureJob(job)) {
-    let label = "";
-    if (job.date) label += formatDateDisplay(job.date);
-    if (job.timeInput) label += (label ? " Â· " : "") + job.timeInput;
-    if (job.ampm && job.ampm !== "None") label += " " + job.ampm;
-    if (!label) label = job.time || "Future";
-    return '<span class="jobTag jobTagBold jobTagSchedule">' + escapeHtml(label) + "</span>";
-  }
-  return '<span class="jobTag asap jobTagBold">' + escapeHtml(job.time || "ASAP") + "</span>";
-}
-
-function jobVehicleTagHtml(job) {
-  const v = job.vehicle && job.vehicle !== "None" ? job.vehicle : "â€”";
-  return '<span class="jobTag jobTagBold jobTagVehicle">' + escapeHtml(v) + "</span>";
-}
-
-function jobRouteHtml(job) {
-  const pickup = (job.pickup || "").trim();
-  const drop = (job.drop || "").trim();
-  if (!pickup && !drop && job.notes) {
-    return '<div class="jobRoute"><div class="jobAddr jobAddrPickup"><span class="jobAddrLbl">NOTES</span>' + escapeHtml(job.notes) + '</div></div>';
-  }
-  return '<div class="jobRoute">' +
-    '<div class="jobAddr jobAddrPickup"><span class="jobAddrLbl">PICKUP</span>' + escapeHtml(pickup || "â€”") + '</div>' +
-    '<div class="jobAddr jobAddrDrop"><span class="jobAddrLbl">DROP</span>' + escapeHtml(drop || "â€”") + '</div>' +
-    '</div>';
 }
 
 function fareLineHtml(job) {
@@ -2087,52 +2129,35 @@ function openJobModal(docId, source) {
   if (!job) return;
 
   document.getElementById("modalJobTitle").textContent = "JOB-" + job.id;
-  const phoneDisplay = job.phone ? formatPhoneDisplay(job.phone) : "â€”";
-  const phoneLink = job.phone
-    ? '<a class="detailPhone" href="tel:' + normalizePhone(job.phone) + '">ðŸ“ž ' + escapeHtml(phoneDisplay) + ' â€” Tap to call</a>'
-    : escapeHtml(phoneDisplay);
-  const rows = [
-    ["Passenger", escapeHtml(job.name || "Unknown") + "<br>" + phoneLink],
-    ["Pickup", job.pickup || "â€”"],
-    ["Drop-off", job.drop || "â€”"],
-    ["Pickup Time", getJobTimeLabel(job)],
-    ["Vehicle", job.vehicle || "None"],
-    ["Passengers", "Adults: " + (job.adults || "â€”") + (job.kids ? " Â· Kids: " + job.kids : "") + (job.luggage ? " Â· Luggage: " + job.luggage : "")],
-    ["Payment", (job.payment || []).join(", ") || "None"],
-    ["Price", (job.priceType || "None") + (job.price ? " Â· $" + job.price : "")],
-    ["Operator", job.operator || "â€”"]
-  ];
-  if (job.notes) rows.push(["Notes", job.notes]);
-  if ((job.payment || []).includes("Deposit")) {
-    rows.push(["Deposit", "$" + (job.depositAmount || "â€”") + (job.depositLink ? "\n" + job.depositLink : "")]);
+  let extra = "";
+  const bits = [];
+  if (job.adults || job.kids || job.luggage) {
+    bits.push("AD " + (job.adults || "0") + (job.kids ? " · KD " + job.kids : "") + (job.luggage ? " · LG " + job.luggage : ""));
   }
-  const dispatched = formatDispatchedAt(job);
-  if (dispatched) rows.splice(3, 0, ["Dispatched", dispatched]);
-  if (job.status === "accepted" && job.acceptedBy) {
-    rows.splice(4, 0, ["Accepted by", job.acceptedBy]);
-  }
-  if (job.status === "completed" && job.fare != null && job.fare !== "") {
-    rows.push(["Fare", formatFareDisplay(job.fare)]);
-  }
-  if (job.status === "completed" && job.completedBy) {
-    rows.push(["Completed by", job.completedBy]);
-  }
+  if ((job.payment || []).length) bits.push(((job.payment || []).join(", ")).toUpperCase());
+  if (job.priceType && job.priceType !== "None") bits.push((job.priceType + (job.price ? " $" + job.price : "")).toUpperCase());
+  if (job.status === "accepted" && job.acceptedBy) bits.push("ACCEPTED · " + job.acceptedBy.toUpperCase());
+  if (job.status === "completed" && job.completedBy) bits.push("DONE · " + job.completedBy.toUpperCase());
+  if (job.fare) bits.push("FARE " + formatFareDisplay(job.fare));
+  if (bits.length) extra = '<div class="jcExtra">' + escapeHtml(bits.join(" · ")) + '</div>';
 
-  document.getElementById("modalJobBody").innerHTML = rows.map(function(r) {
-    const isRoute = r[0] === "Pickup" || r[0] === "Drop-off";
-    const val = r[0] === "Passenger" ? r[1] : escapeHtml(r[1]).replace(/\n/g, "<br>");
-    const valClass = isRoute ? "detailValue routeBig" : "detailValue";
-    return '<div class="detailRow"><div class="detailLabel">' + r[0] + '</div><div class="' + valClass + '">' + val + '</div></div>';
-  }).join("");
+  document.getElementById("modalJobBody").innerHTML =
+    '<div class="jcModal">' +
+    jobCardHeaderHtml(job, docId) +
+    jobCardPersonHtml(job) +
+    jobRouteHtml(job) +
+    jobCardFooterHtml(job, source) +
+    extra +
+    '</div>';
 
   let actions = '<button onclick="copyJobMessage(\'' + docId + '\')">Copy Dispatch</button>';
-  actions += '<button onclick="loadJobIntoForm(\'' + docId + '\')">Load to Form</button>';
+  actions += '<button onclick="loadJobIntoForm(\'' + docId + '\')">Load Form</button>';
   if (source === "available" && job.status === "available") {
-    actions += '<button class="btnAccept" onclick="acceptJob(\'' + docId + '\');closeJobModal()">Accept</button>';
+    actions += '<button class="btnAccept btnAcceptJob" onclick="acceptJob(\'' + docId + '\');closeJobModal()">✓ ACCEPT JOB</button>';
   }
   if (source === "available" && job.status === "accepted" && isJobAcceptedByMe(job)) {
-    actions += '<button class="btnComplete" onclick="completeJob(\'' + docId + '\')">Complete</button>';
-    actions += '<button class="btnRecall" onclick="recallJob(\'' + docId + '\')">Recall</button>';
+    actions += '<button class="btnComplete" onclick="completeJob(\'' + docId + '\')">✓ COMPLETE</button>';
+    actions += '<button class="btnRecall" onclick="recallJob(\'' + docId + '\')">RECALL</button>';
   }
   document.getElementById("modalJobActions").innerHTML = actions;
   document.getElementById("jobModal").classList.add("open");
@@ -2147,25 +2172,25 @@ function buildDispatchMessage(job) {
   if (isFutureJob(job) && !date && job.timeInput) date = getTodayDate();
   const dateFormatted = formatDateDisplay(date);
   const timeSection = isFutureJob(job) && date && job.timeInput
-    ? "ðŸª§ *Pickup Time - " + (job.time === "Later" ? "Future" : job.time) + "*\nðŸ“… *Date: " + dateFormatted + "*\nâ±ï¸ *Time: " + job.timeInput + " " + job.ampm + "*"
-    : "ðŸª§ *Pickup Time - " + job.time + "*";
-  let passengers = "ðŸ‘¥ Adults: " + (job.adults || "None");
-  if (job.kids) passengers += "\nðŸ‘¥ Kids: " + job.kids;
-  if (job.luggage) passengers += "\nðŸ‘œ Luggage: " + job.luggage;
-  let payment = "ðŸ’³ " + ((job.payment || []).join(", ") || "None");
-  if ((job.payment || []).includes("Deposit")) payment += "\nðŸ’³ *Deposit Required - $" + job.depositAmount + "*";
-  const op = job.operator ? "\nðŸ‘¤ Operator: " + job.operator : "";
-  const notes = job.notes ? "\nðŸ“ Notes: " + job.notes : "";
-  const phoneLine = job.phone ? "\nðŸ“ž " + job.phone : "";
+    ? "🪧 *Pickup Time - " + (job.time === "Later" ? "Future" : job.time) + "*\n📅 *Date: " + dateFormatted + "*\n⏱️ *Time: " + job.timeInput + " " + job.ampm + "*"
+    : "🪧 *Pickup Time - " + job.time + "*";
+  let passengers = "👥 Adults: " + (job.adults || "None");
+  if (job.kids) passengers += "\n👥 Kids: " + job.kids;
+  if (job.luggage) passengers += "\n👜 Luggage: " + job.luggage;
+  let payment = "💳 " + ((job.payment || []).join(", ") || "None");
+  if ((job.payment || []).includes("Deposit")) payment += "\n💳 *Deposit Required - $" + job.depositAmount + "*";
+  const op = job.operator ? "\n👤 Operator: " + job.operator : "";
+  const notes = job.notes ? "\n📝 Notes: " + job.notes : "";
+  const phoneLine = job.phone ? "\n📞 " + job.phone : "";
   let routeBlock = "";
   if (job.pickup || job.drop) {
-    routeBlock = "\n\nðŸ“ Pickup: " + (job.pickup || "â€”") + "\nðŸ“ Drop: " + (job.drop || "â€”");
+    routeBlock = "\n\n📍 Pickup: " + (job.pickup || "—") + "\n📍 Drop: " + (job.drop || "—");
   } else if (job.notes) {
-    routeBlock = "\n\nðŸ“ " + job.notes;
+    routeBlock = "\n\n📝 " + job.notes;
   }
-  return "ðŸš– TAXI DISPATCH\nðŸ†” JOB-" + job.id + op + "\nâ° " + new Date().toLocaleString() + "\n" + timeSection +
-    "\n\nðŸ‘¤ " + job.name + phoneLine + "\n\nðŸš— " + (job.vehicle || "None") + "\n" + payment +
-    "\nðŸ’² " + (job.priceType || "None") + " " + (job.price ? "$" + job.price : "") + "\n" + passengers + notes +
+  return "🚖 TAXI DISPATCH\n🆔 JOB-" + job.id + op + "\n⏰ " + new Date().toLocaleString() + "\n" + timeSection +
+    "\n\n👤 " + job.name + phoneLine + "\n\n🚗 " + (job.vehicle || "None") + "\n" + payment +
+    "\n💲 " + (job.priceType || "None") + " " + (job.price ? "$" + job.price : "") + "\n" + passengers + notes +
     routeBlock;
 }
 
@@ -2216,7 +2241,7 @@ function copyJobMessage(docId) {
   const job = findJobById(docId);
   if (!job) return;
   copyToClipboard(buildDispatchMessage(job)).then(function(ok) {
-    alert(ok ? "Copied âœ”" : "Could not copy â€” select text manually");
+    alert(ok ? "Copied ✔" : "Could not copy — select text manually");
   });
 }
 
@@ -2318,7 +2343,7 @@ async function confirmCompleteJob() {
         await addProspectPoints(op, pts);
       } catch (pe) {
         console.error("Prospect points failed", pe);
-        alert("Job completed but points update failed â€” use Prospect tab to adjust");
+        alert("Job completed but points update failed — use Prospect tab to adjust");
       }
     }
     closeFareModal();
@@ -2397,7 +2422,7 @@ function showNewJobAlert(job) {
   playNewJobTune();
   const toast = document.getElementById("alertToast");
   document.getElementById("alertText").textContent =
-    "JOB-" + job.id + " Â· " + (job.name || "New passenger") + " Â· " + (job.pickup || "");
+    "JOB-" + job.id + " · " + (job.name || "New passenger") + " · " + (job.pickup || "");
   toast.classList.add("show");
   toast.dataset.docId = job.docId;
   if (alertTimeout) clearTimeout(alertTimeout);
@@ -2454,9 +2479,9 @@ async function dispatch() {
 
     const copied = await copyToClipboard(message);
     if (copied) {
-      alert("Dispatched âœ” JOB-" + jobId + " â€” copied!");
+      alert("Dispatched ✔ JOB-" + jobId + " — copied!");
     } else {
-      alert("Dispatched âœ” JOB-" + jobId + "\n\nTap Available â†’ job card â†’ Copy Dispatch");
+      alert("Dispatched ✔ JOB-" + jobId + "\n\nTap Available → job card → Copy Dispatch");
     }
     openWhatsAppGroup();
   } catch (err) {
@@ -2474,7 +2499,7 @@ function updateQuickTimeDisplay() {
     el.textContent = "Tap Quick or Ready Now";
     el.classList.remove("active");
   } else {
-    el.textContent = "âœ“ " + quickSelectedTime + " selected";
+    el.textContent = "✓ " + quickSelectedTime + " selected";
     el.classList.add("active");
   }
 }
@@ -2597,7 +2622,7 @@ async function dispatchQuick() {
     setAvailableView("current");
     switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
     const copied = await copyToClipboard(message);
-    alert(copied ? "Quick dispatch âœ” JOB-" + jobId : "Dispatched âœ” JOB-" + jobId);
+    alert(copied ? "Quick dispatch ✔ JOB-" + jobId : "Dispatched ✔ JOB-" + jobId);
     openWhatsAppGroup();
   } catch (err) {
     alert("Dispatch failed: " + err.message);
@@ -2645,7 +2670,7 @@ function setupAutocomplete(inputId, listId) {
           const local = isLocalArea(p.description);
           const item = document.createElement("div");
           item.className = "autocomplete-item" + (local ? " geelong-highlight" : "");
-          item.innerHTML = '<span class="pac-icon">ðŸ“</span>' + p.description;
+          item.innerHTML = '<span class="pac-icon">📍</span>' + p.description;
           item.onclick = function() {
             input.value = p.description.replace(/\s*,?\s*Australia\s*$/i, "").replace(/\s*,?\s*$/, "");
             list.classList.remove("active");
