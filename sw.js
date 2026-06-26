@@ -1,4 +1,4 @@
-const CACHE = "gpn-v36";
+const CACHE = "gpn-v37";
 
 const ASSETS = [
   "./",
@@ -10,6 +10,41 @@ const ASSETS = [
   "./icons/icon-512.png",
   "./icons/apple-touch-icon.png"
 ];
+
+importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js");
+importScripts("./firebase-config.js");
+
+if (typeof firebaseConfig !== "undefined" && firebaseConfig.projectId && firebaseConfig.projectId !== "YOUR_PROJECT_ID") {
+  firebase.initializeApp(firebaseConfig);
+  const messaging = firebase.messaging();
+  messaging.onBackgroundMessage(function(payload) {
+    const n = payload.notification || {};
+    const title = n.title || "GPN Dispatch";
+    const body = n.body || "";
+    const data = payload.data || {};
+    return self.registration.showNotification(title, {
+      body: body,
+      icon: "./icons/icon-192.png",
+      badge: "./icons/icon-192.png",
+      data: data,
+      tag: data.docId || data.type || "gpn-push",
+      renotify: true
+    });
+  });
+}
+
+self.addEventListener("notificationclick", function(event) {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(list) {
+      for (let i = 0; i < list.length; i++) {
+        if ("focus" in list[i]) return list[i].focus();
+      }
+      if (clients.openWindow) return clients.openWindow("./index.html");
+    })
+  );
+});
 
 self.addEventListener("install", function(event) {
   event.waitUntil(
