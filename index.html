@@ -363,32 +363,28 @@ button:disabled{
   box-shadow:none;
 }
 .jobCardAccepted{border-color:#ffd700}
-.jcHead{
-  display:flex;align-items:stretch;position:relative;
+.jcHeadGrid{
+  display:flex;flex-direction:column;
   border-bottom:1px solid #333;
-  min-height:42px;
 }
-.jcHeadMain{
-  flex:1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:2px;
-  padding:8px 10px;padding-right:54px;
-  min-width:0;
+.jcHeadRow{display:flex;align-items:stretch;min-height:34px}
+.jcHeadRow+.jcHeadRow{border-top:1px solid #333}
+.jcHeadBox{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:4px 5px;margin:2px;
+  border:1px solid #ffd700;border-radius:3px;
+  color:#ffd700;font-weight:900;font-size:11px;
+  text-transform:uppercase;text-align:center;line-height:1.1;
+  min-width:0;word-break:break-word;
 }
-.jcHeadId{
-  color:#ffd700;font-weight:900;font-size:14px;text-transform:uppercase;
-  line-height:1.15;word-break:break-word;
+.jcHeadBoxFare{color:#4ade80}
+.jcHeadBoxSplit{
+  flex:1;display:flex;align-items:stretch;gap:2px;
+  padding:0;margin:2px;min-width:0;
 }
-.jcHeadFare{color:#4ade80;font-weight:900}
-.jcHeadDate{
-  font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1;
-}
-.jcHeadSched{display:flex;align-items:baseline;gap:5px;flex-wrap:wrap;line-height:1.1}
-.jcHeadActs{
-  position:absolute;top:4px;right:4px;z-index:2;
-  display:flex;align-items:center;gap:3px;
-}
-.jcHeadActs .jcActBox{
-  width:22px;height:22px;min-width:22px;
-  font-size:10px!important;border-width:1px;border-radius:4px;
+.jcHeadBoxSplit .jcActBox{
+  flex:1;width:auto;height:auto;min-height:30px;
+  border:1px solid #ffd700;border-radius:3px;
 }
 .jcHeadLbl{font-size:9px;color:#fff;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
 .jcHeadTime{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
@@ -425,10 +421,6 @@ button:disabled{
   text-decoration:none;margin-top:3px;
 }
 .jcPhone:active{opacity:.8}
-.jcFare{
-  font-size:15px;font-weight:900;color:#4ade80;
-  text-transform:uppercase;line-height:1.1;margin-top:2px;
-}
 .jcVehicle{
   flex:0 0 auto;display:flex;align-items:center;gap:5px;
   padding:8px 10px;border-left:1px solid #333;
@@ -1659,13 +1651,7 @@ function getJobPickupDayDateLabel(job) {
 
 function buildJobDetailListHtml(job, docId, source) {
   let html = '<div class="jdList">';
-  html += '<div class="jdMetaRow">' +
-    '<div class="jdMetaLeft">' +
-    '<div class="jdMetaVal">' + escapeHtml(getJobPickupDayDateLabel(job)) + '</div>' +
-    jobScheduleBlockHtml(job) +
-    '</div>' +
-    '<div class="jdMetaRight">';
-  html += '</div></div>';
+  html += jobCardHeaderGridHtml(job, null, source);
   html += jobCardPersonHtml(job, source);
   html += jobRouteHtml(job, true);
 
@@ -2338,20 +2324,51 @@ function getJobScheduleHeader(job) {
   return { label: (job.time || "QUICK").toUpperCase(), time: "ASAP" };
 }
 
-function getJobScheduleTimePart(job) {
-  const schedule = getJobScheduleHeader(job);
-  if (isFutureJob(job) && job.date && !job.timeInput) return "";
-  return schedule.time;
+function getJobPickupTimeDisplay(job) {
+  if (isFutureJob(job) && job.timeInput) {
+    let t = job.timeInput;
+    if (job.ampm && job.ampm !== "None") t += " " + job.ampm;
+    return t.toUpperCase();
+  }
+  if (isFutureJob(job) && job.date && !job.timeInput) return "TBC";
+  return "ASAP";
 }
 
-function jobScheduleBlockHtml(job) {
-  const schedule = getJobScheduleHeader(job);
-  const timePart = getJobScheduleTimePart(job);
-  if (timePart) {
-    return '<div class="jcHeadSched"><span class="jcHeadLbl">' + escapeHtml(schedule.label) + '</span>' +
-      '<span class="jcHeadTime">' + escapeHtml(timePart) + '</span></div>';
+function getJobFareBoxDisplay(job, source) {
+  if (job.status === "completed" || source === "previous") {
+    const recorded = formatFareDisplay(job.fare);
+    if (recorded) return recorded.toUpperCase();
   }
-  return '<div class="jcHeadSched"><span class="jcHeadTime">' + escapeHtml(schedule.label) + '</span></div>';
+  if (job.priceType === "Set Price" && job.price) {
+    const n = parseFloat(String(job.price).replace(/[^0-9.]/g, ""));
+    if (!isNaN(n) && n > 0) {
+      return (n % 1 === 0 ? "$" + n.toFixed(0) : "$" + n.toFixed(2)).toUpperCase();
+    }
+  }
+  if (job.priceType === "Meter Fare") return "METER FARE";
+  if (job.priceType === "Set Price") return "SET PRICE";
+  return "—";
+}
+
+function jobCardHeaderGridHtml(job, docId, source) {
+  const dateLbl = getJobPickupDayDateLabel(job);
+  const pickupTime = getJobPickupTimeDisplay(job);
+  const fareBox = getJobFareBoxDisplay(job, source);
+  const actsBox = docId
+    ? '<div class="jcHeadBoxSplit" onclick="event.stopPropagation()">' + jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>'
+    : '<div class="jcHeadBox"></div>';
+  return '<div class="jcHeadGrid">' +
+    '<div class="jcHeadRow">' +
+    '<div class="jcHeadBox">📋 JOB-' + job.id + '</div>' +
+    '<div class="jcHeadBox">📅 ' + escapeHtml(dateLbl) + '</div>' +
+    actsBox +
+    '</div>' +
+    '<div class="jcHeadRow">' +
+    '<div class="jcHeadBox">PICKUP TIME</div>' +
+    '<div class="jcHeadBox">⏰ ' + escapeHtml(pickupTime) + '</div>' +
+    '<div class="jcHeadBox jcHeadBoxFare">💲 ' + escapeHtml(fareBox) + '</div>' +
+    '</div>' +
+    '</div>';
 }
 
 function jobRouteHtml(job, inModal) {
@@ -2448,31 +2465,15 @@ function jobCardPersonHtml(job, source) {
   const phoneHtml = job.phone
     ? '<a class="jcPhone" href="tel:' + normalizePhone(job.phone) + '" onclick="event.stopPropagation()">📞 ' + escapeHtml(formatPhoneDisplay(job.phone)) + '</a>'
     : "";
-  const fareLabel = formatFareDisplay(job.fare);
-  let fareHtml = "";
-  if (fareLabel && source === "previous") {
-    fareHtml = '<div class="jcFare">FARE ' + escapeHtml(fareLabel.toUpperCase()) + '</div>';
-  }
   return '<div class="jcPerson">' +
     '<div class="jcAvatar">👤</div>' +
-    '<div class="jcPersonInfo"><div class="jcName">' + escapeHtml(name) + '</div>' + fareHtml + phoneHtml + '</div>' +
+    '<div class="jcPersonInfo"><div class="jcName">' + escapeHtml(name) + '</div>' + phoneHtml + '</div>' +
     '<div class="jcVehicle">🚗 ' + escapeHtml(vehicle) + '</div>' +
     '</div>';
 }
 
 function jobCardHeaderHtml(job, docId, source) {
-  const idHtml = '📋 JOB-' + job.id;
-  const actsHtml = docId
-    ? '<div class="jcHeadActs" onclick="event.stopPropagation()">' + jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>'
-    : "";
-  return '<div class="jcHead">' +
-    '<div class="jcHeadMain">' +
-    '<div class="jcHeadId">' + idHtml + '</div>' +
-    '<div class="jcHeadDate">' + escapeHtml(getJobPickupDayDateLabel(job)) + '</div>' +
-    jobScheduleBlockHtml(job) +
-    '</div>' +
-    actsHtml +
-    '</div>';
+  return jobCardHeaderGridHtml(job, docId, source);
 }
 
 function buildJobCardHtml(job, docId, source, actionsHtml, extraHtml) {
@@ -2813,12 +2814,7 @@ function openJobModal(docId, source) {
   const job = findJobById(docId);
   if (!job) return;
 
-  const fareLabel = formatFareDisplay(job.fare);
-  let title = "JOB-" + job.id;
-  if (fareLabel && (job.status === "completed" || source === "previous")) {
-    title += " · FARE " + fareLabel.toUpperCase();
-  }
-  document.getElementById("modalJobTitle").textContent = title;
+  document.getElementById("modalJobTitle").textContent = "JOB-" + job.id;
   document.getElementById("modalJobBody").innerHTML = buildJobDetailListHtml(job, docId, source);
 
   let actions = '<button onclick="copyJobMessage(\'' + docId + '\')">Copy Dispatch</button>';
