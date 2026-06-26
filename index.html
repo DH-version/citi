@@ -365,27 +365,36 @@ button:disabled{
 .jobCardAccepted{border-color:#ffd700}
 .jcHeadGrid{
   display:flex;flex-direction:column;
-  border-bottom:1px solid #333;
+  border-bottom:1px solid #444;
 }
-.jcHeadRow{display:flex;align-items:stretch;min-height:34px}
-.jcHeadRow+.jcHeadRow{border-top:1px solid #333}
+.jcHeadRow{display:flex;align-items:stretch;min-height:44px}
+.jcHeadRow+.jcHeadRow{border-top:1px solid #444}
 .jcHeadBox{
   flex:1;display:flex;align-items:center;justify-content:center;
-  padding:4px 5px;margin:2px;
-  border:1px solid #ffd700;border-radius:3px;
-  color:#ffd700;font-weight:900;font-size:11px;
-  text-transform:uppercase;text-align:center;line-height:1.1;
+  padding:5px 4px;margin:0;
+  border:none;border-radius:0;
+  color:#ffd700;font-weight:900;
+  text-transform:uppercase;text-align:center;line-height:1.05;
   min-width:0;word-break:break-word;
 }
-.jcHeadBoxFare{color:#4ade80}
+.jcHeadBox+.jcHeadBox{border-left:1px solid #444}
+.jcHeadBoxLbl{font-size:11px;color:#fff;font-weight:900;line-height:1.05}
+.jcHeadBoxVal{font-size:clamp(14px,4.5vw,19px);font-weight:900;line-height:1.05}
+.jcHeadBoxTime{font-size:clamp(15px,5vw,21px);font-weight:900;line-height:1.05}
+.jcHeadBoxFare{color:#4ade80;font-size:clamp(14px,4.5vw,19px);font-weight:900;line-height:1.05}
 .jcHeadBoxSplit{
-  flex:1;display:flex;align-items:stretch;gap:2px;
-  padding:0;margin:2px;min-width:0;
+  flex:1;display:flex;align-items:stretch;
+  padding:0;margin:0;min-width:0;
+  border-left:1px solid #444;
 }
 .jcHeadBoxSplit .jcActBox{
-  flex:1;width:auto;height:auto;min-height:30px;
-  border:1px solid #ffd700;border-radius:3px;
+  flex:1;width:auto;height:auto;min-height:44px;
+  border:none;border-radius:0;
+  font-size:17px!important;font-weight:900!important;
 }
+.jcHeadBoxSplit .jcActBox+.jcActBox{border-left:1px solid #444}
+.jcHeadBoxSplit .jcActEdit{color:#ffd700!important;background:#111!important}
+.jcHeadBoxSplit .jcActDel{color:#ff4444!important;background:#111!important}
 .jcHeadLbl{font-size:9px;color:#fff;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
 .jcHeadTime{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
 .jcActBox{
@@ -2359,14 +2368,14 @@ function jobCardHeaderGridHtml(job, docId, source) {
     : '<div class="jcHeadBox"></div>';
   return '<div class="jcHeadGrid">' +
     '<div class="jcHeadRow">' +
-    '<div class="jcHeadBox">📋 JOB-' + job.id + '</div>' +
-    '<div class="jcHeadBox">📅 ' + escapeHtml(dateLbl) + '</div>' +
+    '<div class="jcHeadBox jcHeadBoxVal">JOB-' + job.id + '</div>' +
+    '<div class="jcHeadBox jcHeadBoxVal">' + escapeHtml(dateLbl) + '</div>' +
     actsBox +
     '</div>' +
     '<div class="jcHeadRow">' +
-    '<div class="jcHeadBox">PICKUP TIME</div>' +
-    '<div class="jcHeadBox">⏰ ' + escapeHtml(pickupTime) + '</div>' +
-    '<div class="jcHeadBox jcHeadBoxFare">💲 ' + escapeHtml(fareBox) + '</div>' +
+    '<div class="jcHeadBox jcHeadBoxLbl">PICKUP TIME</div>' +
+    '<div class="jcHeadBox jcHeadBoxVal jcHeadBoxTime">' + escapeHtml(pickupTime) + '</div>' +
+    '<div class="jcHeadBox jcHeadBoxVal jcHeadBoxFare">' + escapeHtml(fareBox) + '</div>' +
     '</div>' +
     '</div>';
 }
