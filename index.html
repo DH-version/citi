@@ -347,7 +347,7 @@ button:disabled{
 .jdLineVal.gold{color:#ffd700}
 .jdLineVal.white{color:#fff}
 .jdCancelRow{padding:10px 12px;border-bottom:1px solid #333;text-align:center}
-.jdList .jcPerson,.jdList .jcRoute,.jdList .jcFooter{border-left:none;border-right:none}
+.jdList .jcPerson,.jdList .jcRoute,.jdList .jcFooter,.jdList .jcHeadGrid{border-left:none;border-right:none}
 .qbField{font-size:17px;padding:13px;margin-bottom:8px}
 .jobList{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 
@@ -365,36 +365,48 @@ button:disabled{
 .jobCardAccepted{border-color:#ffd700}
 .jcHeadGrid{
   display:flex;flex-direction:column;
-  border-bottom:1px solid #444;
+  border-bottom:1px solid #333;
+  background:#000;
 }
-.jcHeadRow{display:flex;align-items:stretch;min-height:44px}
-.jcHeadRow+.jcHeadRow{border-top:1px solid #444}
+.jcHeadRow{display:flex;align-items:stretch;min-height:48px}
+.jcHeadRow+.jcHeadRow{border-top:1px solid #333}
 .jcHeadBox{
-  flex:1;display:flex;align-items:center;justify-content:center;
-  padding:5px 4px;margin:0;
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:8px 6px;margin:0;
   border:none;border-radius:0;
-  color:#ffd700;font-weight:900;
-  text-transform:uppercase;text-align:center;line-height:1.05;
-  min-width:0;word-break:break-word;
+  border-right:1px solid #333;
+  background:#000;
+  text-align:center;min-width:0;
 }
-.jcHeadBox+.jcHeadBox{border-left:1px solid #444}
-.jcHeadBoxLbl{font-size:11px;color:#fff;font-weight:900;line-height:1.05}
-.jcHeadBoxVal{font-size:clamp(14px,4.5vw,19px);font-weight:900;line-height:1.05}
-.jcHeadBoxTime{font-size:clamp(15px,5vw,21px);font-weight:900;line-height:1.05}
-.jcHeadBoxFare{color:#4ade80;font-size:clamp(14px,4.5vw,19px);font-weight:900;line-height:1.05}
+.jcHeadBox:last-child{border-right:none}
+.jcHeadBoxLbl{
+  font-size:9px;color:#fff;font-weight:900;
+  text-transform:uppercase;letter-spacing:.3px;
+  line-height:1.15;
+}
+.jcHeadBoxVal{
+  font-size:clamp(13px,4vw,17px);font-weight:900;
+  color:#ffd700;text-transform:uppercase;line-height:1.15;
+  word-break:break-word;
+}
+.jcHeadBoxTime{font-size:clamp(14px,4.5vw,19px);color:#ffd700}
+.jcHeadBoxFare{color:#4ade80;font-size:clamp(13px,4vw,17px)}
 .jcHeadBoxSplit{
   flex:1;display:flex;align-items:stretch;
   padding:0;margin:0;min-width:0;
-  border-left:1px solid #444;
+  border-right:none;background:#000;
 }
 .jcHeadBoxSplit .jcActBox{
-  flex:1;width:auto;height:auto;min-height:44px;
+  flex:1;width:auto;height:auto;min-height:48px;
   border:none;border-radius:0;
-  font-size:17px!important;font-weight:900!important;
+  border-right:1px solid #333;
+  background:transparent!important;
+  font-size:15px!important;font-weight:900!important;
 }
-.jcHeadBoxSplit .jcActBox+.jcActBox{border-left:1px solid #444}
-.jcHeadBoxSplit .jcActEdit{color:#ffd700!important;background:#111!important}
-.jcHeadBoxSplit .jcActDel{color:#ff4444!important;background:#111!important}
+.jcHeadBoxSplit .jcActBox:last-child{border-right:none}
+.jcHeadBoxSplit .jcActEdit{color:#ffd700!important}
+.jcHeadBoxSplit .jcActDel{color:#ff4444!important}
 .jcHeadLbl{font-size:9px;color:#fff;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
 .jcHeadTime{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
 .jcActBox{
@@ -2373,7 +2385,7 @@ function jobCardHeaderGridHtml(job, docId, source) {
     actsBox +
     '</div>' +
     '<div class="jcHeadRow">' +
-    '<div class="jcHeadBox jcHeadBoxLbl">PICKUP TIME</div>' +
+    '<div class="jcHeadBox"><div class="jcHeadBoxLbl">PICKUP TIME</div></div>' +
     '<div class="jcHeadBox jcHeadBoxVal jcHeadBoxTime">' + escapeHtml(pickupTime) + '</div>' +
     '<div class="jcHeadBox jcHeadBoxVal jcHeadBoxFare">' + escapeHtml(fareBox) + '</div>' +
     '</div>' +
