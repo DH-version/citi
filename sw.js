@@ -1,4 +1,4 @@
-const CACHE = "gpn-v37";
+const CACHE = "gpn-v38";
 
 const ASSETS = [
   "./",
@@ -49,7 +49,13 @@ self.addEventListener("notificationclick", function(event) {
 self.addEventListener("install", function(event) {
   event.waitUntil(
     caches.open(CACHE).then(function(cache) {
-      return cache.addAll(ASSETS);
+      return Promise.all(
+        ASSETS.map(function(url) {
+          return cache.add(url).catch(function(err) {
+            console.warn("SW cache skip:", url, err);
+          });
+        })
+      );
     })
   );
   self.skipWaiting();
