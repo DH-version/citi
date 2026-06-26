@@ -318,7 +318,7 @@ button:disabled{
   flex:0 0 auto;margin:0!important;padding:12px 16px!important;
   background:#1b8a44!important;border-color:#1b8a44!important;
 }
-.jdList{background:#000}
+.jdList{background:#0a1628}
 .jdMetaRow{
   display:flex;justify-content:space-between;align-items:center;
   padding:10px 12px;border-bottom:1px solid #333;
@@ -347,13 +347,13 @@ button:disabled{
 .jdLineVal.gold{color:#ffd700}
 .jdLineVal.white{color:#fff}
 .jdCancelRow{padding:10px 12px;border-bottom:1px solid #333;text-align:center}
-.jdList .jcPerson,.jdList .jcRoute,.jdList .jcFooter,.jdList .jcHeadGrid{border-left:none;border-right:none}
+.jdList .jcPerson,.jdList .jcRoute,.jdList .jcFooter,.jdList .jcHead{border-left:none;border-right:none}
 .qbField{font-size:17px;padding:13px;margin-bottom:8px}
 .jobList{display:flex;flex-direction:column;gap:8px;margin-top:6px}
 
 /* —— Job card (dispatch theme) —— */
 .jobCard{
-  background:#000;
+  background:#0a1628;
   border:2px solid #0066ff;
   border-radius:8px;
   overflow:hidden;
@@ -363,50 +363,56 @@ button:disabled{
   box-shadow:none;
 }
 .jobCardAccepted{border-color:#ffd700}
-.jcHeadGrid{
-  display:flex;flex-direction:column;
-  border-bottom:1px solid #333;
-  background:#000;
+.jcHead{
+  display:flex;align-items:stretch;
+  border-bottom:1px solid #1e3a5f;
+  background:#0a1628;min-height:72px;
 }
-.jcHeadRow{display:flex;align-items:stretch;min-height:48px}
-.jcHeadRow+.jcHeadRow{border-top:1px solid #333}
-.jcHeadBox{
-  flex:1;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  padding:8px 6px;margin:0;
-  border:none;border-radius:0;
-  border-right:1px solid #333;
-  background:#000;
-  text-align:center;min-width:0;
-}
-.jcHeadBox:last-child{border-right:none}
-.jcHeadBoxLbl{
-  font-size:9px;color:#fff;font-weight:900;
-  text-transform:uppercase;letter-spacing:.3px;
-  line-height:1.15;
-}
-.jcHeadBoxVal{
-  font-size:clamp(13px,4vw,17px);font-weight:900;
-  color:#ffd700;text-transform:uppercase;line-height:1.15;
+.jcHeadJob{
+  flex:0 0 26%;display:flex;align-items:center;justify-content:center;
+  padding:8px 6px;border-right:1px solid #1e3a5f;
+  font-size:clamp(14px,4.5vw,20px);font-weight:900;color:#ffd700;
+  text-transform:uppercase;text-align:center;line-height:1.1;
   word-break:break-word;
 }
-.jcHeadBoxTime{font-size:clamp(14px,4.5vw,19px);color:#ffd700}
-.jcHeadBoxFare{color:#4ade80;font-size:clamp(13px,4vw,17px)}
-.jcHeadBoxSplit{
-  flex:1;display:flex;align-items:stretch;
-  padding:0;margin:0;min-width:0;
-  border-right:none;background:#000;
+.jcHeadSched{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  padding:6px 8px;border-right:1px solid #1e3a5f;
+  text-align:center;min-width:0;
 }
-.jcHeadBoxSplit .jcActBox{
-  flex:1;width:auto;height:auto;min-height:48px;
-  border:none;border-radius:0;
-  border-right:1px solid #333;
-  background:transparent!important;
-  font-size:15px!important;font-weight:900!important;
+.jcHeadBoxLbl{
+  font-size:9px;color:#fff;font-weight:900;
+  text-transform:uppercase;letter-spacing:.4px;line-height:1.15;
 }
-.jcHeadBoxSplit .jcActBox:last-child{border-right:none}
-.jcHeadBoxSplit .jcActEdit{color:#ffd700!important}
-.jcHeadBoxSplit .jcActDel{color:#ff4444!important}
+.jcHeadDateLine{
+  font-size:clamp(10px,3vw,12px);font-weight:900;color:#fff;
+  text-transform:uppercase;line-height:1.15;word-break:break-word;
+}
+.jcHeadTimeLine{
+  font-size:clamp(14px,4.5vw,20px);font-weight:900;color:#ffd700;
+  text-transform:uppercase;line-height:1.1;
+}
+.jcHeadFareLine{
+  font-size:clamp(10px,3vw,12px);font-weight:900;color:#4ade80;
+  text-transform:uppercase;line-height:1.15;
+}
+.jcHeadActs{
+  flex:0 0 30%;display:flex;align-items:center;justify-content:center;
+  gap:5px;padding:6px 5px;min-width:0;
+}
+.jcHeadActs .jcActBox{
+  flex:1;width:auto;height:auto;min-height:0;
+  flex-direction:column;gap:2px;
+  border:2px solid;border-radius:6px;
+  background:#0a1628!important;
+  padding:6px 4px!important;margin:0!important;
+  font-size:9px!important;font-weight:900!important;line-height:1!important;
+}
+.jcHeadActs .jcActIcon{font-size:15px;line-height:1;display:block}
+.jcHeadActs .jcActTxt{font-size:8px;letter-spacing:.3px;display:block}
+.jcHeadActs .jcActEdit{color:#ffd700!important;border-color:#ffd700!important}
+.jcHeadActs .jcActDel{color:#ff4444!important;border-color:#dc2626!important}
 .jcHeadLbl{font-size:9px;color:#fff;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
 .jcHeadTime{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
 .jcActBox{
@@ -424,7 +430,8 @@ button:disabled{
 .jdActionRow .jcActBox{width:34px;height:34px;min-width:34px;font-size:15px!important}
 .jcPerson{
   display:flex;align-items:center;
-  border-bottom:1px solid #333;min-height:56px;
+  border-bottom:1px solid #1e3a5f;min-height:58px;
+  background:#0a1628;
 }
 .jcAvatar{
   flex:0 0 52px;display:flex;align-items:center;justify-content:center;
@@ -444,15 +451,16 @@ button:disabled{
 .jcPhone:active{opacity:.8}
 .jcVehicle{
   flex:0 0 auto;display:flex;align-items:center;gap:5px;
-  padding:8px 10px;border-left:1px solid #333;
+  padding:8px 10px;border-left:1px solid #1e3a5f;
   font-size:15px;font-weight:900;color:#fff;text-transform:uppercase;
+  background:#0a1628;
 }
-.jcRoute{border-bottom:1px solid #333}
-.jcAddrRow{display:flex;align-items:stretch;min-height:48px}
-.jcAddrRow+.jcAddrRow{border-top:1px solid #333}
+.jcRoute{border-bottom:1px solid #1e3a5f}
+.jcAddrRow{display:flex;align-items:stretch;min-height:50px}
+.jcAddrRow+.jcAddrRow{border-top:1px solid #1e3a5f}
 .jcAddrLbl{
-  flex:0 0 82px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:1px;
+  flex:0 0 22%;max-width:96px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
   padding:4px 6px;font-size:11px;font-weight:900;
   color:#fff;text-transform:uppercase;text-align:center;line-height:1.05;
   letter-spacing:.2px;
@@ -469,30 +477,37 @@ button:disabled{
 .jcAddrText{
   flex:1;font-size:14px;font-weight:900;color:#000;
   text-transform:uppercase;line-height:1.15;
-  word-break:break-word;
-  overflow:hidden;
+  word-break:break-word;overflow:hidden;
+  display:flex;align-items:center;gap:5px;
 }
+.jcAddrPin{flex:0 0 auto;font-size:14px;line-height:1}
+.jcAddrPinPickup{color:#008000}
+.jcAddrPinDrop{color:#0047ab}
 .jcMapsBtn{
-  flex:0 0 28px;display:flex;align-items:center;justify-content:center;
-  width:28px;height:28px;margin-left:4px;
+  flex:0 0 auto;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  min-width:54px;height:38px;margin-left:4px;padding:2px 4px;
   background:#e8f0fe;border-radius:4px;
-  text-decoration:none;font-size:16px;line-height:1;
+  text-decoration:none;font-size:7px;font-weight:900;line-height:1.05;
+  color:#0047ab;text-transform:uppercase;text-align:center;
   border:1px solid #1e90ff;
 }
-.jcMapsBtn:active{background:#1e90ff}
+.jcMapsIcon{font-size:14px;line-height:1;display:block;margin-bottom:1px}
+.jcMapsBtn:active{background:#1e90ff;color:#fff}
 .jcFooter{
-  display:flex;border-bottom:1px solid #333;
+  display:flex;border-bottom:1px solid #1e3a5f;
+  background:#0a1628;
 }
 .jcFootCol{
   flex:1;padding:8px 6px;text-align:center;
-  border-right:1px solid #333;
+  border-right:1px solid #1e3a5f;
 }
 .jcFootCol:last-child{border-right:none}
 .jcFootLbl{font-size:9px;color:#fff;font-weight:900;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
 .jcFootVal{font-size:13px;font-weight:900;text-transform:uppercase;line-height:1.15}
 .jcFootCancel{display:flex;align-items:center;justify-content:center;padding:4px 6px!important}
 .btnCancelJob{
-  width:100%;margin:0!important;padding:7px 4px!important;
+  width:100%;margin:0!important;padding:8px 4px!important;
   font-size:11px!important;font-weight:900!important;
   background:#dc2626!important;color:#fff!important;
   border:none!important;border-radius:4px!important;
@@ -503,8 +518,8 @@ button:disabled{
 .jcFootVal.white{color:#fff}
 .jcExtra{
   padding:6px 10px;font-size:12px;font-weight:900;
-  color:#888;text-transform:uppercase;border-bottom:1px solid #333;
-  line-height:1.3;
+  color:#888;text-transform:uppercase;border-bottom:1px solid #1e3a5f;
+  line-height:1.3;background:#0a1628;
 }
 .jcExtra span{color:#ffd700;font-weight:900}
 .jcCancelReason{color:#ff6b6b;font-weight:900}
@@ -517,9 +532,9 @@ button:disabled{
 }
 .jobActions{display:flex;gap:0;margin:0}
 .jobActions button{
-  flex:1;margin:0!important;border-radius:0!important;
-  border:none!important;padding:14px 8px!important;
-  font-size:14px!important;font-weight:800!important;
+  flex:1;margin:0!important;border-radius:0 0 6px 6px!important;
+  border:none!important;padding:16px 8px!important;
+  font-size:15px!important;font-weight:900!important;
 }
 .btnAccept,.btnAcceptJob{background:#1b8a44!important;color:#fff!important}
 .btnComplete{background:#1b8a44!important;color:#fff!important}
@@ -1652,7 +1667,7 @@ function jdLineHtml(label, value, valueClass) {
     '<div class="jdLineVal' + (valueClass ? " " + valueClass : "") + '">' + escapeHtml(value) + '</div></div>';
 }
 
-function getJobPickupDayDateLabel(job) {
+function getJobPickupDayDateLabel(job, withYear) {
   let dateStr = job.date;
   if (isFutureJob(job) && !dateStr && job.timeInput) dateStr = getTodayDate();
   let d;
@@ -1666,8 +1681,15 @@ function getJobPickupDayDateLabel(job) {
     d = new Date();
   }
   const day = d.toLocaleDateString("en-AU", { weekday: "short" }).toUpperCase();
-  const datePart = d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }).toUpperCase();
+  const datePart = d.toLocaleDateString("en-AU", withYear
+    ? { day: "numeric", month: "short", year: "numeric" }
+    : { day: "numeric", month: "short" }).toUpperCase();
   return day + " " + datePart;
+}
+
+function getJobScheduleTypeLabel(job) {
+  if (isFutureJob(job)) return "SCHEDULED";
+  return (job.time || "QUICK").toUpperCase();
 }
 
 function buildJobDetailListHtml(job, docId, source) {
@@ -2306,11 +2328,13 @@ function focusModalInput(input, selectAll) {
 }
 
 function jobDeleteBtn(docId) {
-  return '<button type="button" class="jcActBox jcActDel" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">🗑</button>';
+  return '<button type="button" class="jcActBox jcActDel" onclick="promptDeleteJob(\'' + docId + '\', event)" title="Delete">' +
+    '<span class="jcActIcon">🗑</span><span class="jcActTxt">DELETE</span></button>';
 }
 
 function jobEditBtn(docId) {
-  return '<button type="button" class="jcActBox jcActEdit" onclick="editJobInForm(\'' + docId + '\', event)" title="Edit">✏</button>';
+  return '<button type="button" class="jcActBox jcActEdit" onclick="editJobInForm(\'' + docId + '\', event)" title="Edit">' +
+    '<span class="jcActIcon">✏</span><span class="jcActTxt">EDIT</span></button>';
 }
 
 function googleMapsUrl(address) {
@@ -2321,7 +2345,8 @@ function googleMapsUrl(address) {
 function mapsLinkHtml(address) {
   const url = googleMapsUrl(address);
   if (!url) return "";
-  return '<a class="jcMapsBtn" href="' + url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Google Maps">🗺</a>';
+  return '<a class="jcMapsBtn" href="' + url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Google Maps">' +
+    '<span class="jcMapsIcon">🗺</span>VIEW MAP</a>';
 }
 
 function formatDispatchedTimeOnly(job) {
@@ -2372,23 +2397,23 @@ function getJobFareBoxDisplay(job, source) {
 }
 
 function jobCardHeaderGridHtml(job, docId, source) {
-  const dateLbl = getJobPickupDayDateLabel(job);
+  const schedLbl = getJobScheduleTypeLabel(job);
+  const dateLbl = getJobPickupDayDateLabel(job, true);
   const pickupTime = getJobPickupTimeDisplay(job);
   const fareBox = getJobFareBoxDisplay(job, source);
-  const actsBox = docId
-    ? '<div class="jcHeadBoxSplit" onclick="event.stopPropagation()">' + jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>'
-    : '<div class="jcHeadBox"></div>';
-  return '<div class="jcHeadGrid">' +
-    '<div class="jcHeadRow">' +
-    '<div class="jcHeadBox jcHeadBoxVal">JOB-' + job.id + '</div>' +
-    '<div class="jcHeadBox jcHeadBoxVal">' + escapeHtml(dateLbl) + '</div>' +
-    actsBox +
-    '</div>' +
-    '<div class="jcHeadRow">' +
-    '<div class="jcHeadBox"><div class="jcHeadBoxLbl">PICKUP TIME</div></div>' +
-    '<div class="jcHeadBox jcHeadBoxVal jcHeadBoxTime">' + escapeHtml(pickupTime) + '</div>' +
-    '<div class="jcHeadBox jcHeadBoxVal jcHeadBoxFare">' + escapeHtml(fareBox) + '</div>' +
-    '</div>' +
+  let schedHtml = '<div class="jcHeadBoxLbl">' + escapeHtml(schedLbl) + '</div>' +
+    '<div class="jcHeadDateLine">📅 ' + escapeHtml(dateLbl) + '</div>' +
+    '<div class="jcHeadTimeLine">🕐 ' + escapeHtml(pickupTime) + '</div>';
+  if (fareBox && fareBox !== "—") {
+    schedHtml += '<div class="jcHeadFareLine">' + escapeHtml(fareBox) + '</div>';
+  }
+  const actsHtml = docId
+    ? '<div class="jcHeadActs" onclick="event.stopPropagation()">' + jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>'
+    : '<div class="jcHeadActs"></div>';
+  return '<div class="jcHead">' +
+    '<div class="jcHeadJob">📋 JOB-' + job.id + '</div>' +
+    '<div class="jcHeadSched">' + schedHtml + '</div>' +
+    actsHtml +
     '</div>';
 }
 
@@ -2404,11 +2429,13 @@ function jobRouteHtml(job, inModal) {
   let html = '<div class="jcRoute">';
   html += '<div class="jcAddrRow">' +
     '<div class="jcAddrLbl jcAddrLblPickup">📍<br>PICK UP</div>' +
-    '<div class="jcAddrBox"><span class="jcAddrText">' + escapeHtml(pickup || "—") + '</span>' +
+    '<div class="jcAddrBox"><span class="jcAddrText"><span class="jcAddrPin jcAddrPinPickup">📍</span>' +
+    escapeHtml(pickup || "—") + '</span>' +
     mapsLinkHtml(pickup) + '</div></div>';
   html += '<div class="jcAddrRow">' +
     '<div class="jcAddrLbl jcAddrLblDrop">📍<br>DROP OFF</div>' +
-    '<div class="jcAddrBox"><span class="jcAddrText">' + escapeHtml(drop || "—") + '</span>' +
+    '<div class="jcAddrBox"><span class="jcAddrText"><span class="jcAddrPin jcAddrPinDrop">📍</span>' +
+    escapeHtml(drop || "—") + '</span>' +
     mapsLinkHtml(drop) + '</div></div>';
   html += '</div>';
   return html;
@@ -2430,7 +2457,7 @@ function jobCardFooterHtml(job, source, options) {
       escapeHtml((job.canceledBy || "—").toUpperCase()) + '</div></div>';
   } else if (isActive && (source === "available" || options.inModal) && docId) {
     col3Html = '<div class="jcFootCol jcFootCancel" onclick="event.stopPropagation()">' +
-      '<button type="button" class="btnCancelJob" onclick="promptCancelJob(\'' + docId + '\', event)">CANCEL</button></div>';
+      '<button type="button" class="btnCancelJob" onclick="promptCancelJob(\'' + docId + '\', event)">✕ CANCEL</button></div>';
   } else {
     col3Html = '<div class="jcFootCol"><div class="jcFootLbl">&nbsp;</div><div class="jcFootVal white">—</div></div>';
   }
