@@ -1509,6 +1509,7 @@ async function initPushNotifications(operatorName) {
       return;
     }
     if (token !== pushTokenSaved) await savePushToken(operatorName, token);
+    showToast("Push alerts enabled — works when app is closed");
     messaging.onMessage(function(payload) {
       const n = payload.notification || {};
       const title = n.title || "GPN Dispatch";
@@ -1517,6 +1518,7 @@ async function initPushNotifications(operatorName) {
     });
   } catch (err) {
     console.error("Push init failed", err);
+    showToast("Push setup failed — refresh and try again", true);
   }
 }
 
