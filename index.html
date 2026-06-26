@@ -646,6 +646,11 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   background:#cc0000;color:#fff;font-size:10px;
   padding:1px 6px;border-radius:10px;min-width:18px;
 }
+.filterTypeBtn .filterBadge{
+  position:absolute;top:2px;right:4px;
+  background:#cc0000;color:#fff;font-size:10px;font-weight:800;
+  padding:1px 5px;border-radius:10px;min-width:16px;line-height:1.2;
+}
 
 .prevHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .prevHeader h3{margin:0}
@@ -658,7 +663,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .filterLabel{font-size:10px;color:#888;margin-bottom:4px;text-transform:uppercase;font-weight:800}
 .filterRow{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
 .filterOpBtn{flex:1;min-width:28%;font-size:10px;padding:8px 4px;margin:0}
-.filterTypeBtn{flex:1;font-size:11px;padding:10px;margin:0}
+.filterTypeBtn{flex:1;font-size:11px;padding:10px;margin:0;position:relative}
 .filterOpBtn.selected,.filterTypeBtn.selected{
   background:#ffd700!important;color:#000!important;
   border-color:#ffd700!important;
@@ -875,7 +880,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <h3>Available Bookings</h3>
   <div class="availToggle">
     <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
-    <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Future Bookings</button>
+    <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Future Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
   </div>
   <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
   <div id="availableList" class="jobList"></div>
@@ -1002,6 +1007,19 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button style="background:#dc2626;flex:1" onclick="confirmCancelJob()">Confirm Cancel</button>
       <button style="background:#64748b;flex:1" onclick="closeCancelReasonModal()">Back</button>
     </div>
+  </div>
+</div>
+
+<!-- FOLLOW UP MODAL -->
+<div id="followUpModal" class="modalOverlay" onclick="if(event.target===this)closeFollowUpModal()">
+  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
+    <h3 style="color:#8b5cf6;margin-bottom:4px;text-align:center">Follow Up</h3>
+    <p style="text-align:center;color:#94a3b8;font-size:12px;margin-bottom:12px">Choose message type to send</p>
+    <div class="pinActions">
+      <button style="background:#8b5cf6;flex:1" onclick="sendFollowUpMarketing()">Marketing</button>
+      <button style="background:#2563eb;flex:1" onclick="sendFollowUpCompliance()">Compliance</button>
+    </div>
+    <button style="width:100%;background:#64748b;margin-top:8px" onclick="closeFollowUpModal()">Cancel</button>
   </div>
 </div>
 
@@ -1974,6 +1992,25 @@ function isCurrentJob(job) {
   return !isFutureJob(job);
 }
 
+function updateAvailableBadges() {
+  const currentCount = availableJobs.filter(function(j) {
+    return j.status === "available" && isCurrentJob(j);
+  }).length;
+  const futureCount = availableJobs.filter(function(j) {
+    return j.status === "available" && isFutureJob(j);
+  }).length;
+  const navBadge = document.getElementById("availableBadge");
+  if (navBadge) {
+    navBadge.textContent = currentCount;
+    navBadge.style.display = currentCount ? "inline" : "none";
+  }
+  const futureBadge = document.getElementById("futureBadge");
+  if (futureBadge) {
+    futureBadge.textContent = futureCount;
+    futureBadge.style.display = futureCount ? "inline" : "none";
+  }
+}
+
 function setAvailableView(view) {
   availableView = view;
   document.getElementById("availCurrentBtn").classList.toggle("selected", view === "current");
@@ -2284,9 +2321,7 @@ function applyOptimisticCancel(docId, op, reason) {
   if (!job) return;
   availableJobs = availableJobs.filter(function(j) { return j.docId !== docId; });
   scheduleRenderAvailable();
-  const openCount = availableJobs.filter(function(j) { return j.status === "available" && isCurrentJob(j); }).length;
-  document.getElementById("availableBadge").textContent = openCount;
-  document.getElementById("availableBadge").style.display = openCount ? "inline" : "none";
+  updateAvailableBadges();
   const updated = Object.assign({}, job, {
     status: "cancelled",
     canceledBy: op,
@@ -2866,9 +2901,7 @@ function subscribeAvailableJobs() {
         return (a.sortKey || 0) - (b.sortKey || 0);
       });
       scheduleRenderAvailable();
-      const openCount = availableJobs.filter(function(j) { return j.status === "available" && isCurrentJob(j); }).length;
-      document.getElementById("availableBadge").textContent = openCount;
-      document.getElementById("availableBadge").style.display = openCount ? "inline" : "none";
+      updateAvailableBadges();
 
       if (jobsListenerReady) {
         changes.forEach(function(change) {
@@ -2965,7 +2998,7 @@ async function openJobModalAsync(docId, source) {
       console.warn("Job fetch failed", e);
     }
   }
-  if (!job) return;
+  if (!job) return false;
 
   document.getElementById("modalJobTitle").textContent = "JOB-" + job.id;
   document.getElementById("modalJobBody").innerHTML = buildJobDetailListHtml(job, docId, source);
@@ -2981,6 +3014,7 @@ async function openJobModalAsync(docId, source) {
   }
   document.getElementById("modalJobActions").innerHTML = actions;
   document.getElementById("jobModal").classList.add("open");
+  return true;
 }
 
 function closeJobModal() {
@@ -3262,31 +3296,22 @@ function playNewJobTune() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const t0 = audioCtx.currentTime;
-    const notes = [
-      { f: 329.63, s: 0.00, d: 0.16 },
-      { f: 293.66, s: 0.14, d: 0.16 },
-      { f: 329.63, s: 0.28, d: 0.16 },
-      { f: 392.00, s: 0.42, d: 0.20 },
-      { f: 329.63, s: 0.60, d: 0.16 },
-      { f: 293.66, s: 0.74, d: 0.16 },
-      { f: 261.63, s: 0.88, d: 0.16 },
-      { f: 293.66, s: 1.02, d: 0.16 },
-      { f: 329.63, s: 1.16, d: 0.20 },
-      { f: 392.00, s: 1.34, d: 0.22 },
-      { f: 493.88, s: 1.54, d: 0.28 },
-      { f: 523.25, s: 1.78, d: 0.22 }
+    const melody = [
+      { f: 784, s: 0.00, d: 0.12, vol: 0.4 },
+      { f: 988, s: 0.10, d: 0.15, vol: 0.45 },
+      { f: 1175, s: 0.22, d: 0.35, vol: 0.4 }
     ];
-    notes.forEach(function(n) {
+    melody.forEach(function(n) {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = "sine";
+      osc.type = "triangle";
       osc.frequency.setValueAtTime(n.f, t0 + n.s);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       const start = t0 + n.s;
       const end = start + n.d;
       gain.gain.setValueAtTime(0.001, start);
-      gain.gain.exponentialRampToValueAtTime(0.7, start + 0.02);
+      gain.gain.exponentialRampToValueAtTime(n.vol, start + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.001, end);
       osc.start(start);
       osc.stop(end + 0.02);
@@ -3323,7 +3348,6 @@ function alertNewJobArrival() {
 
 async function openJobFromNotification(docId, playAlert) {
   if (!docId) return;
-  if (playAlert) alertNewJobArrival();
   if (!getCurrentOperator()) {
     sessionStorage.setItem("pendingOpenJob", docId);
     sessionStorage.setItem("pendingOpenJobAlert", playAlert ? "1" : "0");
@@ -3333,16 +3357,60 @@ async function openJobFromNotification(docId, playAlert) {
   sessionStorage.removeItem("pendingOpenJobAlert");
   const tabBtn = document.querySelector('[data-tab="tabAvailable"]');
   if (tabBtn) switchTab("tabAvailable", tabBtn);
-  const job = findJobById(docId);
+
+  let job = findJobById(docId);
+  if (!job && firebaseReady && db) {
+    try {
+      const doc = await db.collection("jobs").doc(docId).get();
+      if (doc.exists) job = Object.assign({ docId: doc.id }, doc.data());
+    } catch (e) {
+      console.warn("Job fetch failed", e);
+    }
+  }
+  if (job && isFutureJob(job)) setAvailableView("future");
+  else setAvailableView("current");
+
   const source = job && job.status === "completed" ? "completed" : "available";
-  await openJobModalAsync(docId, source);
+  let opened = await openJobModalAsync(docId, source);
+  if (!opened) {
+    for (let i = 0; i < 25; i++) {
+      await new Promise(function(r) { setTimeout(r, 60); });
+      opened = await openJobModalAsync(docId, source);
+      if (opened) break;
+    }
+  }
+  if (playAlert) alertNewJobArrival();
+}
+
+function queueOpenJobFromPush(docId, playAlert) {
+  let tries = 0;
+  function attempt() {
+    if (firebaseReady && getCurrentOperator()) {
+      openJobFromNotification(docId, playAlert);
+      return;
+    }
+    if (firebaseReady && !getCurrentOperator()) {
+      sessionStorage.setItem("pendingOpenJob", docId);
+      sessionStorage.setItem("pendingOpenJobAlert", playAlert ? "1" : "0");
+      return;
+    }
+    if (tries++ < 80) setTimeout(attempt, 50);
+    else openJobFromNotification(docId, playAlert);
+  }
+  attempt();
+}
+
+function handlePushNavigation(msg) {
+  if (!msg || msg.type !== "openJob" || !msg.docId) return;
+  const playAlert = msg.pushType === "new_job" || msg.pushType === "job_recalled";
+  queueOpenJobFromPush(msg.docId, playAlert);
 }
 
 function processPendingOpenJob() {
   const docId = sessionStorage.getItem("pendingOpenJob");
   if (!docId || !getCurrentOperator()) return;
   const playAlert = sessionStorage.getItem("pendingOpenJobAlert") === "1";
-  openJobFromNotification(docId, playAlert);
+  queueOpenJobFromPush(docId, playAlert);
 }
 
 function handleNotificationDeepLink() {
@@ -3352,9 +3420,7 @@ function handleNotificationDeepLink() {
   const type = params.get("type") || "";
   const playAlert = type === "new_job" || type === "job_recalled";
   history.replaceState({}, "", window.location.pathname);
-  setTimeout(function() {
-    openJobFromNotification(docId, playAlert);
-  }, 600);
+  queueOpenJobFromPush(docId, playAlert);
 }
 
 function showNewJobAlert(job) {
@@ -3817,13 +3883,40 @@ function sendConfirmation() {
   window.location.href = "sms:" + phone + "&body=" + encodeURIComponent(msg);
 }
 
+function closeFollowUpModal() {
+  document.getElementById("followUpModal").classList.remove("open");
+}
+
+function openFollowUpSms(msg) {
+  const phone = document.getElementById("phone").value.replace(/\s+/g, "");
+  closeFollowUpModal();
+  window.location.href = "sms:" + phone + "&body=" + encodeURIComponent(msg);
+}
+
+function sendFollowUpMarketing() {
+  const name = titleCase(document.getElementById("name").value);
+  const msg = "Hi " + name + ",\n\nThanks for riding with Geelong City Cabs today.\nWe're here 24/7 for all your travel needs." + SIGNATURE;
+  openFollowUpSms(msg);
+}
+
+function sendFollowUpCompliance() {
+  const name = titleCase(document.getElementById("name").value);
+  const msg = "Hi " + name + ",\n\nThanks for riding with Geelong City Cabs today.\n\nWe'd like to hear about your recent trip. If you experienced any concerns or would like us to contact you, please reply to this message with your comments.\n\n🚖 Geelong City Cabs\n🛡️ Compliance Team\n📞 0426 885 690\n🌎 www.geelongcitytaxicab.com.au";
+  openFollowUpSms(msg);
+}
+
 function sendFollowUp() {
   if (!requireOperator("send follow up")) return;
   const name = titleCase(document.getElementById("name").value);
   const phone = document.getElementById("phone").value.replace(/\s+/g, "");
   if (!name || !phone) { alert("Please enter Passenger Name and Phone Number"); return; }
-  const msg = "Hi " + name + ",\n\nThanks for riding with Geelong City Cabs today.\nWe're here 24/7 for all your travel needs." + SIGNATURE;
-  window.location.href = "sms:" + phone + "&body=" + encodeURIComponent(msg);
+  document.getElementById("followUpModal").classList.add("open");
+}
+
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.addEventListener("message", function(event) {
+    handlePushNavigation(event.data);
+  });
 }
 
 window.addEventListener("DOMContentLoaded", function() {
@@ -3839,13 +3932,6 @@ window.addEventListener("DOMContentLoaded", function() {
 
   if ("serviceWorker" in navigator) {
     ensureServiceWorker();
-    navigator.serviceWorker.addEventListener("message", function(event) {
-      const msg = event.data || {};
-      if (msg.type === "openJob" && msg.docId) {
-        const playAlert = msg.pushType === "new_job" || msg.pushType === "job_recalled";
-        openJobFromNotification(msg.docId, playAlert);
-      }
-    });
   }
   handleNotificationDeepLink();
   document.getElementById("pinInput").addEventListener("keydown", function(e) {
