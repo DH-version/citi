@@ -1,4 +1,4 @@
-const CACHE = "gpn-v38";
+const CACHE = "gpn-v40";
 
 const ASSETS = [
   "./",
@@ -17,31 +17,33 @@ importScripts("./firebase-config.js");
 
 if (typeof firebaseConfig !== "undefined" && firebaseConfig.projectId && firebaseConfig.projectId !== "YOUR_PROJECT_ID") {
   firebase.initializeApp(firebaseConfig);
-  const messaging = firebase.messaging();
-  messaging.onBackgroundMessage(function(payload) {
-    const n = payload.notification || {};
-    const title = n.title || "GPN Dispatch";
-    const body = n.body || "";
-    const data = payload.data || {};
-    return self.registration.showNotification(title, {
-      body: body,
-      icon: "./icons/icon-192.png",
-      badge: "./icons/icon-192.png",
-      data: data,
-      tag: data.docId || data.type || "gpn-push",
-      renotify: true
-    });
-  });
+  firebase.messaging();
+  // Background alerts use the notification payload from the server — do not call
+  // showNotification here or each push appears twice.
 }
 
 self.addEventListener("notificationclick", function(event) {
   event.notification.close();
+  const data = event.notification.data || {};
+  const docId = data.docId || "";
+  const pushType = data.type || "";
+  let url = "./index.html";
+  if (docId) {
+    url += "?job=" + encodeURIComponent(docId);
+    if (pushType) url += "&type=" + encodeURIComponent(pushType);
+  }
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(list) {
-      for (let i = 0; i < list.length; i++) {
-        if ("focus" in list[i]) return list[i].focus();
+      for (var i = 0; i < list.length; i++) {
+        var client = list[i];
+        var href = client.url || "";
+        if (href.indexOf("index.html") !== -1 || href.indexOf("/citi") !== -1) {
+          client.focus();
+          client.postMessage({ type: "openJob", docId: docId, pushType: pushType });
+          return;
+        }
       }
-      if (clients.openWindow) return clients.openWindow("./index.html");
+      if (clients.openWindow) return clients.openWindow(url);
     })
   );
 });
