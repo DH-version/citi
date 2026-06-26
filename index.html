@@ -1076,6 +1076,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <script src="firebase-config.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js"></script>
 <script>
 const GOOGLE_MAPS_API_KEY = "AIzaSyDMA_Frd6ut6hv4s0YnoWoYdI4hRoEWZs4";
 const GEELONG_CENTER = { lat: -38.1499, lng: 144.3617 };
@@ -1099,6 +1100,9 @@ let selectedVehicle = "None", selectedTime = "None", selectedAMPM = "None";
 let paymentArray = [], priceType = "None";
 let autocompleteService, map;
 let db, firebaseReady = false;
+let messaging = null;
+let pushSwRegistration = null;
+let pushTokenSaved = "";
 let availableJobs = [], previousJobs = [], completedJobs = [], filterResultJobs = [], historyJobs = [];
 let teamOperators = AUTHORIZED_OPERATORS.slice();
 let selectedFilterOperator = "", selectedFilterType = "";
@@ -1320,10 +1324,12 @@ async function claimOperatorSession(canonical, silent) {
     }, { merge: true });
     saveOperatorLocally(canonical);
     watchOperatorSession(canonical);
+    initPushNotifications(canonical);
     return true;
   } catch (e) {
     console.error(e);
     saveOperatorLocally(canonical);
+    initPushNotifications(canonical);
     return true;
   }
 }
@@ -1348,6 +1354,7 @@ function signOutOperator(forced, otherDeviceId) {
     operatorSessionUnsub();
     operatorSessionUnsub = null;
   }
+  removePushTokenForDevice();
   document.getElementById("operator").value = "";
   localStorage.removeItem("operatorName");
   localStorage.removeItem("operatorSession");
@@ -1364,6 +1371,7 @@ async function onOperatorInput() {
   const raw = el.value;
   if (!raw.trim()) {
     if (getCurrentOperator()) await releaseOperatorSession(getCurrentOperator());
+    await removePushTokenForDevice();
     localStorage.removeItem("operatorName");
     localStorage.removeItem("operatorSession");
     updateOperatorAccess(false);
@@ -1438,6 +1446,78 @@ function setSyncStatus(msg, isError) {
   const el = document.getElementById("syncStatus");
   el.textContent = msg;
   el.className = "syncStatus" + (isError ? " error" : " online");
+}
+
+async function ensureServiceWorker() {
+  if (pushSwRegistration) return pushSwRegistration;
+  if (!("serviceWorker" in navigator)) return null;
+  try {
+    pushSwRegistration = await navigator.serviceWorker.register("sw.js", { scope: "./" });
+    await navigator.serviceWorker.ready;
+    return pushSwRegistration;
+  } catch (err) {
+    console.warn("Service worker registration failed:", err);
+    return null;
+  }
+}
+
+async function savePushToken(operator, token) {
+  if (!firebaseReady || !operator || !token || !deviceId) return;
+  pushTokenSaved = token;
+  await db.collection("pushTokens").doc(deviceId).set({
+    operator: operator,
+    token: token,
+    sessionId: sessionId,
+    deviceId: deviceId,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+}
+
+async function removePushTokenForDevice() {
+  pushTokenSaved = "";
+  if (!firebaseReady || !deviceId) return;
+  try {
+    await db.collection("pushTokens").doc(deviceId).delete();
+  } catch (e) {
+    console.warn("Push token remove failed", e);
+  }
+}
+
+async function initPushNotifications(operatorName) {
+  if (!firebaseReady || !operatorName) return;
+  if (!("Notification" in window) || !firebase.messaging) return;
+  if (!firebaseVapidKey || firebaseVapidKey === "YOUR_VAPID_KEY") {
+    console.warn("Add firebaseVapidKey in firebase-config.js for push notifications");
+    return;
+  }
+  try {
+    const reg = await ensureServiceWorker();
+    if (!reg) return;
+    if (!messaging) messaging = firebase.messaging();
+    let permission = Notification.permission;
+    if (permission === "default") permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      showToast("Push blocked — enable notifications in browser settings", true);
+      return;
+    }
+    const token = await messaging.getToken({
+      vapidKey: firebaseVapidKey,
+      serviceWorkerRegistration: reg
+    });
+    if (!token) {
+      showToast("Could not enable push on this device", true);
+      return;
+    }
+    if (token !== pushTokenSaved) await savePushToken(operatorName, token);
+    messaging.onMessage(function(payload) {
+      const n = payload.notification || {};
+      const title = n.title || "GPN Dispatch";
+      const body = n.body || "";
+      showToast(title + (body ? " — " + body : ""));
+    });
+  } catch (err) {
+    console.error("Push init failed", err);
+  }
 }
 
 function normalizePhone(phone) {
@@ -3668,9 +3748,7 @@ window.addEventListener("DOMContentLoaded", function() {
   document.head.appendChild(s);
 
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js", { scope: "./" }).catch(function(err) {
-      console.warn("Service worker registration failed:", err);
-    });
+    ensureServiceWorker();
   }
   document.getElementById("pinInput").addEventListener("keydown", function(e) {
     if (e.key === "Enter") confirmPinAction();
