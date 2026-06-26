@@ -1,4 +1,4 @@
-const CACHE = "gpn-v32";
+const CACHE = "gpn-v33";
 
 const ASSETS = [
   "./",
