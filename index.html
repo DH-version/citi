@@ -1285,6 +1285,7 @@ async function restoreOperatorSession() {
     saveOperatorLocally(canonical);
     watchOperatorSession(canonical);
     if (firebaseReady) claimOperatorSession(canonical, true);
+    else processPendingOpenJob();
   } else {
     localStorage.removeItem("operatorName");
     localStorage.removeItem("operatorSession");
@@ -1325,11 +1326,13 @@ async function claimOperatorSession(canonical, silent) {
     saveOperatorLocally(canonical);
     watchOperatorSession(canonical);
     initPushNotifications(canonical);
+    processPendingOpenJob();
     return true;
   } catch (e) {
     console.error(e);
     saveOperatorLocally(canonical);
     initPushNotifications(canonical);
+    processPendingOpenJob();
     return true;
   }
 }
@@ -1511,6 +1514,12 @@ async function initPushNotifications(operatorName) {
     if (token !== pushTokenSaved) await savePushToken(operatorName, token);
     showToast("Push alerts enabled — works when app is closed");
     messaging.onMessage(function(payload) {
+      const data = payload.data || {};
+      if (data.type === "new_job") return;
+      if (data.type === "job_recalled") {
+        alertNewJobArrival();
+        return;
+      }
       const n = payload.notification || {};
       const title = n.title || "GPN Dispatch";
       const body = n.body || "";
@@ -2943,7 +2952,19 @@ function escapeHtml(str) {
 }
 
 function openJobModal(docId, source) {
-  const job = findJobById(docId);
+  openJobModalAsync(docId, source);
+}
+
+async function openJobModalAsync(docId, source) {
+  let job = findJobById(docId);
+  if (!job && firebaseReady && db) {
+    try {
+      const doc = await db.collection("jobs").doc(docId).get();
+      if (doc.exists) job = Object.assign({ docId: doc.id }, doc.data());
+    } catch (e) {
+      console.warn("Job fetch failed", e);
+    }
+  }
   if (!job) return;
 
   document.getElementById("modalJobTitle").textContent = "JOB-" + job.id;
@@ -3241,35 +3262,103 @@ function playNewJobTune() {
   try {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const t0 = audioCtx.currentTime;
-    const melody = [
-      { f: 523.25, s: 0.00, d: 0.18, vol: 0.28 },
-      { f: 659.25, s: 0.14, d: 0.18, vol: 0.28 },
-      { f: 783.99, s: 0.28, d: 0.22, vol: 0.30 },
-      { f: 1046.50, s: 0.44, d: 0.35, vol: 0.32 },
-      { f: 880.00, s: 0.72, d: 0.25, vol: 0.26 },
-      { f: 1046.50, s: 0.95, d: 0.55, vol: 0.30 },
-      { f: 1318.51, s: 1.35, d: 0.65, vol: 0.24 }
+    const notes = [
+      { f: 329.63, s: 0.00, d: 0.16 },
+      { f: 293.66, s: 0.14, d: 0.16 },
+      { f: 329.63, s: 0.28, d: 0.16 },
+      { f: 392.00, s: 0.42, d: 0.20 },
+      { f: 329.63, s: 0.60, d: 0.16 },
+      { f: 293.66, s: 0.74, d: 0.16 },
+      { f: 261.63, s: 0.88, d: 0.16 },
+      { f: 293.66, s: 1.02, d: 0.16 },
+      { f: 329.63, s: 1.16, d: 0.20 },
+      { f: 392.00, s: 1.34, d: 0.22 },
+      { f: 493.88, s: 1.54, d: 0.28 },
+      { f: 523.25, s: 1.78, d: 0.22 }
     ];
-    melody.forEach(function(n) {
+    notes.forEach(function(n) {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = "triangle";
+      osc.type = "sine";
       osc.frequency.setValueAtTime(n.f, t0 + n.s);
       osc.connect(gain);
       gain.connect(audioCtx.destination);
       const start = t0 + n.s;
       const end = start + n.d;
       gain.gain.setValueAtTime(0.001, start);
-      gain.gain.exponentialRampToValueAtTime(n.vol, start + 0.025);
+      gain.gain.exponentialRampToValueAtTime(0.7, start + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.001, end);
       osc.start(start);
       osc.stop(end + 0.02);
     });
-  } catch (e) { console.warn("Audio blocked", e); }
+    return true;
+  } catch (e) {
+    console.warn("Audio blocked", e);
+    return false;
+  }
+}
+
+function vibrateNewJobAlert() {
+  if (!navigator.vibrate) return;
+  navigator.vibrate([600, 200, 600, 200, 600]);
+}
+
+function alertNewJobArrival() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  var audioBlocked = audioCtx.state === "suspended";
+  var resume = audioCtx.resume ? audioCtx.resume() : null;
+  function runTune() {
+    audioBlocked = !playNewJobTune();
+    if (audioBlocked) vibrateNewJobAlert();
+  }
+  if (resume && resume.then) {
+    resume.then(runTune).catch(function() {
+      audioBlocked = true;
+      vibrateNewJobAlert();
+    });
+  } else {
+    runTune();
+  }
+}
+
+async function openJobFromNotification(docId, playAlert) {
+  if (!docId) return;
+  if (playAlert) alertNewJobArrival();
+  if (!getCurrentOperator()) {
+    sessionStorage.setItem("pendingOpenJob", docId);
+    sessionStorage.setItem("pendingOpenJobAlert", playAlert ? "1" : "0");
+    return;
+  }
+  sessionStorage.removeItem("pendingOpenJob");
+  sessionStorage.removeItem("pendingOpenJobAlert");
+  const tabBtn = document.querySelector('[data-tab="tabAvailable"]');
+  if (tabBtn) switchTab("tabAvailable", tabBtn);
+  const job = findJobById(docId);
+  const source = job && job.status === "completed" ? "completed" : "available";
+  await openJobModalAsync(docId, source);
+}
+
+function processPendingOpenJob() {
+  const docId = sessionStorage.getItem("pendingOpenJob");
+  if (!docId || !getCurrentOperator()) return;
+  const playAlert = sessionStorage.getItem("pendingOpenJobAlert") === "1";
+  openJobFromNotification(docId, playAlert);
+}
+
+function handleNotificationDeepLink() {
+  const params = new URLSearchParams(window.location.search);
+  const docId = params.get("job");
+  if (!docId) return;
+  const type = params.get("type") || "";
+  const playAlert = type === "new_job" || type === "job_recalled";
+  history.replaceState({}, "", window.location.pathname);
+  setTimeout(function() {
+    openJobFromNotification(docId, playAlert);
+  }, 600);
 }
 
 function showNewJobAlert(job) {
-  playNewJobTune();
+  alertNewJobArrival();
   const toast = document.getElementById("alertToast");
   document.getElementById("alertText").textContent =
     "JOB-" + job.id + " · " + (job.name || "New passenger") + " · " + (job.pickup || "");
@@ -3277,7 +3366,6 @@ function showNewJobAlert(job) {
   toast.dataset.docId = job.docId;
   if (alertTimeout) clearTimeout(alertTimeout);
   alertTimeout = setTimeout(dismissAlert, 8000);
-  if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 }
 
 function dismissAlert() {
@@ -3751,7 +3839,15 @@ window.addEventListener("DOMContentLoaded", function() {
 
   if ("serviceWorker" in navigator) {
     ensureServiceWorker();
+    navigator.serviceWorker.addEventListener("message", function(event) {
+      const msg = event.data || {};
+      if (msg.type === "openJob" && msg.docId) {
+        const playAlert = msg.pushType === "new_job" || msg.pushType === "job_recalled";
+        openJobFromNotification(msg.docId, playAlert);
+      }
+    });
   }
+  handleNotificationDeepLink();
   document.getElementById("pinInput").addEventListener("keydown", function(e) {
     if (e.key === "Enter") confirmPinAction();
   });
