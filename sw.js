@@ -1,4 +1,4 @@
-const CACHE = "gpn-v40";
+const CACHE = "gpn-v41";
 
 const ASSETS = [
   "./",
@@ -25,25 +25,33 @@ if (typeof firebaseConfig !== "undefined" && firebaseConfig.projectId && firebas
 self.addEventListener("notificationclick", function(event) {
   event.notification.close();
   const data = event.notification.data || {};
-  const docId = data.docId || "";
+  let docId = data.docId || "";
   const pushType = data.type || "";
+  if (!docId && event.notification.tag && event.notification.tag !== "gpn-push") {
+    docId = event.notification.tag;
+  }
   let url = "./index.html";
   if (docId) {
     url += "?job=" + encodeURIComponent(docId);
     if (pushType) url += "&type=" + encodeURIComponent(pushType);
   }
+  const targetUrl = new URL(url, self.location.href).href;
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(list) {
       for (var i = 0; i < list.length; i++) {
         var client = list[i];
-        var href = client.url || "";
-        if (href.indexOf("index.html") !== -1 || href.indexOf("/citi") !== -1) {
+        if ("focus" in client) {
+          if ("navigate" in client) {
+            return client.focus().then(function() {
+              return client.navigate(targetUrl);
+            });
+          }
           client.focus();
           client.postMessage({ type: "openJob", docId: docId, pushType: pushType });
           return;
         }
       }
-      if (clients.openWindow) return clients.openWindow(url);
+      if (clients.openWindow) return clients.openWindow(targetUrl);
     })
   );
 });
