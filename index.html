@@ -393,10 +393,6 @@ button:disabled{
   font-size:clamp(14px,4.5vw,20px);font-weight:900;color:#ffd700;
   text-transform:uppercase;line-height:1.1;
 }
-.jcHeadFareLine{
-  font-size:clamp(10px,3vw,12px);font-weight:900;color:#4ade80;
-  text-transform:uppercase;line-height:1.15;
-}
 .jcHeadActs{
   flex:0 0 30%;display:flex;align-items:center;justify-content:center;
   gap:5px;padding:6px 5px;min-width:0;
@@ -413,6 +409,16 @@ button:disabled{
 .jcHeadActs .jcActTxt{font-size:8px;letter-spacing:.3px;display:block}
 .jcHeadActs .jcActEdit{color:#ffd700!important;border-color:#ffd700!important}
 .jcHeadActs .jcActDel{color:#ff4444!important;border-color:#dc2626!important}
+.jcHeadNoActs .jcHeadSched{border-right:none}
+.jcHeadFareCol{
+  flex:0 0 30%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;
+  padding:6px 5px;min-width:0;text-align:center;
+}
+.jcHeadFareVal{
+  font-size:clamp(14px,4.5vw,20px);font-weight:900;color:#4ade80;
+  text-transform:uppercase;line-height:1.1;word-break:break-word;
+}
 .jcHeadLbl{font-size:9px;color:#fff;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
 .jcHeadTime{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
 .jcActBox{
@@ -1694,7 +1700,7 @@ function getJobScheduleTypeLabel(job) {
 
 function buildJobDetailListHtml(job, docId, source) {
   let html = '<div class="jdList">';
-  html += jobCardHeaderGridHtml(job, null, source);
+  html += jobCardHeaderGridHtml(job, null, source, { inModal: true });
   html += jobCardPersonHtml(job, source);
   html += jobRouteHtml(job, true);
 
@@ -2380,40 +2386,36 @@ function getJobPickupTimeDisplay(job) {
   return "ASAP";
 }
 
-function getJobFareBoxDisplay(job, source) {
-  if (job.status === "completed" || source === "previous") {
-    const recorded = formatFareDisplay(job.fare);
-    if (recorded) return recorded.toUpperCase();
-  }
-  if (job.priceType === "Set Price" && job.price) {
-    const n = parseFloat(String(job.price).replace(/[^0-9.]/g, ""));
-    if (!isNaN(n) && n > 0) {
-      return (n % 1 === 0 ? "$" + n.toFixed(0) : "$" + n.toFixed(2)).toUpperCase();
-    }
-  }
-  if (job.priceType === "Meter Fare") return "METER FARE";
-  if (job.priceType === "Set Price") return "SET PRICE";
-  return "—";
-}
-
-function jobCardHeaderGridHtml(job, docId, source) {
+function jobCardHeaderGridHtml(job, docId, source, opts) {
+  opts = opts || {};
+  const inModal = !!opts.inModal;
   const schedLbl = getJobScheduleTypeLabel(job);
   const dateLbl = getJobPickupDayDateLabel(job, true);
   const pickupTime = getJobPickupTimeDisplay(job);
-  const fareBox = getJobFareBoxDisplay(job, source);
-  let schedHtml = '<div class="jcHeadBoxLbl">' + escapeHtml(schedLbl) + '</div>' +
+  const schedHtml = '<div class="jcHeadBoxLbl">' + escapeHtml(schedLbl) + '</div>' +
     '<div class="jcHeadDateLine">📅 ' + escapeHtml(dateLbl) + '</div>' +
     '<div class="jcHeadTimeLine">🕐 ' + escapeHtml(pickupTime) + '</div>';
-  if (fareBox && fareBox !== "—") {
-    schedHtml += '<div class="jcHeadFareLine">' + escapeHtml(fareBox) + '</div>';
+
+  let rightHtml = "";
+  let headClass = "jcHead";
+  if (inModal) {
+    const fareLabel = formatFareDisplay(job.fare);
+    if (job.status === "completed" && fareLabel) {
+      rightHtml = '<div class="jcHeadFareCol">' +
+        '<div class="jcHeadBoxLbl">FARE</div>' +
+        '<div class="jcHeadFareVal">' + escapeHtml(fareLabel.toUpperCase()) + '</div></div>';
+    } else {
+      headClass += " jcHeadNoActs";
+    }
+  } else if (docId) {
+    rightHtml = '<div class="jcHeadActs" onclick="event.stopPropagation()">' +
+      jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>';
   }
-  const actsHtml = docId
-    ? '<div class="jcHeadActs" onclick="event.stopPropagation()">' + jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>'
-    : '<div class="jcHeadActs"></div>';
-  return '<div class="jcHead">' +
-    '<div class="jcHeadJob">📋 JOB-' + job.id + '</div>' +
+
+  return '<div class="' + headClass + '">' +
+    '<div class="jcHeadJob">JOB-' + job.id + '</div>' +
     '<div class="jcHeadSched">' + schedHtml + '</div>' +
-    actsHtml +
+    rightHtml +
     '</div>';
 }
 
