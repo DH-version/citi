@@ -768,7 +768,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="syncStatus" class="syncStatus">Connecting…</div>
 
 <div id="alertToast" class="alertToast" onclick="dismissAlert()">
-  <h4>🚖 New Job Arrived!</h4>
+  <h4>NEW JOB</h4>
   <p id="alertText">Tap to view</p>
 </div>
 <div id="opToast" class="opToast"></div>
@@ -3423,11 +3423,37 @@ function handleNotificationDeepLink() {
   queueOpenJobFromPush(docId, playAlert);
 }
 
+function extractSuburbFromAddress(address) {
+  const raw = String(address || "").trim().toLowerCase();
+  if (!raw) return "";
+  const suburbs = GEELONG_SUBURBS.slice().sort(function(a, b) { return b.length - a.length; });
+  let i;
+  for (i = 0; i < suburbs.length; i++) {
+    if (raw.includes(suburbs[i])) {
+      return suburbs[i].split(" ").map(function(w) {
+        return w.charAt(0).toUpperCase() + w.slice(1);
+      }).join(" ");
+    }
+  }
+  return "";
+}
+
+function newJobAlertText(job) {
+  const pickupSub = extractSuburbFromAddress(job.pickup);
+  const dropSub = extractSuburbFromAddress(job.drop);
+  if (!pickupSub && !dropSub) {
+    return "NEW JOB · JOB-" + job.id + " — tap to view";
+  }
+  let route = ((pickupSub || "Pickup") + " → " + (dropSub || "Drop-off")).toUpperCase();
+  const name = (job.name || "").trim();
+  if (name) return titleCase(name) + " · " + route;
+  return "JOB-" + job.id + " · " + route;
+}
+
 function showNewJobAlert(job) {
   alertNewJobArrival();
   const toast = document.getElementById("alertToast");
-  document.getElementById("alertText").textContent =
-    "JOB-" + job.id + " · " + (job.name || "New passenger") + " · " + (job.pickup || "");
+  document.getElementById("alertText").textContent = newJobAlertText(job);
   toast.classList.add("show");
   toast.dataset.docId = job.docId;
   if (alertTimeout) clearTimeout(alertTimeout);
