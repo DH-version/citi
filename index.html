@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <base href="/citi/">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#070b12">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,57 +14,108 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>Geelong Premium Network</title>
 <style>
+:root{
+  --bg:#070b12;
+  --bg-elevated:#0f1419;
+  --bg-card:#121c28;
+  --bg-card-hover:#162030;
+  --surface:#f8fafc;
+  --border:rgba(148,163,184,.14);
+  --border-strong:rgba(59,130,246,.28);
+  --text:#f1f5f9;
+  --text-muted:#94a3b8;
+  --text-dim:#64748b;
+  --gold:#d4af37;
+  --gold-soft:rgba(212,175,55,.12);
+  --blue:#3b82f6;
+  --blue-deep:#1d4ed8;
+  --green:#16a34a;
+  --green-bright:#22c55e;
+  --radius:12px;
+  --radius-sm:8px;
+  --radius-xs:6px;
+  --shadow:0 8px 32px rgba(0,0,0,.45);
+  --shadow-sm:0 2px 12px rgba(0,0,0,.28);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 
 body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-  background:#000;
-  padding:6px;
-  padding-top:max(6px, env(safe-area-inset-top));
-  color:#fff;
+  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Roboto,Arial,sans-serif;
+  background:var(--bg);
+  background-image:radial-gradient(ellipse 120% 80% at 50% -20%,rgba(59,130,246,.08),transparent 55%);
+  padding:8px;
+  padding-top:max(8px,env(safe-area-inset-top));
+  color:var(--text);
   max-width:430px;
   margin:0 auto;
   min-height:100dvh;
-  padding-bottom:calc(62px + env(safe-area-inset-bottom));
+  padding-bottom:calc(68px + env(safe-area-inset-bottom));
+  line-height:1.45;
+}
+
+.appHeader{
+  text-align:center;
+  padding:8px 4px 12px;
+  margin-bottom:4px;
+}
+.appBrand{
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:.02em;
+  color:var(--text);
+  line-height:1.2;
+}
+.appTagline{
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-top:3px;
 }
 
 h2{
   text-align:center;
   margin-bottom:4px;
   font-size:16px;
-  font-weight:800;
-  color:#ffd700;
-  text-transform:uppercase;
-  letter-spacing:.5px;
+  font-weight:700;
+  color:var(--gold);
+  letter-spacing:.02em;
 }
 
 h3{
-  margin:3px 0;
-  font-size:13px;
-  font-weight:800;
-  color:#ffd700;
+  margin:4px 0 8px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-muted);
   text-transform:uppercase;
-  letter-spacing:.4px;
+  letter-spacing:.12em;
 }
 
 .syncStatus{
+  display:inline-block;
   text-align:center;
-  font-size:11px;
-  margin-bottom:4px;
-  color:#888;
+  font-size:10px;
+  margin-top:8px;
+  padding:4px 12px;
+  border-radius:999px;
+  color:var(--text-dim);
   text-transform:uppercase;
-  font-weight:700;
+  letter-spacing:.08em;
+  font-weight:600;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border);
 }
-.syncStatus.online{color:#1e90ff}
-.syncStatus.error{color:#ff4444}
+.syncStatus.online{color:var(--green-bright);border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.08)}
+.syncStatus.error{color:#f87171;border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.08)}
 
 .tabPanel{display:none}
 .tabPanel.active{display:block}
 
 .section{margin-top:6px}
 #bookingForm .formSection{
-  padding-top:8px;margin-top:8px;
-  border-top:1px solid #333;
+  padding-top:10px;margin-top:10px;
+  border-top:1px solid var(--border);
 }
 #bookingForm .formSection button{
   padding:14px 8px;font-size:15px;margin:1px;
@@ -103,56 +154,80 @@ input,select{
   padding:12px;
   margin:3px 0;
   font-size:16px;
-  border-radius:6px;
-  border:1px solid #0066ff;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border-strong);
   box-sizing:border-box;
-  background:#111;
-  color:#fff;
-  font-weight:600;
+  background:var(--bg-elevated);
+  color:var(--text);
+  font-weight:500;
+  transition:border-color .15s ease,box-shadow .15s ease;
+}
+input:focus,select:focus{
+  outline:none;
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(59,130,246,.15);
 }
 select{
-  background:#0047ab;
+  background:var(--blue-deep);
   color:#fff;
   cursor:pointer;
-  font-weight:800;
-  text-transform:uppercase;
+  font-weight:600;
+  text-transform:none;
 }
 input:disabled{
-  background:#1a1a1a;
-  color:#666;
-  border-color:#333;
+  background:#151b24;
+  color:var(--text-dim);
+  border-color:var(--border);
   cursor:not-allowed;
 }
-input::placeholder{color:#666;text-transform:none;font-weight:500}
+input::placeholder{color:var(--text-dim);text-transform:none;font-weight:400}
 
 button{
   padding:12px;
   margin:2px;
-  font-size:14px;
-  border-radius:6px;
-  border:1px solid #0066ff;
-  background:#0047ab;
-  color:#fff;
-  font-weight:800;
+  font-size:13px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border-strong);
+  background:linear-gradient(180deg,#1e3a5f 0%,#152238 100%);
+  color:var(--text);
+  font-weight:600;
   cursor:pointer;
-  text-transform:uppercase;
-  letter-spacing:.3px;
-  box-shadow:none;
-  transition:transform .1s ease;
+  text-transform:none;
+  letter-spacing:.02em;
+  box-shadow:var(--shadow-sm);
+  transition:transform .12s ease,filter .12s ease,border-color .12s ease;
 }
-button:active:not(:disabled){transform:scale(.98)}
-button:disabled{
-  background:#222;
-  color:#555;
-  border-color:#333;
+button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
+<button:disabled{
+  background:#151b24;
+  color:var(--text-dim);
+  border-color:var(--border);
   cursor:not-allowed;
+  box-shadow:none;
 }
 
+.btnPrimary{background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%)!important;border-color:rgba(96,165,250,.35)!important}
+.btnSecondary{background:var(--bg-card)!important;border-color:var(--border)!important;color:var(--text-muted)!important}
+.btnSuccess{background:linear-gradient(180deg,#22c55e 0%,#16a34a 100%)!important;border-color:rgba(74,222,128,.35)!important}
+.btnDanger{background:linear-gradient(180deg,#ef4444 0%,#dc2626 100%)!important;border-color:rgba(248,113,113,.35)!important}
+.btnPurple{background:linear-gradient(180deg,#7c3aed 0%,#6d28d9 100%)!important;border-color:rgba(167,139,250,.35)!important}
+.syncWrap{text-align:center;margin-bottom:10px}
+.modalTitleGold{color:var(--gold);text-align:center;margin-bottom:10px}
+.modalTitleBlue{color:var(--blue);text-align:center;margin-bottom:10px}
+.modalTitleGreen{color:var(--green-bright);text-align:center;margin-bottom:4px}
+.pinModalRounded{margin-top:auto;margin-bottom:auto;border-radius:var(--radius)!important}
+.pinModalScroll{max-height:92vh;overflow-y:auto}
+.modalTitlePurple{color:#a78bfa;text-align:center;margin-bottom:4px}
+.modalTitleRed{color:#f87171;text-align:center;margin-bottom:4px}
+.modalSubtitle{text-align:center;color:var(--text-muted);font-size:12px;margin-bottom:12px;line-height:1.4}
+.modalCancelFull{width:100%;margin-top:8px!important}
+.prospectPointsHead{text-align:center}
+
 .glow{
-  background:#ffd700!important;
-  color:#000!important;
-  border-color:#ffd700!important;
-  box-shadow:0 0 10px rgba(255,215,0,.45)!important;
+  background:linear-gradient(180deg,#e8c547 0%,#c9a227 100%)!important;
+  color:#1a1200!important;
+  border-color:#d4af37!important;
+  box-shadow:0 0 0 2px var(--gold-soft),var(--shadow-sm)!important;
 }
 
 .row{display:flex;gap:4px}
@@ -176,7 +251,7 @@ button:disabled{
 
 .depositAmountBox{
   display:flex;align-items:center;
-  background:#fff;border-radius:6px;padding:0 8px;flex:1;border:1px solid #0066ff;
+  background:var(--surface);border-radius:var(--radius-sm);padding:0 8px;flex:1;border:1px solid #cbd5e1;
 }
 .depositAmountBox span{color:#000;font-weight:bold;margin-right:4px}
 .depositAmountBox input{
@@ -195,7 +270,7 @@ button:disabled{
 
 .priceBox{
   display:flex;align-items:center;
-  background:#fff;border-radius:6px;padding:0 8px;flex:1;border:1px solid #0066ff;
+  background:var(--surface);border-radius:var(--radius-sm);padding:0 8px;flex:1;border:1px solid #cbd5e1;
 }
 .priceBox span{color:#000;font-weight:bold;margin-right:4px}
 .priceBox input{
@@ -253,80 +328,79 @@ button:disabled{
   display:flex;flex-direction:column;flex:1;min-height:0;
   overflow:hidden;position:relative;
 }
-.noticeBoardHeader{
-  overflow:hidden;position:relative;
-  border:2px solid #0066ff;border-radius:8px;
-  margin-bottom:8px;background:#000;
-  height:44px;display:flex;align-items:center;
+.chatHeader{
   flex:0 0 auto;
+  background:linear-gradient(180deg,#1a2634 0%,#141f2b 100%);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm) var(--radius-sm) 0 0;
+  padding:12px 14px;
+  margin-bottom:0;
 }
-.noticeMarquee{
-  width:100%;overflow:hidden;white-space:nowrap;
-}
-.noticeMarqueeText{
-  display:inline-block;padding-left:100%;
-  font-weight:900;color:#ffd700;font-size:14px;
-  white-space:nowrap;
-  animation:noticeMarquee 14s linear infinite;
-}
-@keyframes noticeMarquee{
-  0%{transform:translateX(0)}
-  100%{transform:translateX(-100%)}
-}
-.noticeFeed{
+.chatHeaderTitle{font-size:15px;font-weight:700;color:var(--text);letter-spacing:.02em}
+.chatHeaderSub{font-size:11px;color:var(--text-muted);margin-top:2px}
+.noticeFeed,.chatFeed{
   flex:1 1 0;min-height:0;
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  display:flex;flex-direction:column;gap:8px;
-  padding:10px;padding-bottom:12px;
-  background:#0a0a0a;border:2px solid #333;border-radius:8px;
+  display:flex;flex-direction:column;gap:4px;
+  padding:12px 10px 72px;
+  background:#0a1018;
+  border:1px solid var(--border);
+  border-top:none;
+  border-radius:0 0 var(--radius-sm) var(--radius-sm);
 }
-.noticeFeedEmpty{
-  text-align:center;color:#666;font-size:12px;font-weight:700;
-  padding:40px 12px;text-transform:uppercase;
+.noticeFeedEmpty,.chatFeedEmpty{
+  text-align:center;color:#8696a0;font-size:13px;font-weight:600;
+  padding:48px 16px;
 }
-.noticeMsg{
-  background:#111;border:1px solid #333;border-radius:10px;
-  padding:10px 12px;align-self:stretch;flex-shrink:0;
+.chatRow{display:flex;flex-direction:column;margin-bottom:10px;max-width:100%}
+.chatRowMine{align-items:flex-end}
+.chatRowOther{align-items:flex-start}
+.chatSender{font-size:12px;font-weight:700;color:#53bdeb;margin:0 8px 3px}
+.chatBubble{
+  max-width:86%;padding:8px 10px 6px;
+  border-radius:8px;position:relative;
+  box-shadow:0 1px 1px rgba(0,0,0,.25);
 }
-.noticeMsgHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}
-.noticeOp{font-weight:900;color:#1e90ff;font-size:13px;text-transform:uppercase}
-.noticeTime{font-size:10px;color:#888;font-weight:700;white-space:nowrap}
-.noticeMsgBody{color:#fff;font-size:15px;font-weight:700;line-height:1.4;word-break:break-word}
-#tabTeam.active .noticeCompose{
+.chatBubbleMine{background:#005c4b;border-radius:10px 10px 2px 10px}
+.chatBubbleOther{background:#1f2c34;border-radius:10px 10px 10px 2px}
+.chatText{color:#e9edef;font-size:15px;line-height:1.45;word-break:break-word;white-space:pre-wrap}
+.chatBubbleMeta{font-size:10px;color:rgba(255,255,255,.55);text-align:right;margin-top:4px}
+#tabTeam.active .noticeCompose,#tabTeam.active .chatCompose{
   position:fixed;
   left:0;right:0;
   max-width:430px;margin:0 auto;
   padding:6px;
   bottom:calc(62px + env(safe-area-inset-bottom));
-  background:#000;
-  border-top:2px solid #333;
+  background:#0b141a;
+  border-top:1px solid #2a3942;
   z-index:150;
   box-sizing:border-box;
   display:flex;gap:6px;align-items:stretch;
 }
-#tabTeam.active .noticeFeed{
+#tabTeam.active .noticeFeed,#tabTeam.active .chatFeed{
   margin-bottom:58px;
 }
-.noticeCompose{display:flex;gap:6px;align-items:stretch;flex:0 0 auto}
-.noticeCompose input{
-  flex:1;margin:0!important;padding:12px!important;
-  background:#fff!important;color:#000!important;font-weight:800!important;
-  border:2px solid #0066ff!important;border-radius:8px!important;
+.noticeCompose,.chatCompose{display:flex;gap:8px;align-items:center;flex:0 0 auto}
+.noticeCompose input,.chatCompose input{
+  flex:1;margin:0!important;padding:12px 14px!important;
+  background:#1f2c34!important;color:#e9edef!important;font-weight:600!important;
+  border:1px solid #2a3942!important;border-radius:24px!important;
 }
-.noticeCompose button{
-  flex:0 0 auto;margin:0!important;padding:12px 16px!important;
-  background:#1b8a44!important;border-color:#1b8a44!important;
+.noticeCompose button,.chatCompose button{
+  flex:0 0 auto;margin:0!important;min-width:48px!important;width:48px!important;height:48px!important;
+  padding:0!important;border-radius:50%!important;background:#005c4b!important;
+  border-color:#005c4b!important;font-size:18px!important;line-height:1!important;
 }
-.jdList{background:#0a1628}
+.jdList{background:var(--bg-card)}
 .jdMetaRow{
   display:flex;justify-content:space-between;align-items:center;
   padding:10px 12px;border-bottom:1px solid #333;
 }
-.jdMetaLeft{color:#ffd700;font-weight:900;font-size:14px;text-transform:uppercase;line-height:1.2}
+.jdMetaLeft{color:var(--gold);font-weight:700;font-size:14px;line-height:1.2}
 .jdMetaRight{text-align:right;flex:0 0 auto;min-width:88px}
-.jdMetaLbl{font-size:9px;color:#fff;font-weight:900;text-transform:uppercase}
-.jdMetaVal{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
+.jdMetaLbl{font-size:9px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.jdMetaVal{font-size:15px;color:var(--gold);font-weight:700;line-height:1.1}
 .jdActionRow{
   display:flex;justify-content:center;gap:4px;padding:4px 6px;
   border-bottom:1px solid #333;
@@ -336,16 +410,16 @@ button:disabled{
   padding:9px 12px;border-bottom:1px solid #333;min-height:38px;gap:10px;
 }
 .jdLineLbl{
-  font-size:10px;font-weight:900;color:#888;text-transform:uppercase;
-  flex:0 0 auto;white-space:nowrap;
+  font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;
+  flex:0 0 auto;white-space:nowrap;letter-spacing:.04em;
 }
 .jdLineVal{
-  font-size:13px;font-weight:900;color:#fff;text-transform:uppercase;
+  font-size:13px;font-weight:600;color:var(--text);
   text-align:right;flex:1;word-break:break-word;
 }
-.jdLineVal.blue{color:#1e90ff}
-.jdLineVal.gold{color:#ffd700}
-.jdLineVal.white{color:#fff}
+.jdLineVal.blue{color:var(--blue)}
+.jdLineVal.gold{color:var(--gold)}
+.jdLineVal.white{color:var(--text)}
 .jdCancelRow{padding:10px 12px;border-bottom:1px solid #333;text-align:center}
 .jdList .jcPerson,.jdList .jcRoute,.jdList .jcFooter,.jdList .jcHead{border-left:none;border-right:none}
 .qbField{font-size:17px;padding:13px;margin-bottom:8px}
@@ -353,46 +427,217 @@ button:disabled{
 
 /* —— Job card (dispatch theme) —— */
 .jobCard{
-  background:#0a1628;
-  border:2px solid #0066ff;
-  border-radius:8px;
+  background:var(--bg-card);
+  border:1px solid var(--border-strong);
+  border-radius:var(--radius);
   overflow:hidden;
   cursor:pointer;
   padding:0;
   margin:0;
-  box-shadow:none;
+  box-shadow:var(--shadow-sm);
+  transition:border-color .15s ease,box-shadow .15s ease;
 }
-.jobCardAccepted{border-color:#ffd700}
+.jobCard:active{box-shadow:var(--shadow-sm);transform:scale(.998)}
+.jobCardAccepted{border-color:rgba(212,175,55,.45);box-shadow:0 0 0 1px var(--gold-soft)}
 .jcHead{
   display:flex;align-items:stretch;
-  border-bottom:1px solid #1e3a5f;
-  background:#0a1628;min-height:72px;
+  border-bottom:1px solid var(--border);
+  background:var(--bg-card);min-height:72px;
 }
 .jcHeadJob{
   flex:0 0 26%;display:flex;align-items:center;justify-content:center;
-  padding:8px 6px;border-right:1px solid #1e3a5f;
-  font-size:clamp(14px,4.5vw,20px);font-weight:900;color:#ffd700;
-  text-transform:uppercase;text-align:center;line-height:1.1;
+  padding:8px 6px;border-right:1px solid var(--border);
+  font-size:clamp(13px,4.2vw,18px);font-weight:700;color:var(--gold);
+  text-align:center;line-height:1.15;
   word-break:break-word;
+}
+.jcHeadTimeLine{
+  font-size:clamp(14px,4.5vw,20px);font-weight:700;color:var(--gold);
+  line-height:1.1;
+}
+.jcHeadBoxLbl{
+  font-size:9px;color:var(--text-muted);font-weight:600;
+  text-transform:uppercase;letter-spacing:.1em;line-height:1.15;
+}
+.jcHeadDateLine{
+  font-size:clamp(10px,3vw,12px);font-weight:600;color:var(--text);
+  line-height:1.15;word-break:break-word;
 }
 .jcHeadSched{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:3px;
-  padding:6px 8px;border-right:1px solid #1e3a5f;
+  padding:6px 8px;border-right:1px solid var(--border);
   text-align:center;min-width:0;
 }
-.jcHeadBoxLbl{
-  font-size:9px;color:#fff;font-weight:900;
-  text-transform:uppercase;letter-spacing:.4px;line-height:1.15;
+.jcPerson{
+  display:flex;align-items:center;
+  border-bottom:1px solid var(--border);min-height:58px;
+  background:var(--bg-card);
 }
-.jcHeadDateLine{
-  font-size:clamp(10px,3vw,12px);font-weight:900;color:#fff;
-  text-transform:uppercase;line-height:1.15;word-break:break-word;
+.jcAvatar{
+  flex:0 0 52px;display:flex;align-items:center;justify-content:center;
+  font-size:26px;opacity:.9;
 }
-.jcHeadTimeLine{
-  font-size:clamp(14px,4.5vw,20px);font-weight:900;color:#ffd700;
-  text-transform:uppercase;line-height:1.1;
+.jcName{
+  font-size:18px;font-weight:700;color:var(--text);
+  line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
+.jcPhone{
+  display:flex;align-items:center;gap:4px;
+  color:var(--blue);font-size:14px;font-weight:600;
+  text-decoration:none;margin-top:3px;
+}
+.jcRoute{border-bottom:1px solid var(--border)}
+.jcAddrRow+.jcAddrRow{border-top:1px solid var(--border)}
+.jcAddrLbl{
+  flex:0 0 22%;max-width:96px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:2px;
+  padding:4px 6px;font-size:10px;font-weight:700;
+  color:#fff;text-transform:uppercase;text-align:center;line-height:1.05;
+  letter-spacing:.06em;
+}
+.jcAddrLblPickup{background:#166534}
+.jcAddrLblDrop{background:#1e40af}
+.jcAddrLblNotes{background:#166534}
+.jcAddrBox{
+  flex:1;display:flex;align-items:center;
+  background:var(--surface);padding:8px 10px;min-width:0;
+}
+.jcAddrText{
+  flex:1;font-size:13px;font-weight:600;color:#0f172a;
+  line-height:1.2;
+  word-break:break-word;overflow:hidden;
+  display:flex;align-items:center;gap:5px;
+}
+.jcMapsBtn{
+  flex:0 0 auto;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  min-width:54px;height:38px;margin-left:4px;padding:2px 4px;
+  background:#eff6ff;border-radius:var(--radius-xs);
+  text-decoration:none;font-size:7px;font-weight:700;line-height:1.05;
+  color:#1d4ed8;text-transform:uppercase;text-align:center;
+  border:1px solid #bfdbfe;
+}
+.jcFooter{
+  display:flex;border-bottom:1px solid var(--border);
+  background:var(--bg-card);
+}
+.jcFootCol{
+  flex:1;padding:8px 6px;text-align:center;
+  border-right:1px solid var(--border);
+}
+.jcFootLbl{font-size:9px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
+.jcFootVal{font-size:12px;font-weight:700;line-height:1.15}
+.jcFootVal.blue{color:var(--blue)}
+.jcFootVal.gold{color:var(--gold)}
+.jcPersonInfo{flex:1;min-width:0;padding:6px 0}
+.jcPhone:active{opacity:.8}
+.jcVehicle{
+  flex:0 0 auto;display:flex;align-items:center;gap:5px;
+  padding:8px 10px;border-left:1px solid var(--border);
+  font-size:14px;font-weight:700;color:var(--text);
+  background:var(--bg-card);
+}
+.jcAddrRow{display:flex;align-items:stretch;min-height:50px}
+.jcAddrPin{flex:0 0 auto;font-size:14px;line-height:1}
+.jcAddrPinPickup{color:#166534}
+.jcAddrPinDrop{color:#1e40af}
+.jcAddrLblPass{background:#b45309}
+.jcAddrLblLug{background:#7c3aed}
+.jcMapsIcon{font-size:14px;line-height:1;display:block;margin-bottom:1px}
+.jcMapsBtn:active{background:#1d4ed8;color:#fff}
+.jcFootCol:last-child{border-right:none}
+.jcFootCancel{display:flex;align-items:center;justify-content:center;padding:4px 6px!important}
+.btnCancelJob{
+  width:100%;margin:0!important;padding:8px 4px!important;
+  font-size:11px!important;font-weight:700!important;
+  background:linear-gradient(180deg,#ef4444 0%,#dc2626 100%)!important;
+  color:#fff!important;border:none!important;border-radius:var(--radius-xs)!important;
+  letter-spacing:.02em!important;box-shadow:none!important;
+}
+.jcFootVal.white{color:var(--text)}
+.jcExtra{
+  padding:6px 10px;font-size:12px;font-weight:600;
+  color:var(--text-muted);border-bottom:1px solid var(--border);
+  line-height:1.3;background:var(--bg-card);
+}
+.jcExtra span{color:var(--gold);font-weight:700}
+.jcCancelReason{color:#f87171;font-weight:700}
+.jcCancelReason span{color:var(--text)}
+.jcExtraFull{color:var(--text-muted);font-size:12px;font-weight:500;line-height:1.35;word-break:break-word}
+.jobActions{display:flex;gap:0;margin:0}
+.jobActions button{
+  flex:1;margin:0!important;border-radius:0 0 var(--radius-xs) var(--radius-xs)!important;
+  border:none!important;padding:14px 8px!important;
+  font-size:14px!important;font-weight:700!important;
+}
+.btnAccept,.btnAcceptJob{background:linear-gradient(180deg,#22c55e 0%,#16a34a 100%)!important;color:#fff!important}
+.btnComplete{background:linear-gradient(180deg,#22c55e 0%,#16a34a 100%)!important;color:#fff!important}
+.btnRecall{background:linear-gradient(180deg,#ef4444 0%,#dc2626 100%)!important;color:#fff!important;flex:.85}
+.acceptedBanner{
+  padding:10px;text-align:center;
+  background:var(--gold-soft);border-top:1px solid rgba(212,175,55,.25);
+  color:var(--gold);font-size:11px;font-weight:600;letter-spacing:.06em;
+}
+.emptyState{
+  text-align:center;padding:36px 20px;color:var(--text-dim);
+  font-size:13px;font-weight:500;line-height:1.5;
+  background:var(--bg-elevated);border:1px dashed var(--border);
+  border-radius:var(--radius);
+}
+.emptyState .icon{font-size:28px;margin-bottom:8px;opacity:.7}
+.listHeader{
+  font-size:11px;color:var(--text-muted);margin-bottom:8px;
+  font-weight:500;letter-spacing:.02em;line-height:1.4;
+}
+.btnQuickBooking{
+  width:100%;margin-bottom:10px;
+  background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%)!important;
+  font-weight:600;padding:14px;
+  border:1px solid rgba(96,165,250,.35)!important;
+  border-radius:var(--radius-sm)!important;
+}
+.btnDispatch{
+  width:100%;
+  background:linear-gradient(180deg,#22c55e 0%,#16a34a 100%)!important;
+  border:1px solid rgba(74,222,128,.35)!important;
+  font-weight:700;padding:16px;font-size:15px;
+  border-radius:var(--radius-sm)!important;
+  margin-bottom:8px;
+}
+.formActionRow{display:flex;gap:8px;margin-bottom:6px}
+.formActionRow button{flex:1;margin:0!important;font-size:12px!important}
+.btnFollowUp{background:linear-gradient(180deg,#7c3aed 0%,#6d28d9 100%)!important;border-color:rgba(167,139,250,.35)!important}
+.btnClearForm{width:100%;background:var(--bg-card)!important;border-color:var(--border)!important;color:var(--text-muted)!important;margin-top:4px!important}
+.operatorRow input{
+  padding:12px;font-size:15px;width:100%;
+  border-radius:var(--radius-sm)!important;
+  background:var(--bg-elevated)!important;color:var(--text)!important;
+  border:1px solid var(--border-strong)!important;
+}
+.operatorStatus.ready{color:var(--green-bright);font-weight:600}
+.depositAmountBox,.priceBox{
+  background:var(--surface);border-radius:var(--radius-sm);border:1px solid #cbd5e1;
+}
+.prospectTable{
+  width:100%;border-collapse:separate;border-spacing:0;
+  border:1px solid var(--border-strong);border-radius:var(--radius);overflow:hidden;
+}
+.prospectTable th,.prospectTable td{
+  padding:12px 10px;text-align:left;border-bottom:1px solid var(--border);
+}
+.prospectTable th{background:var(--bg-elevated);color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+.prospectTable td{background:var(--bg-card);color:var(--text);font-size:14px;font-weight:600}
+.prospectTable tr:last-child td{border-bottom:none}
+.prospectTable td.pointsCell{text-align:center;color:var(--gold);font-size:17px;font-weight:700}
+.prospectTable input{
+  width:60px;text-align:center;font-size:15px;font-weight:700;
+  padding:8px;margin:0;background:var(--bg-elevated);border:1px solid var(--border-strong);color:var(--gold);
+  border-radius:var(--radius-xs);
+}
+.prospectToolbar{display:flex;gap:8px;margin-bottom:10px}
+.prospectToolbar button{flex:1;margin:0;font-size:11px}
 .jcHeadActs{
   flex:0 0 30%;display:flex;align-items:center;justify-content:center;
   gap:5px;padding:6px 5px;min-width:0;
@@ -400,15 +645,25 @@ button:disabled{
 .jcHeadActs .jcActBox{
   flex:1;width:auto;height:auto;min-height:0;
   flex-direction:column;gap:2px;
-  border:2px solid;border-radius:6px;
-  background:#0a1628!important;
+  border:1px solid;border-radius:var(--radius-xs);
+  background:var(--bg-elevated)!important;
   padding:6px 4px!important;margin:0!important;
-  font-size:9px!important;font-weight:900!important;line-height:1!important;
+  font-size:9px!important;font-weight:700!important;line-height:1!important;
+  box-shadow:none!important;
 }
 .jcHeadActs .jcActIcon{font-size:15px;line-height:1;display:block}
-.jcHeadActs .jcActTxt{font-size:8px;letter-spacing:.3px;display:block}
-.jcHeadActs .jcActEdit{color:#ffd700!important;border-color:#ffd700!important}
-.jcHeadActs .jcActDel{color:#ff4444!important;border-color:#dc2626!important}
+.jcHeadActs .jcActTxt{font-size:8px;letter-spacing:.04em;display:block}
+.jcHeadActs .jcActEdit{color:var(--gold)!important;border-color:rgba(212,175,55,.5)!important}
+.jcHeadActs .jcActDel{color:#f87171!important;border-color:rgba(248,113,113,.4)!important}
+.jcCountdown{
+  font-size:clamp(18px,5vw,26px);font-weight:700;color:#f87171;
+  line-height:1;font-variant-numeric:tabular-nums;
+}
+.btnFreeDispatch{
+  background:linear-gradient(180deg,#ea580c 0%,#c2410c 100%)!important;
+  color:#fff!important;border-color:rgba(251,146,60,.35)!important;
+}
+.jobCardSwipe{touch-action:pan-y;user-select:none}
 .jcHeadNoActs .jcHeadSched{border-right:none}
 .jcHeadFareCol{
   flex:0 0 30%;display:flex;flex-direction:column;
@@ -416,178 +671,43 @@ button:disabled{
   padding:6px 5px;min-width:0;text-align:center;
 }
 .jcHeadFareVal{
-  font-size:clamp(14px,4.5vw,20px);font-weight:900;color:#4ade80;
-  text-transform:uppercase;line-height:1.1;word-break:break-word;
+  font-size:clamp(14px,4.5vw,20px);font-weight:700;color:var(--green-bright);
+  line-height:1.1;word-break:break-word;
 }
-.jcHeadLbl{font-size:9px;color:#fff;font-weight:900;letter-spacing:.5px;text-transform:uppercase}
-.jcHeadTime{font-size:15px;color:#ffd700;font-weight:900;text-transform:uppercase;line-height:1.1}
+.jcHeadLbl{font-size:9px;color:var(--text-muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.jcHeadTime{font-size:15px;color:var(--gold);font-weight:700;line-height:1.1}
 .jcActBox{
   width:30px;height:30px;min-width:30px;
   display:flex;align-items:center;justify-content:center;
-  border:2px solid #0066ff;border-radius:5px;
-  background:#111!important;
+  border:1px solid var(--border-strong);border-radius:var(--radius-xs);
+  background:var(--bg-elevated)!important;
   padding:0!important;margin:0!important;
   font-size:14px!important;line-height:1!important;
   box-shadow:none!important;cursor:pointer;
 }
-.jcActEdit{color:#ffd700!important;border-color:#ffd700!important}
-.jcActDel{color:#ff4444!important;border-color:#cc0000!important}
+.jcActEdit{color:var(--gold)!important;border-color:rgba(212,175,55,.5)!important}
+.jcActDel{color:#f87171!important;border-color:rgba(248,113,113,.4)!important}
 .jcActBox:active{transform:scale(.95)}
 .jdActionRow .jcActBox{width:34px;height:34px;min-width:34px;font-size:15px!important}
-.jcPerson{
-  display:flex;align-items:center;
-  border-bottom:1px solid #1e3a5f;min-height:58px;
-  background:#0a1628;
-}
-.jcAvatar{
-  flex:0 0 52px;display:flex;align-items:center;justify-content:center;
-  font-size:28px;color:#1e90ff;
-}
-.jcPersonInfo{flex:1;min-width:0;padding:6px 0}
-.jcName{
-  font-size:21px;font-weight:900;color:#fff;
-  text-transform:uppercase;line-height:1.1;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.jcPhone{
-  display:flex;align-items:center;gap:4px;
-  color:#1e90ff;font-size:15px;font-weight:900;
-  text-decoration:none;margin-top:3px;
-}
-.jcPhone:active{opacity:.8}
-.jcVehicle{
-  flex:0 0 auto;display:flex;align-items:center;gap:5px;
-  padding:8px 10px;border-left:1px solid #1e3a5f;
-  font-size:15px;font-weight:900;color:#fff;text-transform:uppercase;
-  background:#0a1628;
-}
-.jcRoute{border-bottom:1px solid #1e3a5f}
-.jcAddrRow{display:flex;align-items:stretch;min-height:50px}
-.jcAddrRow+.jcAddrRow{border-top:1px solid #1e3a5f}
-.jcAddrLbl{
-  flex:0 0 22%;max-width:96px;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:2px;
-  padding:4px 6px;font-size:11px;font-weight:900;
-  color:#fff;text-transform:uppercase;text-align:center;line-height:1.05;
-  letter-spacing:.2px;
-}
-.jcAddrLblPickup{background:#008000}
-.jcAddrLblDrop{background:#0047ab}
-.jcAddrLblNotes{background:#008000}
-.jcAddrLblPass{background:#b45309}
-.jcAddrLblLug{background:#7c3aed}
-.jcAddrBox{
-  flex:1;display:flex;align-items:center;
-  background:#fff;padding:6px 8px;min-width:0;
-}
-.jcAddrText{
-  flex:1;font-size:14px;font-weight:900;color:#000;
-  text-transform:uppercase;line-height:1.15;
-  word-break:break-word;overflow:hidden;
-  display:flex;align-items:center;gap:5px;
-}
-.jcAddrPin{flex:0 0 auto;font-size:14px;line-height:1}
-.jcAddrPinPickup{color:#008000}
-.jcAddrPinDrop{color:#0047ab}
-.jcMapsBtn{
-  flex:0 0 auto;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  min-width:54px;height:38px;margin-left:4px;padding:2px 4px;
-  background:#e8f0fe;border-radius:4px;
-  text-decoration:none;font-size:7px;font-weight:900;line-height:1.05;
-  color:#0047ab;text-transform:uppercase;text-align:center;
-  border:1px solid #1e90ff;
-}
-.jcMapsIcon{font-size:14px;line-height:1;display:block;margin-bottom:1px}
-.jcMapsBtn:active{background:#1e90ff;color:#fff}
-.jcFooter{
-  display:flex;border-bottom:1px solid #1e3a5f;
-  background:#0a1628;
-}
-.jcFootCol{
-  flex:1;padding:8px 6px;text-align:center;
-  border-right:1px solid #1e3a5f;
-}
-.jcFootCol:last-child{border-right:none}
-.jcFootLbl{font-size:9px;color:#fff;font-weight:900;text-transform:uppercase;letter-spacing:.3px;margin-bottom:2px}
-.jcFootVal{font-size:13px;font-weight:900;text-transform:uppercase;line-height:1.15}
-.jcFootCancel{display:flex;align-items:center;justify-content:center;padding:4px 6px!important}
-.btnCancelJob{
-  width:100%;margin:0!important;padding:8px 4px!important;
-  font-size:11px!important;font-weight:900!important;
-  background:#dc2626!important;color:#fff!important;
-  border:none!important;border-radius:4px!important;
-  letter-spacing:.3px!important;box-shadow:none!important;
-}
-.jcFootVal.blue{color:#1e90ff}
-.jcFootVal.gold{color:#ffd700}
-.jcFootVal.white{color:#fff}
-.jcExtra{
-  padding:6px 10px;font-size:12px;font-weight:900;
-  color:#888;text-transform:uppercase;border-bottom:1px solid #1e3a5f;
-  line-height:1.3;background:#0a1628;
-}
-.jcExtra span{color:#ffd700;font-weight:900}
-.jcCancelReason{color:#ff6b6b;font-weight:900}
-.jcCancelReason span{color:#fff;text-transform:uppercase}
-.jcExtraFull{color:#ccc;font-size:12px;font-weight:800;line-height:1.35;word-break:break-word}
-.acceptedBanner{
-  padding:8px;text-align:center;
-  background:#ffd70022;border-top:1px solid #ffd700;
-  color:#ffd700;font-size:12px;font-weight:800;text-transform:uppercase;
-}
-.jobActions{display:flex;gap:0;margin:0}
-.jobActions button{
-  flex:1;margin:0!important;border-radius:0 0 6px 6px!important;
-  border:none!important;padding:16px 8px!important;
-  font-size:15px!important;font-weight:900!important;
-}
-.btnAccept,.btnAcceptJob{background:#1b8a44!important;color:#fff!important}
-.btnComplete{background:#1b8a44!important;color:#fff!important}
-.btnRecall{background:#cc0000!important;color:#fff!important;flex:0.85}
-.detailPhone{color:#1e90ff;font-weight:700;text-decoration:none}
-.emptyState{text-align:center;padding:30px 16px;color:#888;font-size:13px;font-weight:700;text-transform:uppercase}
-.listHeader{font-size:11px;color:#888;margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.3px}
-.prospectTable{
-  width:100%;border-collapse:separate;border-spacing:0;
-  border-radius:8px;overflow:hidden;
-  border:2px solid #0066ff;
-}
-.prospectTable th,.prospectTable td{
-  padding:12px 10px;text-align:left;border-bottom:1px solid #333;
-}
-.prospectTable th{background:#000;color:#888;font-size:10px;text-transform:uppercase;letter-spacing:.5px}
-.prospectTable td{background:#111;color:#fff;font-size:15px;font-weight:800;text-transform:uppercase}
-.prospectTable tr:last-child td{border-bottom:none}
-.prospectTable td.pointsCell{text-align:center;color:#ffd700;font-size:18px;font-weight:800}
-.prospectTable input{
-  width:60px;text-align:center;font-size:16px;font-weight:800;
-  padding:8px;margin:0;background:#000;border:1px solid #0066ff;color:#ffd700;
-}
-.prospectToolbar{display:flex;gap:8px;margin-bottom:10px}
-.prospectToolbar button{flex:1;margin:0;font-size:11px}
-.navTab{font-size:9px;padding:7px 2px 5px}
+.jdList{background:var(--bg-card)}
 .availToggle{display:flex;gap:6px;margin-bottom:8px}
 .availToggle button{flex:1;margin:0;font-size:11px;padding:10px 6px}
-.btnQuickBooking{
-  width:100%;margin-bottom:8px;background:#0047ab!important;
-  font-weight:800;padding:12px;border:2px solid #0066ff!important;
-}
 .qbTimeRow{display:flex;gap:8px;margin-bottom:6px}
-.qbTimeRow button{flex:1;margin:0;font-weight:800;font-size:16px;padding:14px 12px}
+.qbTimeRow button{flex:1;margin:0;font-weight:700;font-size:15px;padding:14px 12px}
 .qbTimeRow button.qbSelected{
-  background:#ffd700!important;color:#000!important;border-color:#ffd700!important;
-  box-shadow:0 0 10px rgba(255,215,0,.4)!important;
+  background:linear-gradient(180deg,#e8c547 0%,#c9a227 100%)!important;
+  color:#1a1200!important;border-color:var(--gold)!important;
+  box-shadow:0 0 0 2px var(--gold-soft)!important;
 }
-.qbHint{font-size:11px;color:#888;text-align:center;margin-bottom:8px;line-height:1.35;font-weight:700;text-transform:uppercase}
+.qbHint{font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:8px;line-height:1.35;font-weight:500}
 .qbTimeSelected{
-  text-align:center;font-size:14px;font-weight:800;color:#555;
-  margin:0 0 10px;min-height:20px;text-transform:uppercase;
+  text-align:center;font-size:14px;font-weight:600;color:var(--text-dim);
+  margin:0 0 10px;min-height:20px;
 }
-.qbTimeSelected.active{color:#ffd700}
+.qbTimeSelected.active{color:var(--gold)}
 .qbFieldLabel{
-  font-size:10px;font-weight:800;color:#888;
-  text-transform:uppercase;letter-spacing:.4px;margin:4px 0 2px;
+  font-size:10px;font-weight:600;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:.08em;margin:4px 0 2px;
 }
 .qbField{width:100%;margin-bottom:8px}
 .qbNotes{
@@ -628,68 +748,85 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   position:fixed;bottom:0;left:0;right:0;
   max-width:430px;margin:0 auto;
   display:flex;
-  background:#000;
-  border-top:2px solid #0066ff;
+  background:rgba(7,11,18,.94);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
   z-index:200;
   padding-bottom:env(safe-area-inset-bottom,0);
+  box-shadow:0 -4px 24px rgba(0,0,0,.35);
 }
 .navTab{
-  flex:1;padding:8px 4px 6px;
-  background:transparent;color:#888;
-  border-radius:0;font-size:9px;font-weight:800;
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  margin:0;border:none;box-shadow:none;text-transform:uppercase;
+  flex:1;padding:10px 4px 8px;
+  background:transparent;color:var(--text-dim);
+  border-radius:0;font-size:10px;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  margin:0;border:none;box-shadow:none;
+  letter-spacing:.04em;
+  position:relative;
 }
-.navTab .icon{font-size:18px;line-height:1}
-.navTab.active{color:#ffd700;background:#111}
+.navTab .icon{font-size:20px;line-height:1;opacity:.85}
+.navTab.active{color:var(--gold);background:transparent}
+.navTab.active::after{
+  content:"";position:absolute;top:0;left:20%;right:20%;
+  height:2px;background:var(--gold);border-radius:0 0 2px 2px;
+}
 .navTab .badge{
-  background:#cc0000;color:#fff;font-size:10px;
-  padding:1px 6px;border-radius:10px;min-width:18px;
+  background:linear-gradient(180deg,#ef4444 0%,#dc2626 100%);
+  color:#fff;font-size:9px;font-weight:700;
+  padding:2px 6px;border-radius:999px;min-width:17px;
+  box-shadow:0 1px 4px rgba(0,0,0,.3);
 }
 .filterTypeBtn .filterBadge{
   position:absolute;top:2px;right:4px;
-  background:#cc0000;color:#fff;font-size:10px;font-weight:800;
+  background:linear-gradient(180deg,#ef4444 0%,#dc2626 100%);
+  color:#fff;font-size:10px;font-weight:700;
   padding:1px 5px;border-radius:10px;min-width:16px;line-height:1.2;
 }
 
 .prevHeader{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
 .prevHeader h3{margin:0}
-.btnFilter{background:#0047ab!important;padding:8px 14px;font-size:12px;margin:0}
+.btnFilter{
+  background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%)!important;
+  padding:8px 14px;font-size:12px;margin:0;
+  border-color:rgba(96,165,250,.35)!important;
+}
 .filterPanel{
-  background:#000;border:2px solid #0066ff;border-radius:8px;
-  padding:10px;margin-bottom:8px;display:none;
+  background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius);
+  padding:12px;margin-bottom:10px;display:none;
 }
 .filterPanel.open{display:block}
-.filterLabel{font-size:10px;color:#888;margin-bottom:4px;text-transform:uppercase;font-weight:800}
+.filterLabel{font-size:10px;color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;font-weight:600;letter-spacing:.08em}
 .filterRow{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
 .filterOpBtn{flex:1;min-width:28%;font-size:10px;padding:8px 4px;margin:0}
 .filterTypeBtn{flex:1;font-size:11px;padding:10px;margin:0;position:relative}
 .filterOpBtn.selected,.filterTypeBtn.selected{
-  background:#ffd700!important;color:#000!important;
-  border-color:#ffd700!important;
-  box-shadow:0 0 8px rgba(255,215,0,.4);
+  background:linear-gradient(180deg,#e8c547 0%,#c9a227 100%)!important;
+  color:#1a1200!important;
+  border-color:#d4af37!important;
+  box-shadow:0 0 0 2px var(--gold-soft)!important;
 }
 .filterSearchRow{display:flex;gap:6px}
 .filterSearchRow button{flex:1;margin:0}
-.operatorStatus.ready{color:#1e90ff;font-weight:800}
-.phoneHint{color:#1e90ff}
+.operatorStatus.ready{color:var(--green-bright);font-weight:600}
+.phoneHint{color:var(--green-bright)}
 #pinModal.open{align-items:center;justify-content:center;padding:16px}
 #fareModal.open{align-items:center;justify-content:center;padding:16px}
 #cancelReasonModal.open{align-items:center;justify-content:center;padding:16px}
 #cancelReasonInput{
   width:100%;padding:12px;margin:10px 0;
-  background:#fff;color:#000;font-weight:800;
-  border:2px solid #0066ff;border-radius:8px;
+  background:var(--surface);color:#0f172a;font-weight:600;
+  border:1px solid #cbd5e1;border-radius:var(--radius-sm);
   font-size:16px;box-sizing:border-box;
 }
-#cancelReasonInput::placeholder{color:#888;font-weight:600}
+#cancelReasonInput::placeholder{color:var(--text-dim);font-weight:500}
 #quickBookingModal.open{align-items:center;justify-content:center;padding:16px}
 .pinModalSheet input{text-align:center;font-size:22px;letter-spacing:6px}
 .fareInputWrap{
-  display:flex;align-items:center;background:#111;
-  border:2px solid #0066ff;border-radius:8px;padding:6px 12px;margin:10px 0;
+  display:flex;align-items:center;background:var(--bg-elevated);
+  border:1px solid var(--border-strong);border-radius:var(--radius-sm);padding:6px 12px;margin:10px 0;
 }
-.farePrefix{font-size:32px;color:#ffd700;font-weight:800;padding-right:4px}
+.farePrefix{font-size:32px;color:var(--gold);font-weight:700;padding-right:4px}
 .fareInputWrap input{
   border:none;background:transparent;font-size:32px;color:#fff;
   flex:1;padding:10px 4px;outline:none;width:100%;
@@ -700,23 +837,25 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 
 .modalOverlay{
   display:none;position:fixed;inset:0;
-  background:#000000dd;z-index:300;
-  align-items:flex-end;justify-content:center;
+  background:rgba(2,6,12,.72);backdrop-filter:blur(4px);
+  z-index:300;align-items:flex-end;justify-content:center;
 }
 .modalOverlay.open{display:flex}
 .modalSheet{
-  background:#000;border:2px solid #0066ff;border-radius:12px 12px 0 0;
+  background:var(--bg-elevated);border:1px solid var(--border-strong);
+  border-radius:var(--radius) var(--radius) 0 0;
   width:100%;max-width:430px;max-height:90vh;overflow-y:auto;
-  padding:0;animation:slideUp .25s ease;
+  padding:0;animation:slideUp .28s cubic-bezier(.22,1,.36,1);
+  box-shadow:var(--shadow);
 }
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modalHandle{width:40px;height:4px;background:#333;border-radius:2px;margin:12px auto}
+.modalHandle{width:36px;height:4px;background:rgba(255,255,255,.15);border-radius:99px;margin:10px auto 6px}
 .modalHeader{
   display:flex;justify-content:space-between;align-items:center;
-  padding:10px 12px;border-bottom:1px solid #333;
+  padding:12px 14px;border-bottom:1px solid var(--border);
 }
-.modalHeader h2{font-size:16px;color:#ffd700;font-weight:800;text-transform:uppercase;margin:0}
-.modalClose{background:#0047ab;padding:8px 14px;font-size:11px;border:1px solid #0066ff!important}
+.modalHeader h2{font-size:15px;color:var(--gold);font-weight:700;letter-spacing:.04em;margin:0}
+.modalClose{background:var(--bg-card);padding:8px 14px;font-size:11px;border:1px solid var(--border-strong)!important;border-radius:var(--radius-xs)!important}
 .detailGrid{display:block;padding:0}
 .modalActions{display:flex;gap:0;margin:0;flex-wrap:wrap;border-top:1px solid #333}
 .modalActions button{
@@ -726,33 +865,34 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .jcModal .jobCard{border:none;border-radius:0}
 
 .alertToast{
-  display:none;position:fixed;top:10px;left:10px;right:10px;
-  max-width:410px;margin:0 auto;
-  background:#000;border:2px solid #1b8a44;border-radius:8px;
+  display:none;position:fixed;top:max(12px,env(safe-area-inset-top));left:12px;right:12px;
+  max-width:406px;margin:0 auto;
+  background:var(--bg-elevated);border:1px solid rgba(34,197,94,.35);border-radius:var(--radius);
   padding:14px 16px;z-index:400;
-  animation:popIn .3s ease;cursor:pointer;
+  animation:popIn .32s cubic-bezier(.22,1,.36,1);cursor:pointer;
+  box-shadow:var(--shadow);
 }
 .alertToast.show{display:block}
-@keyframes popIn{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.alertToast h4{font-size:14px;margin-bottom:4px;color:#ffd700;font-weight:800;text-transform:uppercase}
-.alertToast p{font-size:12px;color:#fff;font-weight:700;text-transform:uppercase}
+@keyframes popIn{from{transform:translateY(-16px);opacity:0}to{transform:translateY(0);opacity:1}}
+.alertToast h4{font-size:12px;margin-bottom:4px;color:var(--green-bright);font-weight:700;letter-spacing:.1em}
+.alertToast p{font-size:13px;color:var(--text);font-weight:500;line-height:1.35}
 .opToast{
   display:none;position:fixed;top:max(12px,env(safe-area-inset-top));
   left:50%;transform:translateX(-50%);
   max-width:400px;width:calc(100% - 24px);z-index:500;
-  background:#1b8a44;color:#fff;font-weight:800;font-size:13px;
-  text-align:center;padding:12px 16px;border-radius:8px;
-  border:2px solid #4ade80;box-shadow:0 4px 20px rgba(0,0,0,.5);
-  text-transform:uppercase;pointer-events:none;
+  background:rgba(22,163,74,.95);color:#fff;font-weight:600;font-size:13px;
+  text-align:center;padding:12px 18px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);box-shadow:var(--shadow);
+  pointer-events:none;
 }
-.opToast.error{background:#7f1d1d;border-color:#dc2626}
+.opToast.error{background:rgba(127,29,29,.95);border-color:rgba(248,113,113,.3)}
 .opToast.show{display:block;animation:toastIn .2s ease}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .editModeBanner{
-  display:none;background:#ffd700;color:#000;font-weight:900;
+  display:none;background:var(--gold-soft);color:var(--gold);font-weight:700;
   font-size:12px;text-align:center;padding:10px 8px;
-  border:2px solid #ffd700;border-radius:6px;margin:6px 0;
-  text-transform:uppercase;line-height:1.3;
+  border:1px solid rgba(212,175,55,.35);border-radius:var(--radius-sm);margin:6px 0;
+  line-height:1.3;
 }
 .cancelReasonChips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
 .cancelReasonChips button{
@@ -764,8 +904,11 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 </head>
 <body>
 
-<h2>GEELONG PREMIUM NETWORK</h2>
-<div id="syncStatus" class="syncStatus">Connecting…</div>
+<header class="appHeader">
+  <div class="appBrand">Geelong Premium Network</div>
+  <div class="appTagline">Dispatch</div>
+</header>
+<div class="syncWrap"><div id="syncStatus" class="syncStatus">Connecting…</div></div>
 
 <div id="alertToast" class="alertToast" onclick="dismissAlert()">
   <h4>NEW JOB</h4>
@@ -782,7 +925,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   </div>
 
   <div id="bookingForm" class="locked">
-  <button type="button" class="btnQuickBooking" onclick="openQuickBooking()">⚡ Quick Booking</button>
+  <button type="button" class="btnQuickBooking" onclick="openQuickBooking()">Quick Booking</button>
   <div class="twoCol">
     <div class="nameInputWrap">
       <input id="name" placeholder="Passenger Name" autocomplete="off" autocapitalize="words">
@@ -811,7 +954,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <div class="row">
       <button id="quickBtn" onclick="setTime('Quick')">Quick</button>
       <button id="readyBtn" onclick="setTime('Ready Now')">Ready Now</button>
-      <button id="laterBtn" onclick="setTime('Future')">Future</button>
+      <button id="laterBtn" onclick="setTime('Future')">Later</button>
     </div>
     <div class="threeCol">
       <input id="date" type="date" disabled>
@@ -864,13 +1007,13 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 
   <div class="section formSection">
     <div id="editModeBanner" class="editModeBanner">⚠ EDITING JOB-<span id="editModeJobId"></span> — Tap Clear Form for new dispatch</div>
-    <button id="dispatchBtn" style="width:100%;background:#1b8a44;border-color:#1b8a44;" onclick="dispatch()">DISPATCH</button>
-    <div style="display:flex;gap:8px;">
-      <button style="flex:1;" onclick="sendQuote()">Send Quote</button>
-      <button style="flex:1;" onclick="sendConfirmation()">Send Confirmation</button>
-      <button style="flex:1;background:#8b5cf6;" onclick="sendFollowUp()">Follow Up</button>
+    <button id="dispatchBtn" class="btnDispatch" onclick="dispatch()">Dispatch</button>
+    <div class="formActionRow">
+      <button onclick="sendQuote()">Send Quote</button>
+      <button onclick="sendConfirmation()">Send Confirmation</button>
+      <button class="btnFollowUp" onclick="sendFollowUp()">Follow Up</button>
     </div>
-    <button style="width:100%;background:#64748b;margin-top:4px;" onclick="clearFormRefresh()">Clear Form</button>
+    <button class="btnClearForm" onclick="clearFormRefresh()">Clear Form</button>
   </div>
   </div>
 </div>
@@ -880,7 +1023,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <h3>Available Bookings</h3>
   <div class="availToggle">
     <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
-    <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Future Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
+    <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Later Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
   </div>
   <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
   <div id="availableList" class="jobList"></div>
@@ -901,8 +1044,8 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button id="filterCompleted" class="filterTypeBtn" onclick="setFilterType('completed')">Completed</button>
     </div>
     <div class="filterSearchRow">
-      <button style="background:#2563eb" onclick="runPreviousFilter()">Search</button>
-      <button style="background:#64748b" onclick="clearPreviousFilter()">Clear</button>
+      <button class="btnPrimary" onclick="runPreviousFilter()">Search</button>
+      <button class="btnSecondary" onclick="clearPreviousFilter()">Clear</button>
     </div>
   </div>
   <div id="previousListHint" class="listHeader">Tap to view or reload into New Booking</div>
@@ -913,33 +1056,32 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="tabTeam" class="tabPanel">
   <h3>Team Info</h3>
   <div class="teamToggle availToggle">
-    <button id="teamNoticeBtn" class="filterTypeBtn selected" onclick="setTeamView('notice')">Notice Board</button>
+    <button id="teamNoticeBtn" class="filterTypeBtn selected" onclick="setTeamView('notice')">Team Chat</button>
     <button id="teamProspectBtn" class="filterTypeBtn" onclick="setTeamView('prospect')">Prospect Tracker</button>
   </div>
 
   <div id="teamNoticePanel" class="teamNoticeLayout">
-    <div class="noticeBoardHeader">
-      <div class="noticeMarquee">
-        <span class="noticeMarqueeText">Smile You Are At Geelong Premium Network's Notice Board</span>
-      </div>
+    <div class="chatHeader">
+      <div class="chatHeaderTitle">Team Chat</div>
+      <div class="chatHeaderSub">Geelong Premium Network · All operators</div>
     </div>
-    <div id="noticeBoardFeed" class="noticeFeed">
-      <div class="noticeFeedEmpty">No messages yet — be the first to post</div>
+    <div id="noticeBoardFeed" class="chatFeed">
+      <div class="chatFeedEmpty">No messages yet — say hello to the team</div>
     </div>
-    <div class="noticeCompose">
-      <input id="noticeInput" type="text" placeholder="Type a message…" autocomplete="off" autocapitalize="sentences" onkeydown="if(event.key==='Enter')postNoticeMessage()">
-      <button type="button" onclick="postNoticeMessage()">Send</button>
+    <div class="noticeCompose chatCompose">
+      <input id="noticeInput" type="text" placeholder="Message…" autocomplete="off" autocapitalize="sentences" onkeydown="if(event.key==='Enter')postNoticeMessage()">
+      <button type="button" onclick="postNoticeMessage()" title="Send">➤</button>
     </div>
   </div>
 
   <div id="teamProspectPanel" style="display:none">
     <div class="listHeader">Points: $90+ = 1 · $150+ = 2 · $210+ = 3 · $270+ = 4 · $400+ = 5</div>
     <div class="prospectToolbar">
-      <button style="background:#2563eb" onclick="promptProspectEdit()">✏️ Edit Points (PIN)</button>
-      <button id="prospectSaveBtn" style="background:#10b981;display:none" onclick="saveProspectScores()">Save Points</button>
+      <button class="btnPrimary" onclick="promptProspectEdit()">Edit Points (PIN)</button>
+      <button id="prospectSaveBtn" class="btnSuccess" style="display:none" onclick="saveProspectScores()">Save Points</button>
     </div>
     <table class="prospectTable">
-      <thead><tr><th>Operator</th><th style="text-align:center">Points</th></tr></thead>
+      <thead><tr><th>Operator</th><th class="prospectPointsHead">Points</th></tr></thead>
       <tbody id="prospectTableBody"></tbody>
     </table>
   </div>
@@ -947,28 +1089,28 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 
 <!-- PIN MODAL -->
 <div id="pinModal" class="modalOverlay" onclick="if(event.target===this)closePinModal()">
-  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
-    <h3 id="pinModalTitle" style="color:#facc15;margin-bottom:10px;text-align:center">Enter PIN</h3>
+  <div class="modalSheet pinModalSheet pinModalRounded">
+    <h3 id="pinModalTitle" class="modalTitleGold">Enter PIN</h3>
     <input id="pinInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="••••" autocomplete="off" enterkeyhint="done" readonly>
     <div class="pinActions">
-      <button id="pinConfirmBtn" style="background:#2563eb" onclick="confirmPinAction()">Continue</button>
-      <button style="background:#64748b" onclick="closePinModal()">Cancel</button>
+      <button id="pinConfirmBtn" class="btnPrimary" onclick="confirmPinAction()">Continue</button>
+      <button class="btnSecondary" onclick="closePinModal()">Cancel</button>
     </div>
   </div>
 </div>
 
 <!-- EDIT JOB MODAL -->
 <div id="editJobModal" class="modalOverlay" onclick="if(event.target===this)closeEditJobModal()">
-  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px;max-height:92vh;overflow-y:auto">
-    <h3 style="color:#60a5fa;margin-bottom:10px;text-align:center">Edit Job</h3>
+  <div class="modalSheet pinModalSheet pinModalRounded pinModalScroll">
+    <h3 class="modalTitleBlue">Edit Job</h3>
     <input id="editName" placeholder="Passenger Name">
     <input id="editPhone" type="tel" inputmode="numeric" placeholder="Phone Number">
     <input id="editPickup" placeholder="Pickup Location">
     <input id="editDrop" placeholder="Drop-off Location">
     <textarea id="editNotes" class="notesBox" placeholder="Notes"></textarea>
     <div class="pinActions">
-      <button style="background:#10b981;flex:1" onclick="saveEditedJob()">Save Changes</button>
-      <button style="background:#64748b;flex:1" onclick="closeEditJobModal()">Cancel</button>
+      <button class="btnSuccess" style="flex:1" onclick="saveEditedJob()">Save Changes</button>
+      <button class="btnSecondary" style="flex:1" onclick="closeEditJobModal()">Cancel</button>
     </div>
   </div>
 </div>
@@ -977,25 +1119,29 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 
 <!-- FARE MODAL -->
 <div id="fareModal" class="modalOverlay" onclick="if(event.target===this)closeFareModal()">
-  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
-    <h3 style="color:#4ade80;margin-bottom:4px;text-align:center">Enter Fare</h3>
-    <p style="text-align:center;color:#94a3b8;font-size:12px;margin-bottom:8px">Trip fare to complete this job</p>
+  <div class="modalSheet pinModalSheet pinModalRounded">
+    <h3 id="fareModalTitle" class="modalTitleGreen">Enter Fare</h3>
+    <p id="fareModalHint" class="modalSubtitle" style="margin-bottom:8px">Trip fare to complete this job</p>
+    <div id="completedByRow" style="display:none;margin-bottom:8px">
+      <div class="filterLabel">Completed by</div>
+      <select id="completedBySelect"></select>
+    </div>
     <div class="fareInputWrap">
       <span class="farePrefix">$</span>
       <input id="fareInput" type="tel" inputmode="decimal" pattern="[0-9]*" placeholder="0.00" autocomplete="off" enterkeyhint="done" readonly>
     </div>
     <div class="pinActions">
-      <button class="btnComplete" onclick="confirmCompleteJob()">Complete Job</button>
-      <button style="background:#64748b" onclick="closeFareModal()">Cancel</button>
+      <button id="fareConfirmBtn" class="btnSuccess" onclick="confirmCompleteJob()">Complete Job</button>
+      <button class="btnSecondary" onclick="closeFareModal()">Cancel</button>
     </div>
   </div>
 </div>
 
 <!-- CANCEL REASON MODAL -->
 <div id="cancelReasonModal" class="modalOverlay" onclick="if(event.target===this)closeCancelReasonModal()">
-  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
-    <h3 style="color:#ff6b6b;margin-bottom:4px;text-align:center">Cancel Reason</h3>
-    <p style="text-align:center;color:#94a3b8;font-size:12px;margin-bottom:8px">Why is this job being canceled?</p>
+  <div class="modalSheet pinModalSheet pinModalRounded">
+    <h3 class="modalTitleRed">Cancel Reason</h3>
+    <p class="modalSubtitle" style="margin-bottom:8px">Why is this job being canceled?</p>
     <div class="cancelReasonChips">
       <button type="button" onclick="setCancelReason('No show')">No show</button>
       <button type="button" onclick="setCancelReason('Customer canceled')">Customer canceled</button>
@@ -1004,29 +1150,29 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     </div>
     <input id="cancelReasonInput" type="text" placeholder="Or type reason…" autocomplete="off" autocapitalize="sentences" enterkeyhint="done" onkeydown="if(event.key==='Enter')confirmCancelJob()">
     <div class="pinActions">
-      <button style="background:#dc2626;flex:1" onclick="confirmCancelJob()">Confirm Cancel</button>
-      <button style="background:#64748b;flex:1" onclick="closeCancelReasonModal()">Back</button>
+      <button class="btnDanger" style="flex:1" onclick="confirmCancelJob()">Confirm Cancel</button>
+      <button class="btnSecondary" style="flex:1" onclick="closeCancelReasonModal()">Back</button>
     </div>
   </div>
 </div>
 
 <!-- FOLLOW UP MODAL -->
 <div id="followUpModal" class="modalOverlay" onclick="if(event.target===this)closeFollowUpModal()">
-  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px">
-    <h3 style="color:#8b5cf6;margin-bottom:4px;text-align:center">Follow Up</h3>
-    <p style="text-align:center;color:#94a3b8;font-size:12px;margin-bottom:12px">Choose message type to send</p>
+  <div class="modalSheet pinModalSheet pinModalRounded">
+    <h3 class="modalTitlePurple">Follow Up</h3>
+    <p class="modalSubtitle">Choose message type to send</p>
     <div class="pinActions">
-      <button style="background:#8b5cf6;flex:1" onclick="sendFollowUpMarketing()">Marketing</button>
-      <button style="background:#2563eb;flex:1" onclick="sendFollowUpCompliance()">Compliance</button>
+      <button class="btnPurple" style="flex:1" onclick="sendFollowUpMarketing()">Marketing</button>
+      <button class="btnPrimary" style="flex:1" onclick="sendFollowUpCompliance()">Compliance</button>
     </div>
-    <button style="width:100%;background:#64748b;margin-top:8px" onclick="closeFollowUpModal()">Cancel</button>
+    <button class="btnSecondary modalCancelFull" onclick="closeFollowUpModal()">Cancel</button>
   </div>
 </div>
 
 <!-- QUICK BOOKING MODAL -->
 <div id="quickBookingModal" class="modalOverlay" onclick="if(event.target===this)closeQuickBooking()">
-  <div class="modalSheet pinModalSheet" style="margin-top:auto;margin-bottom:auto;border-radius:12px;max-height:92vh">
-    <h3 style="color:#60a5fa;margin-bottom:6px;text-align:center;font-weight:800">Quick Booking</h3>
+  <div class="modalSheet pinModalSheet pinModalRounded pinModalScroll">
+    <h3 class="modalTitleBlue" style="margin-bottom:6px;font-weight:700">Quick Booking</h3>
     <p class="qbHint">Select time first · then name or addresses · Dispatch when ready</p>
     <div class="qbTimeRow">
       <button type="button" id="qbQuickBtn" onclick="setQuickTime('Quick')">Quick</button>
@@ -1054,10 +1200,10 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     </div>
     <textarea id="qbNotes" class="notesBox qbNotes" placeholder="Notes — driver instructions, special requests…"></textarea>
     <div class="pinActions">
-      <button style="background:#10b981;flex:1" onclick="dispatchQuick()">Dispatch</button>
-      <button style="background:#2563eb;flex:1" onclick="sendQuickConfirmation()">Confirmation</button>
+      <button class="btnSuccess" style="flex:1" onclick="dispatchQuick()">Dispatch</button>
+      <button class="btnPrimary" style="flex:1" onclick="sendQuickConfirmation()">Confirmation</button>
     </div>
-    <button style="width:100%;background:#64748b;margin-top:8px" onclick="closeQuickBooking()">Cancel</button>
+    <button class="btnSecondary modalCancelFull" onclick="closeQuickBooking()">Cancel</button>
   </div>
 </div>
 
@@ -1121,6 +1267,7 @@ let db, firebaseReady = false;
 let messaging = null;
 let pushSwRegistration = null;
 let pushTokenSaved = "";
+let pushMessageBound = false;
 let availableJobs = [], previousJobs = [], completedJobs = [], filterResultJobs = [], historyJobs = [];
 let teamOperators = AUTHORIZED_OPERATORS.slice();
 let selectedFilterOperator = "", selectedFilterType = "";
@@ -1128,7 +1275,10 @@ let previousFilterActive = false;
 let pendingDeleteDocId = null;
 let pendingCancelDocId = null;
 let pendingCompleteDocId = null;
+let pendingFreeDispatchDocId = null;
 let pendingEditDocId = null;
+let countdownTickTimer = null;
+const ACCEPT_WINDOW_MS = 120000;
 let editingDocId = null;
 let pinAction = "";
 let prospectScores = {};
@@ -1172,12 +1322,12 @@ function setCancelReason(text) {
 function validateMainDispatch() {
   if (editingDocId) return true;
   if (selectedTime === "None") {
-    showToast("Select Quick, Ready Now, or Future", true);
+    showToast("Select Quick, Ready Now, or Later", true);
     return false;
   }
   if (isFutureTimeType(selectedTime)) {
     if (!document.getElementById("date").value || !document.getElementById("time").value) {
-      showToast("Select date and time for Future booking", true);
+      showToast("Select date and time for Later booking", true);
       return false;
     }
   }
@@ -1482,6 +1632,58 @@ async function ensureServiceWorker() {
   }
 }
 
+async function refreshPushTokenIfNeeded(operatorName) {
+  if (!operatorName || !firebase.messaging || !firebaseVapidKey) return;
+  try {
+    const reg = await ensureServiceWorker();
+    if (!reg) return;
+    if (!messaging) messaging = firebase.messaging();
+    const token = await messaging.getToken({
+      vapidKey: firebaseVapidKey,
+      serviceWorkerRegistration: reg
+    });
+    if (token && token !== pushTokenSaved) await savePushToken(operatorName, token);
+  } catch (e) {
+    console.warn("Token refresh failed", e);
+  }
+}
+
+function shouldSkipPushForMe(data) {
+  if (!data) return false;
+  const me = getCurrentOperator().trim().toLowerCase();
+  if (me && data.skipOperator && String(data.skipOperator).trim().toLowerCase() === me) return true;
+  if (me && data.recalledBy && String(data.recalledBy).trim().toLowerCase() === me) return true;
+  if (me && data.senderOperator && String(data.senderOperator).trim().toLowerCase() === me) return true;
+  if (data.excludeSessionId && data.excludeSessionId === sessionId) return true;
+  return false;
+}
+
+async function showSystemPushNotification(payload) {
+  const data = payload.data || {};
+  if (shouldSkipPushForMe(data)) return;
+  const n = payload.notification || {};
+  const title = n.title || "GPN Dispatch";
+  const body = n.body || "";
+  try {
+    const reg = pushSwRegistration || await ensureServiceWorker();
+    if (!reg || Notification.permission !== "granted") return;
+    const tag = data.type === "team_chat"
+      ? ("chat-" + (data.chatId || "team"))
+      : (data.docId || data.type || ("gpn-" + Date.now()));
+    await reg.showNotification(title, {
+      body: body,
+      icon: "./icons/icon-192.png",
+      badge: "./icons/icon-192.png",
+      tag: tag,
+      renotify: true,
+      requireInteraction: true,
+      data: data
+    });
+  } catch (e) {
+    console.warn("System notification failed", e);
+  }
+}
+
 async function savePushToken(operator, token) {
   if (!firebaseReady || !operator || !token || !deviceId) return;
   pushTokenSaved = token;
@@ -1531,18 +1733,12 @@ async function initPushNotifications(operatorName) {
     }
     if (token !== pushTokenSaved) await savePushToken(operatorName, token);
     showToast("Push alerts enabled — works when app is closed");
-    messaging.onMessage(function(payload) {
-      const data = payload.data || {};
-      if (data.type === "new_job") return;
-      if (data.type === "job_recalled") {
-        alertNewJobArrival();
-        return;
-      }
-      const n = payload.notification || {};
-      const title = n.title || "GPN Dispatch";
-      const body = n.body || "";
-      showToast(title + (body ? " — " + body : ""));
-    });
+    if (!pushMessageBound) {
+      pushMessageBound = true;
+      messaging.onMessage(function(payload) {
+        showSystemPushNotification(payload);
+      });
+    }
   } catch (err) {
     console.error("Push init failed", err);
     showToast("Push setup failed — refresh and try again", true);
@@ -1700,17 +1896,23 @@ function renderNoticeBoard() {
   const feed = document.getElementById("noticeBoardFeed");
   if (!feed) return;
   if (!noticeMessages.length) {
-    feed.innerHTML = '<div class="noticeFeedEmpty">No messages yet — be the first to post</div>';
+    feed.innerHTML = '<div class="chatFeedEmpty">No messages yet — say hello to the team</div>';
     return;
   }
+  const me = getCurrentOperator();
   feed.innerHTML = noticeMessages.map(function(msg) {
-    return '<div class="noticeMsg">' +
-      '<div class="noticeMsgHead">' +
-      '<span class="noticeOp">' + escapeHtml((msg.operator || "Unknown").toUpperCase()) + '</span>' +
-      '<span class="noticeTime">' + escapeHtml(formatNoticeTime(msg)) + '</span>' +
-      '</div>' +
-      '<div class="noticeMsgBody">' + escapeHtml(msg.message || "") + '</div>' +
-      '</div>';
+    const isMine = me && msg.operator === me;
+    const rowClass = isMine ? "chatRow chatRowMine" : "chatRow chatRowOther";
+    const bubbleClass = isMine ? "chatBubble chatBubbleMine" : "chatBubble chatBubbleOther";
+    let html = '<div class="' + rowClass + '">';
+    if (!isMine) {
+      html += '<div class="chatSender">' + escapeHtml(msg.operator || "Unknown") + '</div>';
+    }
+    html += '<div class="' + bubbleClass + '">';
+    html += '<div class="chatText">' + escapeHtml(msg.message || "") + '</div>';
+    html += '<div class="chatBubbleMeta">' + escapeHtml(formatNoticeTime(msg)) + '</div>';
+    html += '</div></div>';
+    return html;
   }).join("");
   scrollNoticeFeedToBottom();
 }
@@ -1736,6 +1938,7 @@ async function postNoticeMessage() {
     await db.collection("noticeBoard").add({
       operator: op,
       message: text,
+      sessionId: sessionId,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     input.value = "";
@@ -1784,9 +1987,9 @@ function jdLineHtml(label, value, valueClass) {
 
 function getJobPickupDayDateLabel(job, withYear) {
   let dateStr = job.date;
-  if (isFutureJob(job) && !dateStr && job.timeInput) dateStr = getTodayDate();
+  if (!dateStr && isFutureTimeType(job.time) && job.timeInput) dateStr = getTodayDate();
   let d;
-  if (isFutureJob(job) && dateStr) {
+  if (dateStr) {
     d = new Date(dateStr + "T12:00:00");
   } else if (job.dispatchedAt) {
     if (job.dispatchedAt.toDate) d = job.dispatchedAt.toDate();
@@ -1804,6 +2007,7 @@ function getJobPickupDayDateLabel(job, withYear) {
 
 function getJobScheduleTypeLabel(job) {
   if (isFutureJob(job)) return "SCHEDULED";
+  if (isFutureTimeType(job.time)) return "LATER";
   return (job.time || "QUICK").toUpperCase();
 }
 
@@ -1984,12 +2188,122 @@ function isFutureTimeType(timeType) {
   return timeType === "Future" || timeType === "Later";
 }
 
+function getJobDateStr(job) {
+  if (job.date) return job.date;
+  return getTodayDate();
+}
+
 function isFutureJob(job) {
-  return isFutureTimeType(job.time || "");
+  return getJobDateStr(job) > getTodayDate();
 }
 
 function isCurrentJob(job) {
   return !isFutureJob(job);
+}
+
+function isQuickOrReadyJob(job) {
+  const t = String(job.time || "").trim().toLowerCase();
+  return t === "quick" || t === "ready now";
+}
+
+function getJobDispatchedMs(job) {
+  if (!job.dispatchedAt) return Date.now();
+  if (job.dispatchedAt.toDate) return job.dispatchedAt.toDate().getTime();
+  if (job.dispatchedAt.seconds) return job.dispatchedAt.seconds * 1000;
+  return Date.now();
+}
+
+function getAcceptWindowRemainingMs(job) {
+  if (!isQuickOrReadyJob(job)) return ACCEPT_WINDOW_MS;
+  return Math.max(0, ACCEPT_WINDOW_MS - (Date.now() - getJobDispatchedMs(job)));
+}
+
+function canAcceptJob(job) {
+  return job.status === "available" && (!isQuickOrReadyJob(job) || getAcceptWindowRemainingMs(job) > 0);
+}
+
+function showFreeToDispatch(job) {
+  return job.status === "available" && isQuickOrReadyJob(job) && getAcceptWindowRemainingMs(job) === 0;
+}
+
+function formatCountdownMs(ms) {
+  const totalSec = Math.ceil(ms / 1000);
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return m + ":" + String(s).padStart(2, "0");
+}
+
+function jobCountdownHtml(job) {
+  const dispatchMs = getJobDispatchedMs(job);
+  const remain = getAcceptWindowRemainingMs(job);
+  return '<div class="jcHeadActs" onclick="event.stopPropagation()">' +
+    '<div class="jcHeadBoxLbl">ACCEPT IN</div>' +
+    '<div class="jcCountdown" data-dispatch-ms="' + dispatchMs + '">' + formatCountdownMs(remain) + '</div></div>';
+}
+
+function buildAvailableActionsHtml(job) {
+  const isAccepted = job.status === "accepted";
+  if (!isAccepted && canAcceptJob(job)) {
+    return '<div class="jobActions" onclick="event.stopPropagation()">' +
+      '<button class="btnAccept btnAcceptJob" onclick="acceptJob(\'' + job.docId + '\')">✓ ACCEPT JOB</button></div>';
+  }
+  if (!isAccepted && showFreeToDispatch(job)) {
+    return '<div class="jobActions" onclick="event.stopPropagation()">' +
+      '<button class="btnFreeDispatch" onclick="freeToDispatch(\'' + job.docId + '\')">FREE TO DISPATCH</button></div>';
+  }
+  if (isAccepted && isJobAcceptedByMe(job)) {
+    return '<div class="acceptedBanner">ACCEPTED · ' + escapeHtml((job.acceptedBy || "").toUpperCase()) + '</div>' +
+      '<div class="jobActions" onclick="event.stopPropagation()">' +
+      '<button class="btnComplete" onclick="completeJob(\'' + job.docId + '\')">✓ COMPLETE</button>' +
+      '<button class="btnRecall" onclick="recallJob(\'' + job.docId + '\')">RECALL</button></div>';
+  }
+  if (isAccepted) {
+    return '<div class="acceptedBanner">ACCEPTED · ' + escapeHtml((job.acceptedBy || "UNKNOWN").toUpperCase()) + '</div>';
+  }
+  return "";
+}
+
+function bindJobCardSwipe(cardEl, docId) {
+  let startX = 0, startY = 0, tracking = false;
+  cardEl.addEventListener("touchstart", function(e) {
+    if (!e.touches || !e.touches.length) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    tracking = true;
+  }, { passive: true });
+  cardEl.addEventListener("touchend", function(e) {
+    if (!tracking || !e.changedTouches.length) return;
+    tracking = false;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy)) return;
+    if (dx < -70) editJobInForm(docId, e);
+    else if (dx > 70) promptDeleteJob(docId, e);
+  }, { passive: true });
+}
+
+function bindJobListSwipes(container) {
+  if (!container) return;
+  container.querySelectorAll(".jobCardSwipe").forEach(function(card) {
+    const id = card.getAttribute("data-doc-id");
+    if (!id || card.dataset.swipeBound) return;
+    card.dataset.swipeBound = "1";
+    bindJobCardSwipe(card, id);
+  });
+}
+
+function ensureCountdownTicker() {
+  if (countdownTickTimer) return;
+  countdownTickTimer = setInterval(function() {
+    let needsRerender = false;
+    document.querySelectorAll(".jcCountdown[data-dispatch-ms]").forEach(function(el) {
+      const dispatchMs = parseInt(el.getAttribute("data-dispatch-ms"), 10);
+      const remain = Math.max(0, ACCEPT_WINDOW_MS - (Date.now() - dispatchMs));
+      el.textContent = formatCountdownMs(remain);
+      if (remain === 0) needsRerender = true;
+    });
+    if (needsRerender) scheduleRenderAvailable();
+  }, 1000);
 }
 
 function updateAvailableBadges() {
@@ -2016,8 +2330,8 @@ function setAvailableView(view) {
   document.getElementById("availCurrentBtn").classList.toggle("selected", view === "current");
   document.getElementById("availFutureBtn").classList.toggle("selected", view === "future");
   document.getElementById("availableListHint").textContent = view === "future"
-    ? "Future scheduled jobs"
-    : "Quick & Ready Now jobs · Accept to take";
+    ? "Next-day & later scheduled jobs"
+    : "Today · Quick & Ready Now · Accept to take";
   scheduleRenderAvailable();
 }
 
@@ -2491,10 +2805,10 @@ function formatDispatchedTimeOnly(job) {
 }
 
 function getJobScheduleHeader(job) {
-  if (isFutureJob(job) && job.timeInput) {
+  if ((isFutureJob(job) || isFutureTimeType(job.time)) && job.timeInput) {
     let t = job.timeInput;
     if (job.ampm && job.ampm !== "None") t += " " + job.ampm;
-    return { label: "SCHEDULED", time: t.toUpperCase() };
+    return { label: isFutureJob(job) ? "SCHEDULED" : "LATER", time: t.toUpperCase() };
   }
   if (isFutureJob(job) && job.date) {
     return { label: "SCHEDULED", time: formatDateDisplay(job.date).toUpperCase() };
@@ -2503,7 +2817,7 @@ function getJobScheduleHeader(job) {
 }
 
 function getJobPickupTimeDisplay(job) {
-  if (isFutureJob(job) && job.timeInput) {
+  if ((isFutureJob(job) || isFutureTimeType(job.time)) && job.timeInput) {
     let t = job.timeInput;
     if (job.ampm && job.ampm !== "None") t += " " + job.ampm;
     return t.toUpperCase();
@@ -2533,9 +2847,19 @@ function jobCardHeaderGridHtml(job, docId, source, opts) {
     } else {
       headClass += " jcHeadNoActs";
     }
-  } else if (docId) {
-    rightHtml = '<div class="jcHeadActs" onclick="event.stopPropagation()">' +
-      jobEditBtn(docId) + jobDeleteBtn(docId) + '</div>';
+  } else if (source === "previous") {
+    const fareLabel = formatFareDisplay(job.fare);
+    if (job.status === "completed" && fareLabel) {
+      rightHtml = '<div class="jcHeadFareCol">' +
+        '<div class="jcHeadBoxLbl">FARE</div>' +
+        '<div class="jcHeadFareVal">' + escapeHtml(fareLabel.toUpperCase()) + '</div></div>';
+    } else {
+      headClass += " jcHeadNoActs";
+    }
+  } else if (docId && source === "available" && isQuickOrReadyJob(job) && job.status === "available") {
+    rightHtml = jobCountdownHtml(job);
+  } else if (docId && source === "available") {
+    headClass += " jcHeadNoActs";
   }
 
   return '<div class="' + headClass + '">' +
@@ -2654,8 +2978,8 @@ function jobCardHeaderHtml(job, docId, source) {
 
 function buildJobCardHtml(job, docId, source, actionsHtml, extraHtml) {
   const isAccepted = job.status === "accepted";
-  const cardClass = "jobCard" + (source === "available" && isAccepted ? " jobCardAccepted" : "");
-  return '<div class="' + cardClass + '" onclick="openJobModal(\'' + docId + '\',\'' + source + '\')">' +
+  const cardClass = "jobCard jobCardSwipe" + (source === "available" && isAccepted ? " jobCardAccepted" : "");
+  return '<div class="' + cardClass + '" data-doc-id="' + docId + '" onclick="openJobModal(\'' + docId + '\',\'' + source + '\')">' +
     jobCardHeaderHtml(job, docId, source) +
     jobCardPersonHtml(job, source) +
     jobRouteHtml(job) +
@@ -2860,7 +3184,8 @@ function collectJobData(jobId, status) {
 }
 
 function computeSortKey(timeType, date, timeInput, ampm) {
-  if (!isFutureTimeType(timeType) || !date) return Date.now();
+  if (!date) return Date.now();
+  if (!isFutureTimeType(timeType) && !timeInput) return Date.now();
   if (!timeInput) return new Date(date + "T23:59:59").getTime();
   const parts = timeInput.split(":");
   let h = parseInt(parts[0], 10) || 0;
@@ -2907,7 +3232,7 @@ function subscribeAvailableJobs() {
         changes.forEach(function(change) {
           if (change.type === "added") {
             const job = change.doc.data();
-            if (job.status === "available" && job.sessionId !== sessionId) {
+            if (job.status === "available" && job.sessionId !== sessionId && !pushTokenSaved) {
               showNewJobAlert(Object.assign({ docId: change.doc.id }, job));
             }
           }
@@ -2933,25 +3258,14 @@ function renderAvailableList() {
     return (a.sortKey || 0) - (b.sortKey || 0);
   });
   if (!jobs.length) {
-    el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No ' + (availableView === "future" ? "future" : "current") + ' bookings<br><span style="font-size:11px;font-weight:700">Quick & Ready Now jobs appear here</span></div>';
+    el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No ' + (availableView === "future" ? "later" : "current") + ' bookings<br><span style="font-size:11px;font-weight:700">Same-day jobs here · Next-day jobs under Later</span></div>';
     return;
   }
   el.innerHTML = jobs.map(function(job) {
-    const isAccepted = job.status === "accepted";
-    let actionsHtml = "";
-    if (!isAccepted) {
-      actionsHtml = '<div class="jobActions" onclick="event.stopPropagation()">' +
-        '<button class="btnAccept btnAcceptJob" onclick="acceptJob(\'' + job.docId + '\')">✓ ACCEPT JOB</button></div>';
-    } else if (isJobAcceptedByMe(job)) {
-      actionsHtml = '<div class="acceptedBanner">ACCEPTED · ' + escapeHtml((job.acceptedBy || "").toUpperCase()) + '</div>' +
-        '<div class="jobActions" onclick="event.stopPropagation()">' +
-        '<button class="btnComplete" onclick="completeJob(\'' + job.docId + '\')">✓ COMPLETE</button>' +
-        '<button class="btnRecall" onclick="recallJob(\'' + job.docId + '\')">RECALL</button></div>';
-    } else {
-      actionsHtml = '<div class="acceptedBanner">ACCEPTED · ' + escapeHtml((job.acceptedBy || "UNKNOWN").toUpperCase()) + '</div>';
-    }
-    return buildJobCardHtml(job, job.docId, "available", actionsHtml, "");
+    return buildJobCardHtml(job, job.docId, "available", buildAvailableActionsHtml(job), "");
   }).join("");
+  bindJobListSwipes(el);
+  ensureCountdownTicker();
 }
 
 function renderPreviousList() {
@@ -2965,6 +3279,7 @@ function renderPreviousList() {
   el.innerHTML = jobs.map(function(job) {
     return buildJobCardHtml(job, job.docId, "previous", "", "");
   }).join("");
+  bindJobListSwipes(el);
 }
 
 function formatFareDisplay(fare) {
@@ -3005,8 +3320,11 @@ async function openJobModalAsync(docId, source) {
 
   let actions = '<button onclick="copyJobMessage(\'' + docId + '\')">Copy Dispatch</button>';
   actions += '<button onclick="loadJobIntoForm(\'' + docId + '\', false)">Load Form</button>';
-  if (source === "available" && job.status === "available") {
+  if (source === "available" && canAcceptJob(job)) {
     actions += '<button class="btnAccept btnAcceptJob" onclick="acceptJob(\'' + docId + '\');closeJobModal()">✓ ACCEPT JOB</button>';
+  }
+  if (source === "available" && showFreeToDispatch(job)) {
+    actions += '<button class="btnFreeDispatch" onclick="freeToDispatch(\'' + docId + '\');closeJobModal()">FREE TO DISPATCH</button>';
   }
   if (source === "available" && job.status === "accepted" && isJobAcceptedByMe(job)) {
     actions += '<button class="btnComplete" onclick="completeJob(\'' + docId + '\')">✓ COMPLETE</button>';
@@ -3025,8 +3343,8 @@ function buildDispatchMessage(job) {
   let date = job.date;
   if (isFutureJob(job) && !date && job.timeInput) date = getTodayDate();
   const dateFormatted = formatDateDisplay(date);
-  const timeSection = isFutureJob(job) && date && job.timeInput
-    ? "🪧 *Pickup Time - " + (job.time === "Later" ? "Future" : job.time) + "*\n📅 *Date: " + dateFormatted + "*\n⏱️ *Time: " + job.timeInput + " " + job.ampm + "*"
+  const timeSection = (isFutureTimeType(job.time) || isFutureJob(job)) && date && job.timeInput
+    ? "🪧 *Pickup Time - " + (job.time === "Future" ? "Later" : job.time) + "*\n📅 *Date: " + dateFormatted + "*\n⏱️ *Time: " + job.timeInput + " " + job.ampm + "*"
     : "🪧 *Pickup Time - " + job.time + "*";
   let passengers = "👥 Adults: " + (job.adults || "None");
   if (job.kids) passengers += "\n👥 Kids: " + job.kids;
@@ -3187,6 +3505,8 @@ async function recallJob(docId) {
   try {
     await db.collection("jobs").doc(docId).update({
       status: "available",
+      recalledBy: op,
+      recalledBySession: sessionId,
       acceptedBy: firebase.firestore.FieldValue.delete(),
       acceptedAt: firebase.firestore.FieldValue.delete(),
       acceptedBySession: firebase.firestore.FieldValue.delete()
@@ -3197,6 +3517,14 @@ async function recallJob(docId) {
   }
 }
 
+function resetFareModal() {
+  document.getElementById("fareModalTitle").textContent = "Enter Fare";
+  document.getElementById("fareModalHint").textContent = "Trip fare to complete this job";
+  document.getElementById("fareConfirmBtn").textContent = "Complete Job";
+  document.getElementById("completedByRow").style.display = "none";
+  pendingFreeDispatchDocId = null;
+}
+
 async function completeJob(docId) {
   const job = findJobById(docId);
   if (job && job.status === "accepted" && !isJobAcceptedByMe(job)) {
@@ -3204,7 +3532,29 @@ async function completeJob(docId) {
     return;
   }
   if (!requireOperator("complete jobs")) return;
+  resetFareModal();
   pendingCompleteDocId = docId;
+  const fareEl = document.getElementById("fareInput");
+  fareEl.value = job && job.price ? String(job.price).replace(/[^0-9.]/g, "") : "";
+  document.getElementById("fareModal").classList.add("open");
+  focusModalInput(fareEl, true);
+}
+
+function freeToDispatch(docId) {
+  if (!requireOperator("complete jobs")) return;
+  pendingFreeDispatchDocId = docId;
+  pendingCompleteDocId = docId;
+  const job = findJobById(docId);
+  document.getElementById("fareModalTitle").textContent = "Free to Dispatch";
+  document.getElementById("fareModalHint").textContent = "Who completed the job and what was the fare?";
+  document.getElementById("fareConfirmBtn").textContent = "Complete Job";
+  const sel = document.getElementById("completedBySelect");
+  sel.innerHTML = AUTHORIZED_OPERATORS.map(function(n) {
+    return '<option value="' + n + '">' + n + '</option>';
+  }).join("");
+  const me = getCurrentOperator();
+  if (me && AUTHORIZED_OPERATORS.indexOf(me) !== -1) sel.value = me;
+  document.getElementById("completedByRow").style.display = "block";
   const fareEl = document.getElementById("fareInput");
   fareEl.value = job && job.price ? String(job.price).replace(/[^0-9.]/g, "") : "";
   document.getElementById("fareModal").classList.add("open");
@@ -3215,6 +3565,7 @@ function closeFareModal() {
   document.getElementById("fareModal").classList.remove("open");
   document.getElementById("fareInput").setAttribute("readonly", "readonly");
   pendingCompleteDocId = null;
+  resetFareModal();
 }
 
 async function confirmCompleteJob() {
@@ -3228,22 +3579,38 @@ async function confirmCompleteJob() {
   }
   const op = requireOperator("complete jobs");
   if (!op) return;
+  const isFreeDispatch = !!pendingFreeDispatchDocId;
+  let completedBy = op;
+  if (isFreeDispatch) {
+    completedBy = document.getElementById("completedBySelect").value;
+    if (!completedBy) {
+      alert("Select who completed the job");
+      return;
+    }
+  }
   const job = findJobById(docId);
   const jobNum = job ? job.id : "";
+  if (job && job.status === "accepted" && !isFreeDispatch && !isJobAcceptedByMe(job)) {
+    alert("Only " + (job.acceptedBy || "the accepter") + " can complete this job");
+    return;
+  }
   try {
-    applyOptimisticComplete(docId, op, fare);
+    applyOptimisticComplete(docId, completedBy, fare);
     const pts = computeProspectPoints(fare);
     await db.collection("jobs").doc(docId).update({
       status: "completed",
-      completedBy: op,
+      completedBy: completedBy,
       completedAt: firebase.firestore.FieldValue.serverTimestamp(),
       fare: fare,
       prospectPoints: pts,
-      prospectPointsCredited: true
+      prospectPointsCredited: true,
+      acceptedBy: firebase.firestore.FieldValue.delete(),
+      acceptedAt: firebase.firestore.FieldValue.delete(),
+      acceptedBySession: firebase.firestore.FieldValue.delete()
     });
     if (pts > 0) {
       try {
-        await addProspectPoints(op, pts);
+        await addProspectPoints(completedBy, pts);
       } catch (pe) {
         console.error("Prospect points failed", pe);
         alert("Job completed but points update failed — use Prospect tab to adjust");
@@ -3400,27 +3767,51 @@ function queueOpenJobFromPush(docId, playAlert) {
   attempt();
 }
 
+function openTeamChatFromPush() {
+  const tabBtn = document.querySelector('[data-tab="tabTeam"]');
+  if (tabBtn) switchTab("tabTeam", tabBtn);
+  setTeamView("notice");
+  setTimeout(scrollNoticeFeedToBottom, 200);
+}
+
 function handlePushNavigation(msg) {
-  if (!msg || msg.type !== "openJob" || !msg.docId) return;
-  const playAlert = msg.pushType === "new_job" || msg.pushType === "job_recalled";
-  queueOpenJobFromPush(msg.docId, playAlert);
+  if (!msg) return;
+  if (msg.type === "openPush") {
+    if (msg.pushType === "team_chat" || msg.tab === "team") {
+      openTeamChatFromPush();
+      return;
+    }
+    if (msg.docId) queueOpenJobFromPush(msg.docId, false);
+    return;
+  }
+  if (msg.type === "openJob" && msg.docId) {
+    if (msg.pushType === "team_chat") {
+      openTeamChatFromPush();
+      return;
+    }
+    queueOpenJobFromPush(msg.docId, false);
+  }
 }
 
 function processPendingOpenJob() {
   const docId = sessionStorage.getItem("pendingOpenJob");
   if (!docId || !getCurrentOperator()) return;
-  const playAlert = sessionStorage.getItem("pendingOpenJobAlert") === "1";
+  const playAlert = sessionStorage.getItem("pendingOpenJobAlert") === "1" && !pushTokenSaved;
   queueOpenJobFromPush(docId, playAlert);
 }
 
 function handleNotificationDeepLink() {
   const params = new URLSearchParams(window.location.search);
+  const tab = params.get("tab");
+  if (tab === "team") {
+    history.replaceState({}, "", window.location.pathname);
+    setTimeout(openTeamChatFromPush, 300);
+    return;
+  }
   const docId = params.get("job");
   if (!docId) return;
-  const type = params.get("type") || "";
-  const playAlert = type === "new_job" || type === "job_recalled";
   history.replaceState({}, "", window.location.pathname);
-  queueOpenJobFromPush(docId, playAlert);
+  queueOpenJobFromPush(docId, false);
 }
 
 function extractSuburbFromAddress(address) {
@@ -3527,7 +3918,7 @@ async function dispatch() {
     const job = collectJobData(jobId, "available");
     const message = buildDispatchMessage(job);
     await db.collection("jobs").add(job);
-    await saveCustomerRecord(job);
+    saveCustomerRecord(job).catch(function(e) { console.warn("Customer save failed", e); });
     clearForm();
     switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
 
@@ -3666,7 +4057,7 @@ async function dispatchQuick() {
     const job = collectQuickJobData(jobId);
     const message = buildDispatchMessage(job);
     await db.collection("jobs").add(job);
-    await saveCustomerRecord(job);
+    saveCustomerRecord(job).catch(function(e) { console.warn("Customer save failed", e); });
     closeQuickBooking();
     setAvailableView("current");
     switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
@@ -3868,7 +4259,7 @@ function sendQuote() {
   const priceVal = document.getElementById("price").value;
   if (!name || !phone) { alert("Please enter Passenger Name and Phone Number"); return; }
   if (!priceVal) { alert("Please enter price for quote"); return; }
-  if (isFutureTimeType(selectedTime) && (!dateVal || !timeVal)) { alert("Please select date and time for Future pickup"); return; }
+  if (isFutureTimeType(selectedTime) && (!dateVal || !timeVal)) { alert("Please select date and time for Later pickup"); return; }
   const timeDisplay = isFutureTimeType(selectedTime) && dateVal && timeVal ? formatDateDisplay(dateVal) + ", " + timeVal + " " + selectedAMPM : "ASAP";
   const pa = []; if (adults) pa.push(pluralize(adults,"Adult","Adults")); if (kids) pa.push(pluralize(kids,"Kid","Kids"));
   const msg = "Hi " + name + ",\n\nThank you for your inquiry.\n\nTrip Details:\nDate & Time: " + timeDisplay + "\nPickup Address: " + pickup + "\nDrop-off Address: " + drop + "\nPassengers: " + pa.join(", ") + (luggage ? "\nLuggage: " + pluralize(luggage,"Bag","Bags") : "") + "\nVehicle: " + selectedVehicle + "\nEstimated Fare: $" + priceVal + " GST Inclusive\n\nTo confirm your booking or discuss price, simply reply to this message or give us a call." + SIGNATURE;
@@ -3894,7 +4285,7 @@ function sendConfirmation() {
     if (!dateVal || !timeVal) { alert("Please select date and time for deposit booking"); return; }
     if (!depositLink || !depositAmount) { alert("Please enter deposit link and amount"); return; }
   }
-  if (isFutureTimeType(selectedTime) && (!dateVal || !timeVal)) { alert("Please select date and time for Future pickup"); return; }
+  if (isFutureTimeType(selectedTime) && (!dateVal || !timeVal)) { alert("Please select date and time for Later pickup"); return; }
   if (isFutureTimeType(selectedTime) && !dateVal && timeVal) dateVal = getTodayDate();
   let msg;
   const pa = []; if (adults) pa.push(pluralize(adults,"Adult","Adults")); if (kids) pa.push(pluralize(kids,"Kid","Kids"));
@@ -3960,6 +4351,12 @@ window.addEventListener("DOMContentLoaded", function() {
     ensureServiceWorker();
   }
   handleNotificationDeepLink();
+  document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === "visible") {
+      const op = getCurrentOperator();
+      if (op) refreshPushTokenIfNeeded(op);
+    }
+  });
   document.getElementById("pinInput").addEventListener("keydown", function(e) {
     if (e.key === "Enter") confirmPinAction();
   });
