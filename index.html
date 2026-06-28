@@ -36,7 +36,7 @@
   --radius-xs:6px;
   --shadow:0 8px 32px rgba(0,0,0,.45);
   --shadow-sm:0 2px 12px rgba(0,0,0,.28);
-  --city-bg:url("bg-night.png");
+  --city-bg:url("./bg-night.png");
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 
@@ -349,22 +349,23 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   border-top:none;
   border-radius:0;
 }
-.cityNightSurface{
+#noticeBoardFeed,#availableBookingsBg,.cityNightSurface{
   position:relative;
   background-color:#0a1018;
-  background-image:var(--city-bg);
+  background-image:url("./bg-night.png");
+  background-image:var(--city-bg,url("./bg-night.png"));
   background-size:cover;
   background-position:center;
   background-repeat:no-repeat;
 }
-.cityNightSurface::before{
+#noticeBoardFeed::before,#availableBookingsBg::before,.cityNightSurface::before{
   content:"";
   position:absolute;inset:0;
   pointer-events:none;
   z-index:0;
-  background:linear-gradient(180deg,rgba(7,11,18,.52) 0%,rgba(10,16,24,.58) 50%,rgba(7,11,18,.65) 100%);
+  background:linear-gradient(180deg,rgba(7,11,18,.34) 0%,rgba(10,16,24,.4) 50%,rgba(7,11,18,.48) 100%);
 }
-.cityNightSurface > *{position:relative;z-index:1}
+#noticeBoardFeed > *,#availableBookingsBg > *,.cityNightSurface > *{position:relative;z-index:1}
 .cityNightListWrap{
   flex:1;min-height:0;
   overflow-y:auto;overflow-x:hidden;
@@ -1057,7 +1058,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
     <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Later Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
   </div>
-  <div class="cityNightSurface cityNightListWrap">
+  <div id="availableBookingsBg" class="cityNightSurface cityNightListWrap">
     <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
     <div id="availableList" class="jobList"></div>
   </div>
@@ -1391,11 +1392,49 @@ function switchTab(tabId, btn) {
   if (tabId === "tabTeam") openTeamChatScrollLatest();
 }
 
-var CITY_NIGHT_IMAGES = ["bg-night.png", "bg-night-2.png", "bg-night-3.png"];
+var CITY_NIGHT_IMAGES = [
+  "./bg-night.png",
+  "./images/chat/bg-night-2.png",
+  "./images/chat/bg-night-3.png"
+];
+
+function setCityBgPath(path) {
+  var url = 'url("' + path + '")';
+  document.documentElement.style.setProperty("--city-bg", url);
+  var feed = document.getElementById("noticeBoardFeed");
+  var bookings = document.getElementById("availableBookingsBg");
+  if (feed) feed.style.backgroundImage = url;
+  if (bookings) bookings.style.backgroundImage = url;
+}
 
 function updateCityBackground() {
   var slot = Math.floor(Date.now() / (1000 * 60 * 60 * 8)) % CITY_NIGHT_IMAGES.length;
-  document.documentElement.style.setProperty("--city-bg", 'url("' + CITY_NIGHT_IMAGES[slot] + '")');
+  var path = CITY_NIGHT_IMAGES[slot];
+  var test = new Image();
+  test.onload = function() { setCityBgPath(path); };
+  test.onerror = function() { setCityBgPath("./bg-night.png"); };
+  test.src = path;
+}
+
+function ensureCityBackgroundPanels() {
+  var feed = document.getElementById("noticeBoardFeed");
+  if (feed) feed.classList.add("cityNightSurface");
+  var bookings = document.getElementById("availableBookingsBg");
+  if (bookings) {
+    bookings.classList.add("cityNightSurface", "cityNightListWrap");
+    return;
+  }
+  var hint = document.getElementById("availableListHint");
+  var list = document.getElementById("availableList");
+  if (!hint || !list || !hint.parentElement) return;
+  if (hint.parentElement.id === "availableBookingsBg") return;
+  var wrap = document.createElement("div");
+  wrap.id = "availableBookingsBg";
+  wrap.className = "cityNightSurface cityNightListWrap";
+  var parent = hint.parentElement;
+  parent.insertBefore(wrap, hint);
+  wrap.appendChild(hint);
+  wrap.appendChild(list);
 }
 
 function resolveOperator(name) {
@@ -4419,6 +4458,7 @@ if ("serviceWorker" in navigator) {
 
 window.addEventListener("DOMContentLoaded", function() {
   initOperatorField();
+  ensureCityBackgroundPanels();
   updateCityBackground();
   initializeFirebase();
   document.body.addEventListener("click", function() {
