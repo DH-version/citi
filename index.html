@@ -371,22 +371,62 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   left:0;right:0;
   max-width:430px;margin:0 auto;
   padding:6px;
-  bottom:calc(62px + env(safe-area-inset-bottom));
+  padding-bottom:calc(6px + env(safe-area-inset-bottom));
+  bottom:var(--chat-compose-bottom, calc(62px + env(safe-area-inset-bottom)));
   background:#0b141a;
   border-top:1px solid #2a3942;
-  z-index:150;
+  z-index:160;
   box-sizing:border-box;
   display:flex;gap:6px;align-items:stretch;
+  will-change:bottom;
+}
+body.chatKeyboardOpen{
+  overflow:hidden;
+  position:fixed;
+  left:0;right:0;
+  width:100%;
+}
+body.chatKeyboardOpen .bottomNav{
+  transform:translateY(110%);
+  opacity:0;
+  pointer-events:none;
+}
+body.chatKeyboardOpen .appHeader,
+body.chatKeyboardOpen .syncWrap{
+  opacity:0;
+  pointer-events:none;
+  height:0;
+  overflow:hidden;
+  margin:0;
+  padding:0;
+}
+#tabTeam.chatKeyboardActive{
+  position:fixed!important;
+  left:0;right:0;
+  max-width:430px;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  z-index:140;
+  overflow:hidden!important;
 }
 #tabTeam.active .noticeFeed,#tabTeam.active .chatFeed{
   margin-bottom:58px;
+  scroll-behavior:auto;
+}
+body.chatKeyboardOpen #tabTeam.active .noticeFeed,
+body.chatKeyboardOpen #tabTeam.active .chatFeed{
+  margin-bottom:0;
 }
 .noticeCompose,.chatCompose{display:flex;gap:8px;align-items:center;flex:0 0 auto}
 .noticeCompose input,.chatCompose input{
   flex:1;margin:0!important;padding:12px 14px!important;
   background:#1f2c34!important;color:#e9edef!important;font-weight:600!important;
   border:1px solid #2a3942!important;border-radius:24px!important;
+  font-size:16px!important;
+  -webkit-appearance:none;
+  appearance:none;
 }
+.chatBubblePending{opacity:.72}
 .noticeCompose button,.chatCompose button{
   flex:0 0 auto;margin:0!important;min-width:48px!important;width:48px!important;height:48px!important;
   padding:0!important;border-radius:50%!important;background:#005c4b!important;
@@ -1069,7 +1109,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <div class="chatFeedEmpty">No messages yet — say hello to the team</div>
     </div>
     <div class="noticeCompose chatCompose">
-      <input id="noticeInput" type="text" placeholder="Message…" autocomplete="off" autocapitalize="sentences" onkeydown="if(event.key==='Enter')postNoticeMessage()">
+      <input id="noticeInput" type="text" placeholder="Message…" autocomplete="off" autocapitalize="sentences" enterkeyhint="done">
       <button type="button" onclick="postNoticeMessage()" title="Send">➤</button>
     </div>
   </div>
@@ -1350,6 +1390,7 @@ function switchTab(tabId, btn) {
     alert("Enter your operator name first");
     return;
   }
+  if (tabId !== "tabTeam") resetChatComposeKeyboard(true);
   document.querySelectorAll(".tabPanel").forEach(function(p) { p.classList.remove("active"); });
   document.querySelectorAll(".navTab").forEach(function(t) { t.classList.remove("active"); });
   document.getElementById(tabId).classList.add("active");
@@ -1839,7 +1880,129 @@ function setTeamView(view) {
   document.getElementById("teamProspectBtn").classList.toggle("selected", view === "prospect");
   document.getElementById("teamNoticePanel").style.display = view === "notice" ? "flex" : "none";
   document.getElementById("teamProspectPanel").style.display = view === "prospect" ? "block" : "none";
-  if (view === "notice") scrollNoticeFeedToBottom();
+  if (view !== "notice") {
+    const input = document.getElementById("noticeInput");
+    if (input) input.blur();
+    resetChatComposeKeyboard(true);
+  } else {
+    scrollNoticeFeedToBottom();
+  }
+}
+
+function mergeNoticeSnapshot(realMessages) {
+  const pending = noticeMessages.filter(function(m) { return m._optimistic; });
+  const stillPending = pending.filter(function(p) {
+    return !realMessages.some(function(r) {
+      return r.operator === p.operator &&
+        r.message === p.message &&
+        Math.abs(getNoticeTime(r) - getNoticeTime(p)) < 15000;
+    });
+  });
+  noticeMessages = realMessages.concat(stillPending);
+}
+
+let chatKeyboardBound = false;
+
+function isTeamChatActive() {
+  const tab = document.getElementById("tabTeam");
+  return tab && tab.classList.contains("active") && teamView === "notice";
+}
+
+function getChatKeyboardGap() {
+  const vv = window.visualViewport;
+  if (!vv) return 0;
+  return Math.max(0, Math.round(window.innerHeight - vv.offsetTop - vv.height));
+}
+
+function syncChatComposeKeyboard() {
+  if (!isTeamChatActive()) {
+    resetChatComposeKeyboard(false);
+    return;
+  }
+  const compose = document.querySelector("#tabTeam.active .chatCompose");
+  const feed = document.getElementById("noticeBoardFeed");
+  const tab = document.getElementById("tabTeam");
+  const input = document.getElementById("noticeInput");
+  if (!compose || !feed || !tab || !input) return;
+
+  const gap = getChatKeyboardGap();
+  const inputFocused = document.activeElement === input;
+  const keyboardOpen = inputFocused && gap > 36;
+
+  if (keyboardOpen) {
+    if (!document.body.classList.contains("chatKeyboardOpen")) {
+      document.body.dataset.chatScrollY = String(window.scrollY || 0);
+      document.body.classList.add("chatKeyboardOpen");
+      document.body.style.top = "-" + (window.scrollY || 0) + "px";
+    }
+    tab.classList.add("chatKeyboardActive");
+    const vv = window.visualViewport;
+    if (vv) {
+      tab.style.top = vv.offsetTop + "px";
+      tab.style.height = vv.height + "px";
+      tab.style.maxHeight = vv.height + "px";
+    }
+    document.documentElement.style.setProperty("--chat-compose-bottom", gap + "px");
+    compose.style.paddingBottom = "6px";
+    feed.style.paddingBottom = (compose.offsetHeight + 10) + "px";
+    scrollNoticeFeedToBottom();
+  } else if (!inputFocused) {
+    resetChatComposeKeyboard(true);
+  } else {
+    document.documentElement.style.setProperty(
+      "--chat-compose-bottom",
+      "calc(62px + env(safe-area-inset-bottom))"
+    );
+  }
+}
+
+function resetChatComposeKeyboard(restoreScroll) {
+  document.body.classList.remove("chatKeyboardOpen");
+  document.body.style.top = "";
+  const tab = document.getElementById("tabTeam");
+  if (tab) {
+    tab.classList.remove("chatKeyboardActive");
+    tab.style.top = "";
+    tab.style.height = "";
+    tab.style.maxHeight = "";
+  }
+  document.documentElement.style.removeProperty("--chat-compose-bottom");
+  const compose = document.querySelector(".chatCompose");
+  if (compose) compose.style.paddingBottom = "";
+  const feed = document.getElementById("noticeBoardFeed");
+  if (feed) feed.style.paddingBottom = "";
+  if (restoreScroll) {
+    const y = parseInt(document.body.dataset.chatScrollY || "0", 10);
+    delete document.body.dataset.chatScrollY;
+    window.scrollTo(0, y);
+  }
+}
+
+function initChatComposeKeyboard() {
+  if (chatKeyboardBound) return;
+  chatKeyboardBound = true;
+  const input = document.getElementById("noticeInput");
+  if (!input) return;
+
+  input.addEventListener("focus", function() {
+    syncChatComposeKeyboard();
+    setTimeout(syncChatComposeKeyboard, 50);
+    setTimeout(syncChatComposeKeyboard, 150);
+    setTimeout(syncChatComposeKeyboard, 350);
+  });
+  input.addEventListener("blur", function() {
+    setTimeout(function() {
+      if (document.activeElement !== input) resetChatComposeKeyboard(true);
+    }, 100);
+  });
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", syncChatComposeKeyboard);
+    window.visualViewport.addEventListener("scroll", syncChatComposeKeyboard);
+  }
+  window.addEventListener("orientationchange", function() {
+    setTimeout(syncChatComposeKeyboard, 120);
+  });
 }
 
 function subscribeNoticeBoard() {
@@ -1848,9 +2011,9 @@ function subscribeNoticeBoard() {
     .orderBy("createdAt", "asc")
     .limit(100)
     .onSnapshot(function(snap) {
-      noticeMessages = snap.docs.map(function(doc) {
+      mergeNoticeSnapshot(snap.docs.map(function(doc) {
         return Object.assign({ id: doc.id }, doc.data());
-      });
+      }));
       renderNoticeBoard();
     }, function(err) {
       console.error("Notice board index may be needed:", err);
@@ -1858,11 +2021,12 @@ function subscribeNoticeBoard() {
       noticeUnsub = db.collection("noticeBoard")
         .limit(100)
         .onSnapshot(function(snap) {
-          noticeMessages = snap.docs.map(function(doc) {
+          const real = snap.docs.map(function(doc) {
             return Object.assign({ id: doc.id }, doc.data());
           }).sort(function(a, b) {
             return getNoticeTime(a) - getNoticeTime(b);
           });
+          mergeNoticeSnapshot(real);
           renderNoticeBoard();
         });
     });
@@ -1903,7 +2067,9 @@ function renderNoticeBoard() {
   feed.innerHTML = noticeMessages.map(function(msg) {
     const isMine = me && msg.operator === me;
     const rowClass = isMine ? "chatRow chatRowMine" : "chatRow chatRowOther";
-    const bubbleClass = isMine ? "chatBubble chatBubbleMine" : "chatBubble chatBubbleOther";
+    const bubbleClass = isMine
+      ? "chatBubble chatBubbleMine" + (msg._optimistic ? " chatBubblePending" : "")
+      : "chatBubble chatBubbleOther" + (msg._optimistic ? " chatBubblePending" : "");
     let html = '<div class="' + rowClass + '">';
     if (!isMine) {
       html += '<div class="chatSender">' + escapeHtml(msg.operator || "Unknown") + '</div>';
@@ -1915,6 +2081,11 @@ function renderNoticeBoard() {
     return html;
   }).join("");
   scrollNoticeFeedToBottom();
+  if (document.body.classList.contains("chatKeyboardOpen")) {
+    const compose = document.querySelector("#tabTeam.active .chatCompose");
+    const feed = document.getElementById("noticeBoardFeed");
+    if (compose && feed) feed.style.paddingBottom = (compose.offsetHeight + 10) + "px";
+  }
 }
 
 function scrollNoticeFeedToBottom() {
@@ -1930,10 +2101,22 @@ async function postNoticeMessage() {
   if (!op) return;
   const input = document.getElementById("noticeInput");
   const text = (input.value || "").trim();
-  if (!text) {
-    alert("Type a message first");
-    return;
-  }
+  if (!text) return;
+
+  const tempId = "opt-" + Date.now();
+  noticeMessages.push({
+    id: tempId,
+    operator: op,
+    message: text,
+    sessionId: sessionId,
+    createdAt: { seconds: Math.floor(Date.now() / 1000) },
+    _optimistic: true
+  });
+  input.value = "";
+  renderNoticeBoard();
+  syncChatComposeKeyboard();
+  input.focus();
+
   try {
     await db.collection("noticeBoard").add({
       operator: op,
@@ -1941,9 +2124,11 @@ async function postNoticeMessage() {
       sessionId: sessionId,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    input.value = "";
-    input.focus();
   } catch (err) {
+    noticeMessages = noticeMessages.filter(function(m) { return m.id !== tempId; });
+    renderNoticeBoard();
+    input.value = text;
+    input.focus();
     alert("Could not post message: " + err.message);
   }
 }
@@ -4338,6 +4523,7 @@ if ("serviceWorker" in navigator) {
 
 window.addEventListener("DOMContentLoaded", function() {
   initOperatorField();
+  initChatComposeKeyboard();
   initializeFirebase();
   document.body.addEventListener("click", function() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
