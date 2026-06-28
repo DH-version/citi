@@ -344,15 +344,41 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   -webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;gap:4px;
   padding:12px 10px 72px;
-  background:#0a1018;
+  position:relative;
+  background-color:#0a1018;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
   border:1px solid var(--border);
   border-top:none;
   border-radius:0;
 }
+.noticeFeed::before,.chatFeed::before{
+  content:"";
+  position:absolute;inset:0;
+  pointer-events:none;
+  z-index:0;
+  transition:background .6s ease;
+}
+.noticeFeed > *,.chatFeed > *{position:relative;z-index:1}
+.teamNoticeLayout.chatBgDay .chatFeed{
+  background-image:url("images/chat/bg-day.jpg");
+}
+.teamNoticeLayout.chatBgDay .chatFeed::before{
+  background:linear-gradient(180deg,rgba(255,252,245,.72) 0%,rgba(236,246,232,.78) 45%,rgba(220,235,215,.84) 100%);
+}
+.teamNoticeLayout.chatBgNight .chatFeed{
+  background-image:url("images/chat/bg-night.jpg");
+}
+.teamNoticeLayout.chatBgNight .chatFeed::before{
+  background:linear-gradient(180deg,rgba(7,11,18,.68) 0%,rgba(10,16,24,.74) 50%,rgba(7,11,18,.82) 100%);
+}
 .noticeFeedEmpty,.chatFeedEmpty{
-  text-align:center;color:#8696a0;font-size:13px;font-weight:600;
+  text-align:center;font-size:13px;font-weight:600;
   padding:48px 16px;
 }
+.teamNoticeLayout.chatBgDay .chatFeedEmpty{color:#2f4538;text-shadow:0 1px 3px rgba(255,255,255,.65)}
+.teamNoticeLayout.chatBgNight .chatFeedEmpty{color:#b8c5cc;text-shadow:0 1px 4px rgba(0,0,0,.55)}
 .chatRow{display:flex;flex-direction:column;margin-bottom:10px;max-width:100%}
 .chatRowMine{align-items:flex-end}
 .chatRowOther{align-items:flex-start}
@@ -360,10 +386,14 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .chatBubble{
   max-width:86%;padding:8px 10px 6px;
   border-radius:8px;position:relative;
-  box-shadow:0 1px 1px rgba(0,0,0,.25);
+  box-shadow:0 1px 3px rgba(0,0,0,.28);
+  backdrop-filter:blur(2px);
+  -webkit-backdrop-filter:blur(2px);
 }
 .chatBubbleMine{background:#005c4b;border-radius:10px 10px 2px 10px}
 .chatBubbleOther{background:#1f2c34;border-radius:10px 10px 10px 2px}
+.teamNoticeLayout.chatBgDay .chatBubbleMine{background:rgba(0,92,75,.94)}
+.teamNoticeLayout.chatBgDay .chatBubbleOther{background:rgba(31,44,52,.93)}
 .chatText{color:#e9edef;font-size:15px;line-height:1.45;word-break:break-word;white-space:pre-wrap}
 .chatBubbleMeta{font-size:10px;color:rgba(255,255,255,.55);text-align:right;margin-top:4px}
 #tabTeam.active .noticeCompose,#tabTeam.active .chatCompose{
@@ -1358,6 +1388,29 @@ function switchTab(tabId, btn) {
   document.querySelectorAll(".navTab").forEach(function(t) { t.classList.remove("active"); });
   document.getElementById(tabId).classList.add("active");
   btn.classList.add("active");
+  if (tabId === "tabTeam") updateChatWallpaper();
+}
+
+function getChatWallpaperMode() {
+  try {
+    const hour = parseInt(new Intl.DateTimeFormat("en-AU", {
+      timeZone: "Australia/Melbourne",
+      hour: "numeric",
+      hour12: false
+    }).format(new Date()), 10);
+    return (hour >= 6 && hour < 18) ? "day" : "night";
+  } catch (e) {
+    const h = new Date().getHours();
+    return (h >= 6 && h < 18) ? "day" : "night";
+  }
+}
+
+function updateChatWallpaper() {
+  const panel = document.getElementById("teamNoticePanel");
+  if (!panel) return;
+  const mode = getChatWallpaperMode();
+  panel.classList.remove("chatBgDay", "chatBgNight");
+  panel.classList.add(mode === "day" ? "chatBgDay" : "chatBgNight");
 }
 
 function resolveOperator(name) {
@@ -1847,6 +1900,7 @@ function setTeamView(view) {
     const input = document.getElementById("noticeInput");
     if (input) input.blur();
   } else {
+    updateChatWallpaper();
     scrollNoticeFeedToBottom();
   }
 }
@@ -4375,6 +4429,8 @@ if ("serviceWorker" in navigator) {
 
 window.addEventListener("DOMContentLoaded", function() {
   initOperatorField();
+  updateChatWallpaper();
+  setInterval(updateChatWallpaper, 30 * 60 * 1000);
   initializeFirebase();
   document.body.addEventListener("click", function() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -4390,6 +4446,7 @@ window.addEventListener("DOMContentLoaded", function() {
   handleNotificationDeepLink();
   document.addEventListener("visibilitychange", function() {
     if (document.visibilityState === "visible") {
+      updateChatWallpaper();
       const op = getCurrentOperator();
       if (op) refreshPushTokenIfNeeded(op);
     }
