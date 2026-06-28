@@ -362,16 +362,16 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 }
 .noticeFeed > *,.chatFeed > *{position:relative;z-index:1}
 .teamNoticeLayout.chatBgDay .chatFeed{
-  background-image:url("images/chat/bg-day.jpg");
+  background-image:url("bg-day.png"),url("images/chat/bg-day.jpg");
 }
 .teamNoticeLayout.chatBgDay .chatFeed::before{
-  background:linear-gradient(180deg,rgba(255,252,245,.72) 0%,rgba(236,246,232,.78) 45%,rgba(220,235,215,.84) 100%);
+  background:linear-gradient(180deg,rgba(255,252,245,.38) 0%,rgba(236,246,232,.42) 45%,rgba(220,235,215,.48) 100%);
 }
 .teamNoticeLayout.chatBgNight .chatFeed{
-  background-image:url("images/chat/bg-night.jpg");
+  background-image:url("bg-night.png"),url("images/chat/bg-night.jpg");
 }
 .teamNoticeLayout.chatBgNight .chatFeed::before{
-  background:linear-gradient(180deg,rgba(7,11,18,.68) 0%,rgba(10,16,24,.74) 50%,rgba(7,11,18,.82) 100%);
+  background:linear-gradient(180deg,rgba(7,11,18,.42) 0%,rgba(10,16,24,.48) 50%,rgba(7,11,18,.55) 100%);
 }
 .noticeFeedEmpty,.chatFeedEmpty{
   text-align:center;font-size:13px;font-weight:600;
@@ -1094,7 +1094,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <button id="teamProspectBtn" class="filterTypeBtn" onclick="setTeamView('prospect')">Prospect Tracker</button>
   </div>
 
-  <div id="teamNoticePanel" class="teamNoticeLayout">
+  <div id="teamNoticePanel" class="teamNoticeLayout chatBgNight">
     <div class="chatHeader">
       <div class="chatHeaderTitle">Team Chat</div>
       <div class="chatHeaderSub">Geelong Premium Network · All operators</div>
