@@ -36,6 +36,7 @@
   --radius-xs:6px;
   --shadow:0 8px 32px rgba(0,0,0,.45);
   --shadow-sm:0 2px 12px rgba(0,0,0,.28);
+  --city-bg:url("bg-night.png");
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 
@@ -342,44 +343,42 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   flex:1 1 0;min-height:0;
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  display:flex;flex-direction:column;gap:4px;
-  padding:12px 10px 72px;
-  position:relative;
-  background-color:#0a1018;
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
+  display:block;
+  padding:12px 10px 16px;
   border:1px solid var(--border);
   border-top:none;
   border-radius:0;
 }
-.noticeFeed::before,.chatFeed::before{
+.cityNightSurface{
+  position:relative;
+  background-color:#0a1018;
+  background-image:var(--city-bg);
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+.cityNightSurface::before{
   content:"";
   position:absolute;inset:0;
   pointer-events:none;
   z-index:0;
-  transition:background .6s ease;
+  background:linear-gradient(180deg,rgba(7,11,18,.52) 0%,rgba(10,16,24,.58) 50%,rgba(7,11,18,.65) 100%);
 }
-.noticeFeed > *,.chatFeed > *{position:relative;z-index:1}
-.teamNoticeLayout.chatBgDay .chatFeed{
-  background-image:url("bg-day.png"),url("images/chat/bg-day.jpg");
-}
-.teamNoticeLayout.chatBgDay .chatFeed::before{
-  background:linear-gradient(180deg,rgba(255,252,245,.38) 0%,rgba(236,246,232,.42) 45%,rgba(220,235,215,.48) 100%);
-}
-.teamNoticeLayout.chatBgNight .chatFeed{
-  background-image:url("bg-night.png"),url("images/chat/bg-night.jpg");
-}
-.teamNoticeLayout.chatBgNight .chatFeed::before{
-  background:linear-gradient(180deg,rgba(7,11,18,.42) 0%,rgba(10,16,24,.48) 50%,rgba(7,11,18,.55) 100%);
+.cityNightSurface > *{position:relative;z-index:1}
+.cityNightListWrap{
+  flex:1;min-height:0;
+  overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  padding:8px 8px 12px;
+  margin-top:4px;
 }
 .noticeFeedEmpty,.chatFeedEmpty{
   text-align:center;font-size:13px;font-weight:600;
-  padding:48px 16px;
+  padding:48px 16px;color:#b8c5cc;text-shadow:0 1px 4px rgba(0,0,0,.55);
 }
-.teamNoticeLayout.chatBgDay .chatFeedEmpty{color:#2f4538;text-shadow:0 1px 3px rgba(255,255,255,.65)}
-.teamNoticeLayout.chatBgNight .chatFeedEmpty{color:#b8c5cc;text-shadow:0 1px 4px rgba(0,0,0,.55)}
-.chatRow{display:flex;flex-direction:column;margin-bottom:10px;max-width:100%}
+.chatRow{display:flex;flex-direction:column;margin-bottom:10px;max-width:100%;flex-shrink:0}
 .chatRowMine{align-items:flex-end}
 .chatRowOther{align-items:flex-start}
 .chatSender{font-size:12px;font-weight:700;color:#53bdeb;margin:0 8px 3px}
@@ -387,30 +386,25 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   max-width:86%;padding:8px 10px 6px;
   border-radius:8px;position:relative;
   box-shadow:0 1px 3px rgba(0,0,0,.28);
-  backdrop-filter:blur(2px);
-  -webkit-backdrop-filter:blur(2px);
 }
 .chatBubbleMine{background:#005c4b;border-radius:10px 10px 2px 10px}
 .chatBubbleOther{background:#1f2c34;border-radius:10px 10px 10px 2px}
-.teamNoticeLayout.chatBgDay .chatBubbleMine{background:rgba(0,92,75,.94)}
-.teamNoticeLayout.chatBgDay .chatBubbleOther{background:rgba(31,44,52,.93)}
 .chatText{color:#e9edef;font-size:15px;line-height:1.45;word-break:break-word;white-space:pre-wrap}
 .chatBubbleMeta{font-size:10px;color:rgba(255,255,255,.55);text-align:right;margin-top:4px}
 #tabTeam.active .noticeCompose,#tabTeam.active .chatCompose{
-  position:fixed;
-  left:0;right:0;
-  max-width:430px;margin:0 auto;
+  flex:0 0 auto;
+  position:relative;
   padding:6px;
-  bottom:calc(62px + env(safe-area-inset-bottom));
   background:#0b141a;
   border-top:1px solid #2a3942;
-  z-index:150;
   box-sizing:border-box;
   display:flex;gap:6px;align-items:stretch;
 }
-#tabTeam.active .noticeFeed,#tabTeam.active .chatFeed{
-  margin-bottom:58px;
+#tabAvailable.active{
+  display:flex;flex-direction:column;
+  min-height:calc(100dvh - 62px - env(safe-area-inset-top) - 12px);
 }
+#tabAvailable.active h3,#tabAvailable.active .availToggle{flex:0 0 auto}
 .noticeCompose,.chatCompose{display:flex;gap:8px;align-items:center;flex:0 0 auto}
 .noticeCompose input,.chatCompose input{
   flex:1;margin:0!important;padding:12px 14px!important;
@@ -419,6 +413,8 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   font-size:16px!important;
   -webkit-appearance:none;
   appearance:none;
+  touch-action:manipulation;
+  scroll-margin-bottom:72px;
 }
 .chatBubblePending{opacity:.72}
 .noticeCompose button,.chatCompose button{
@@ -622,9 +618,11 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 }
 .emptyState .icon{font-size:28px;margin-bottom:8px;opacity:.7}
 .listHeader{
-  font-size:11px;color:var(--text-muted);margin-bottom:8px;
+  font-size:11px;color:#cbd5e1;margin-bottom:8px;
   font-weight:500;letter-spacing:.02em;line-height:1.4;
+  text-shadow:0 1px 3px rgba(0,0,0,.45);
 }
+.cityNightSurface .emptyState{color:#e2e8f0;text-shadow:0 1px 4px rgba(0,0,0,.5)}
 .btnQuickBooking{
   width:100%;margin-bottom:10px;
   background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%)!important;
@@ -1059,8 +1057,10 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
     <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Later Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
   </div>
-  <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
-  <div id="availableList" class="jobList"></div>
+  <div class="cityNightSurface cityNightListWrap">
+    <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
+    <div id="availableList" class="jobList"></div>
+  </div>
 </div>
 
 <!-- TAB 3: PREVIOUS JOBS -->
@@ -1094,16 +1094,16 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <button id="teamProspectBtn" class="filterTypeBtn" onclick="setTeamView('prospect')">Prospect Tracker</button>
   </div>
 
-  <div id="teamNoticePanel" class="teamNoticeLayout chatBgNight">
+  <div id="teamNoticePanel" class="teamNoticeLayout">
     <div class="chatHeader">
       <div class="chatHeaderTitle">Team Chat</div>
       <div class="chatHeaderSub">Geelong Premium Network · All operators</div>
     </div>
-    <div id="noticeBoardFeed" class="chatFeed">
+    <div id="noticeBoardFeed" class="chatFeed cityNightSurface">
       <div class="chatFeedEmpty">No messages yet — say hello to the team</div>
     </div>
     <div class="noticeCompose chatCompose">
-      <input id="noticeInput" type="text" placeholder="Message…" autocomplete="off" autocapitalize="sentences" onkeydown="if(event.key==='Enter')postNoticeMessage()">
+      <input id="noticeInput" type="text" placeholder="Message…" autocomplete="off" autocapitalize="sentences" enterkeyhint="send" onkeydown="if(event.key==='Enter')postNoticeMessage()">
       <button type="button" onclick="postNoticeMessage()" title="Send">➤</button>
     </div>
   </div>
@@ -1388,29 +1388,14 @@ function switchTab(tabId, btn) {
   document.querySelectorAll(".navTab").forEach(function(t) { t.classList.remove("active"); });
   document.getElementById(tabId).classList.add("active");
   btn.classList.add("active");
-  if (tabId === "tabTeam") updateChatWallpaper();
+  if (tabId === "tabTeam") openTeamChatScrollLatest();
 }
 
-function getChatWallpaperMode() {
-  try {
-    const hour = parseInt(new Intl.DateTimeFormat("en-AU", {
-      timeZone: "Australia/Melbourne",
-      hour: "numeric",
-      hour12: false
-    }).format(new Date()), 10);
-    return (hour >= 6 && hour < 18) ? "day" : "night";
-  } catch (e) {
-    const h = new Date().getHours();
-    return (h >= 6 && h < 18) ? "day" : "night";
-  }
-}
+var CITY_NIGHT_IMAGES = ["bg-night.png", "bg-night-2.png", "bg-night-3.png"];
 
-function updateChatWallpaper() {
-  const panel = document.getElementById("teamNoticePanel");
-  if (!panel) return;
-  const mode = getChatWallpaperMode();
-  panel.classList.remove("chatBgDay", "chatBgNight");
-  panel.classList.add(mode === "day" ? "chatBgDay" : "chatBgNight");
+function updateCityBackground() {
+  var slot = Math.floor(Date.now() / (1000 * 60 * 60 * 8)) % CITY_NIGHT_IMAGES.length;
+  document.documentElement.style.setProperty("--city-bg", 'url("' + CITY_NIGHT_IMAGES[slot] + '")');
 }
 
 function resolveOperator(name) {
@@ -1900,8 +1885,9 @@ function setTeamView(view) {
     const input = document.getElementById("noticeInput");
     if (input) input.blur();
   } else {
-    updateChatWallpaper();
     scrollNoticeFeedToBottom();
+    setTimeout(scrollNoticeFeedToBottom, 150);
+    setTimeout(scrollNoticeFeedToBottom, 400);
   }
 }
 
@@ -1920,28 +1906,24 @@ function mergeNoticeSnapshot(realMessages) {
 function subscribeNoticeBoard() {
   if (noticeUnsub) noticeUnsub();
   noticeUnsub = db.collection("noticeBoard")
-    .orderBy("createdAt", "asc")
     .limit(100)
     .onSnapshot(function(snap) {
-      mergeNoticeSnapshot(snap.docs.map(function(doc) {
+      const real = snap.docs.map(function(doc) {
         return Object.assign({ id: doc.id }, doc.data());
-      }));
+      }).sort(function(a, b) {
+        return getNoticeTime(a) - getNoticeTime(b);
+      });
+      mergeNoticeSnapshot(real);
       renderNoticeBoard();
     }, function(err) {
-      console.error("Notice board index may be needed:", err);
-      if (noticeUnsub) noticeUnsub();
-      noticeUnsub = db.collection("noticeBoard")
-        .limit(100)
-        .onSnapshot(function(snap) {
-          const real = snap.docs.map(function(doc) {
-            return Object.assign({ id: doc.id }, doc.data());
-          }).sort(function(a, b) {
-            return getNoticeTime(a) - getNoticeTime(b);
-          });
-          mergeNoticeSnapshot(real);
-          renderNoticeBoard();
-        });
+      console.error("Notice board sync failed:", err);
     });
+}
+
+function openTeamChatScrollLatest() {
+  scrollNoticeFeedToBottom();
+  setTimeout(scrollNoticeFeedToBottom, 150);
+  setTimeout(scrollNoticeFeedToBottom, 400);
 }
 
 function getNoticeTime(msg) {
@@ -1998,9 +1980,14 @@ function renderNoticeBoard() {
 function scrollNoticeFeedToBottom() {
   const feed = document.getElementById("noticeBoardFeed");
   if (!feed) return;
-  requestAnimationFrame(function() {
+  function go() {
     feed.scrollTop = feed.scrollHeight;
-  });
+  }
+  go();
+  requestAnimationFrame(go);
+  setTimeout(go, 0);
+  setTimeout(go, 120);
+  setTimeout(go, 350);
 }
 
 async function postNoticeMessage() {
@@ -3586,7 +3573,8 @@ async function acceptJob(docId) {
 }
 
 async function recallJob(docId) {
-  if (!requireOperator("recall jobs")) return;
+  const op = requireOperator("recall jobs");
+  if (!op) return;
   const job = availableJobs.find(function(j) { return j.docId === docId; });
   if (!job || !isJobAcceptedByMe(job)) {
     alert("Only the operator who accepted can recall this job");
@@ -3862,7 +3850,9 @@ function openTeamChatFromPush() {
   const tabBtn = document.querySelector('[data-tab="tabTeam"]');
   if (tabBtn) switchTab("tabTeam", tabBtn);
   setTeamView("notice");
+  scrollNoticeFeedToBottom();
   setTimeout(scrollNoticeFeedToBottom, 200);
+  setTimeout(scrollNoticeFeedToBottom, 500);
 }
 
 function handlePushNavigation(msg) {
@@ -4429,8 +4419,7 @@ if ("serviceWorker" in navigator) {
 
 window.addEventListener("DOMContentLoaded", function() {
   initOperatorField();
-  updateChatWallpaper();
-  setInterval(updateChatWallpaper, 30 * 60 * 1000);
+  updateCityBackground();
   initializeFirebase();
   document.body.addEventListener("click", function() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -4446,7 +4435,6 @@ window.addEventListener("DOMContentLoaded", function() {
   handleNotificationDeepLink();
   document.addEventListener("visibilitychange", function() {
     if (document.visibilityState === "visible") {
-      updateChatWallpaper();
       const op = getCurrentOperator();
       if (op) refreshPushTokenIfNeeded(op);
     }
