@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Push notification device tokens (Phase 1)
+    match /pushTokens/{deviceId} {
+      allow read, write: if true;
+    }
+
+    // Existing app collections — adjust if you use stricter rules in console
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
