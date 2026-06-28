@@ -352,13 +352,14 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 #noticeBoardFeed,#availableBookingsBg,.cityNightSurface{
   position:relative;
   background-color:#0a1018;
-  background-image:url("./bg-night.png");
-  background-image:var(--city-bg,url("./bg-night.png"));
+  background-image:
+    linear-gradient(180deg,rgba(7,11,18,.34) 0%,rgba(10,16,24,.4) 50%,rgba(7,11,18,.48) 100%),
+    var(--city-bg,url("./bg-night.png"));
   background-size:cover;
   background-position:center;
   background-repeat:no-repeat;
 }
-#noticeBoardFeed::before,#availableBookingsBg::before,.cityNightSurface::before{
+#availableBookingsBg::before,.cityNightSurface:not(#noticeBoardFeed)::before{
   content:"";
   position:absolute;inset:0;
   pointer-events:none;
@@ -366,6 +367,9 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   background:linear-gradient(180deg,rgba(7,11,18,.34) 0%,rgba(10,16,24,.4) 50%,rgba(7,11,18,.48) 100%);
 }
 #noticeBoardFeed > *,#availableBookingsBg > *,.cityNightSurface > *{position:relative;z-index:1}
+.chatRow,.chatBubble,.chatText,.chatSender,.chatBubbleMeta{
+  visibility:visible;opacity:1;
+}
 .cityNightListWrap{
   flex:1;min-height:0;
   overflow-y:auto;overflow-x:hidden;
@@ -1399,12 +1403,7 @@ var CITY_NIGHT_IMAGES = [
 ];
 
 function setCityBgPath(path) {
-  var url = 'url("' + path + '")';
-  document.documentElement.style.setProperty("--city-bg", url);
-  var feed = document.getElementById("noticeBoardFeed");
-  var bookings = document.getElementById("availableBookingsBg");
-  if (feed) feed.style.backgroundImage = url;
-  if (bookings) bookings.style.backgroundImage = url;
+  document.documentElement.style.setProperty("--city-bg", 'url("' + path + '")');
 }
 
 function updateCityBackground() {
@@ -1818,6 +1817,9 @@ async function initPushNotifications(operatorName) {
       pushMessageBound = true;
       messaging.onMessage(function(payload) {
         showSystemPushNotification(payload);
+        if (payload.data && payload.data.type === "team_chat") {
+          refreshNoticeBoardOnce();
+        }
       });
     }
   } catch (err) {
@@ -1924,6 +1926,7 @@ function setTeamView(view) {
     const input = document.getElementById("noticeInput");
     if (input) input.blur();
   } else {
+    refreshNoticeBoardOnce();
     scrollNoticeFeedToBottom();
     setTimeout(scrollNoticeFeedToBottom, 150);
     setTimeout(scrollNoticeFeedToBottom, 400);
@@ -1940,26 +1943,61 @@ function mergeNoticeSnapshot(realMessages) {
     });
   });
   noticeMessages = realMessages.concat(stillPending);
+  noticeMessages.sort(function(a, b) { return getNoticeTime(a) - getNoticeTime(b); });
+}
+
+function applyNoticeDocs(docs, newestFirst) {
+  let real = docs.map(function(doc) {
+    return Object.assign({ id: doc.id }, doc.data());
+  });
+  if (newestFirst) {
+    real.reverse();
+  } else {
+    real.sort(function(a, b) { return getNoticeTime(a) - getNoticeTime(b); });
+    if (real.length > 100) real = real.slice(-100);
+  }
+  mergeNoticeSnapshot(real);
+  renderNoticeBoard();
 }
 
 function subscribeNoticeBoard() {
   if (noticeUnsub) noticeUnsub();
   noticeUnsub = db.collection("noticeBoard")
+    .orderBy("createdAt", "desc")
     .limit(100)
     .onSnapshot(function(snap) {
-      const real = snap.docs.map(function(doc) {
-        return Object.assign({ id: doc.id }, doc.data());
-      }).sort(function(a, b) {
-        return getNoticeTime(a) - getNoticeTime(b);
-      });
-      mergeNoticeSnapshot(real);
-      renderNoticeBoard();
+      applyNoticeDocs(snap.docs, true);
     }, function(err) {
-      console.error("Notice board sync failed:", err);
+      console.error("Notice board orderBy failed, using fallback:", err);
+      if (noticeUnsub) noticeUnsub();
+      noticeUnsub = db.collection("noticeBoard")
+        .limit(300)
+        .onSnapshot(function(snap) {
+          applyNoticeDocs(snap.docs, false);
+        }, function(err2) {
+          console.error("Notice board sync failed:", err2);
+        });
     });
 }
 
+async function refreshNoticeBoardOnce() {
+  if (!firebaseReady || !db) return;
+  try {
+    let snap;
+    try {
+      snap = await db.collection("noticeBoard").orderBy("createdAt", "desc").limit(100).get();
+      applyNoticeDocs(snap.docs, true);
+    } catch (e) {
+      snap = await db.collection("noticeBoard").limit(300).get();
+      applyNoticeDocs(snap.docs, false);
+    }
+  } catch (err) {
+    console.warn("Notice refresh failed", err);
+  }
+}
+
 function openTeamChatScrollLatest() {
+  refreshNoticeBoardOnce();
   scrollNoticeFeedToBottom();
   setTimeout(scrollNoticeFeedToBottom, 150);
   setTimeout(scrollNoticeFeedToBottom, 400);
@@ -3889,6 +3927,7 @@ function openTeamChatFromPush() {
   const tabBtn = document.querySelector('[data-tab="tabTeam"]');
   if (tabBtn) switchTab("tabTeam", tabBtn);
   setTeamView("notice");
+  refreshNoticeBoardOnce();
   scrollNoticeFeedToBottom();
   setTimeout(scrollNoticeFeedToBottom, 200);
   setTimeout(scrollNoticeFeedToBottom, 500);
@@ -4477,6 +4516,9 @@ window.addEventListener("DOMContentLoaded", function() {
     if (document.visibilityState === "visible") {
       const op = getCurrentOperator();
       if (op) refreshPushTokenIfNeeded(op);
+      if (document.getElementById("tabTeam") && document.getElementById("tabTeam").classList.contains("active") && teamView === "notice") {
+        refreshNoticeBoardOnce();
+      }
     }
   });
   document.getElementById("pinInput").addEventListener("keydown", function(e) {
