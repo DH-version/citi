@@ -378,44 +378,43 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   z-index:160;
   box-sizing:border-box;
   display:flex;gap:6px;align-items:stretch;
-  will-change:bottom;
+}
+html.chatKeyboardOpen,
+html.chatKeyboardOpen body{
+  overflow:hidden;
+  overscroll-behavior:none;
 }
 body.chatKeyboardOpen{
-  overflow:hidden;
-  position:fixed;
-  left:0;right:0;
-  width:100%;
+  padding-bottom:0!important;
+  touch-action:pan-x pan-y;
 }
 body.chatKeyboardOpen .bottomNav{
-  transform:translateY(110%);
-  opacity:0;
-  pointer-events:none;
+  display:none!important;
+}
+body.chatKeyboardOpen .chatCompose{
+  z-index:210;
+  padding-bottom:6px;
 }
 body.chatKeyboardOpen .appHeader,
-body.chatKeyboardOpen .syncWrap{
-  opacity:0;
+body.chatKeyboardOpen .syncWrap,
+body.chatKeyboardOpen #tabTeam > h3,
+body.chatKeyboardOpen #tabTeam > .teamToggle{
+  visibility:hidden;
   pointer-events:none;
-  height:0;
-  overflow:hidden;
-  margin:0;
-  padding:0;
 }
-#tabTeam.chatKeyboardActive{
-  position:fixed!important;
-  left:0;right:0;
-  max-width:430px;
-  margin-left:auto!important;
-  margin-right:auto!important;
-  z-index:140;
-  overflow:hidden!important;
+body.chatKeyboardOpen #tabTeam.active{
+  height:calc(100dvh - 16px - env(safe-area-inset-top))!important;
+  max-height:calc(100dvh - 16px - env(safe-area-inset-top))!important;
 }
 #tabTeam.active .noticeFeed,#tabTeam.active .chatFeed{
   margin-bottom:58px;
   scroll-behavior:auto;
+  -webkit-overflow-scrolling:touch;
 }
 body.chatKeyboardOpen #tabTeam.active .noticeFeed,
 body.chatKeyboardOpen #tabTeam.active .chatFeed{
   margin-bottom:0;
+  padding-bottom:var(--chat-feed-pad, 72px);
 }
 .noticeCompose,.chatCompose{display:flex;gap:8px;align-items:center;flex:0 0 auto}
 .noticeCompose input,.chatCompose input{
@@ -1390,7 +1389,7 @@ function switchTab(tabId, btn) {
     alert("Enter your operator name first");
     return;
   }
-  if (tabId !== "tabTeam") resetChatComposeKeyboard(true);
+  if (tabId !== "tabTeam") resetChatComposeKeyboard();
   document.querySelectorAll(".tabPanel").forEach(function(p) { p.classList.remove("active"); });
   document.querySelectorAll(".navTab").forEach(function(t) { t.classList.remove("active"); });
   document.getElementById(tabId).classList.add("active");
@@ -1883,7 +1882,7 @@ function setTeamView(view) {
   if (view !== "notice") {
     const input = document.getElementById("noticeInput");
     if (input) input.blur();
-    resetChatComposeKeyboard(true);
+    resetChatComposeKeyboard();
   } else {
     scrollNoticeFeedToBottom();
   }
@@ -1902,6 +1901,10 @@ function mergeNoticeSnapshot(realMessages) {
 }
 
 let chatKeyboardBound = false;
+let chatTyping = false;
+let chatSyncRaf = null;
+let chatKeyboardTimer = null;
+let lastChatGap = -1;
 
 function isTeamChatActive() {
   const tab = document.getElementById("tabTeam");
@@ -1914,68 +1917,82 @@ function getChatKeyboardGap() {
   return Math.max(0, Math.round(window.innerHeight - vv.offsetTop - vv.height));
 }
 
-function syncChatComposeKeyboard() {
-  if (!isTeamChatActive()) {
-    resetChatComposeKeyboard(false);
-    return;
-  }
+function setChatKeyboardOpen(on) {
+  document.documentElement.classList.toggle("chatKeyboardOpen", on);
+  document.body.classList.toggle("chatKeyboardOpen", on);
+}
+
+function applyChatComposePosition(forceScroll) {
+  if (!chatTyping || !isTeamChatActive()) return;
   const compose = document.querySelector("#tabTeam.active .chatCompose");
-  const feed = document.getElementById("noticeBoardFeed");
-  const tab = document.getElementById("tabTeam");
-  const input = document.getElementById("noticeInput");
-  if (!compose || !feed || !tab || !input) return;
+  if (!compose) return;
 
   const gap = getChatKeyboardGap();
-  const inputFocused = document.activeElement === input;
-  const keyboardOpen = inputFocused && gap > 36;
+  if (!forceScroll && lastChatGap >= 0 && Math.abs(gap - lastChatGap) < 3) return;
+  lastChatGap = gap;
 
-  if (keyboardOpen) {
-    if (!document.body.classList.contains("chatKeyboardOpen")) {
-      document.body.dataset.chatScrollY = String(window.scrollY || 0);
-      document.body.classList.add("chatKeyboardOpen");
-      document.body.style.top = "-" + (window.scrollY || 0) + "px";
-    }
-    tab.classList.add("chatKeyboardActive");
-    const vv = window.visualViewport;
-    if (vv) {
-      tab.style.top = vv.offsetTop + "px";
-      tab.style.height = vv.height + "px";
-      tab.style.maxHeight = vv.height + "px";
-    }
-    document.documentElement.style.setProperty("--chat-compose-bottom", gap + "px");
-    compose.style.paddingBottom = "6px";
-    feed.style.paddingBottom = (compose.offsetHeight + 10) + "px";
-    scrollNoticeFeedToBottom();
-  } else if (!inputFocused) {
-    resetChatComposeKeyboard(true);
-  } else {
-    document.documentElement.style.setProperty(
-      "--chat-compose-bottom",
-      "calc(62px + env(safe-area-inset-bottom))"
-    );
+  document.documentElement.style.setProperty("--chat-compose-bottom", gap + "px");
+  document.documentElement.style.setProperty("--chat-feed-pad", (compose.offsetHeight + 12) + "px");
+
+  if (forceScroll) scrollNoticeFeedToBottom();
+}
+
+function scheduleChatComposeSync(forceScroll) {
+  if (chatSyncRaf) return;
+  chatSyncRaf = requestAnimationFrame(function() {
+    chatSyncRaf = null;
+    applyChatComposePosition(!!forceScroll);
+  });
+}
+
+function enterChatTyping() {
+  if (!isTeamChatActive()) return;
+  chatTyping = true;
+  lastChatGap = -1;
+  setChatKeyboardOpen(true);
+  applyChatComposePosition(true);
+  if (chatKeyboardTimer) clearTimeout(chatKeyboardTimer);
+  chatKeyboardTimer = setTimeout(function() {
+    chatKeyboardTimer = null;
+    applyChatComposePosition(true);
+  }, 280);
+}
+
+function exitChatTyping() {
+  if (!chatTyping) return;
+  chatTyping = false;
+  lastChatGap = -1;
+  setChatKeyboardOpen(false);
+  document.documentElement.style.removeProperty("--chat-compose-bottom");
+  document.documentElement.style.removeProperty("--chat-feed-pad");
+  if (chatKeyboardTimer) {
+    clearTimeout(chatKeyboardTimer);
+    chatKeyboardTimer = null;
+  }
+  if (chatSyncRaf) {
+    cancelAnimationFrame(chatSyncRaf);
+    chatSyncRaf = null;
   }
 }
 
-function resetChatComposeKeyboard(restoreScroll) {
-  document.body.classList.remove("chatKeyboardOpen");
-  document.body.style.top = "";
-  const tab = document.getElementById("tabTeam");
-  if (tab) {
-    tab.classList.remove("chatKeyboardActive");
-    tab.style.top = "";
-    tab.style.height = "";
-    tab.style.maxHeight = "";
+function syncChatComposeKeyboard() {
+  if (!isTeamChatActive()) {
+    exitChatTyping();
+    return;
   }
-  document.documentElement.style.removeProperty("--chat-compose-bottom");
-  const compose = document.querySelector(".chatCompose");
-  if (compose) compose.style.paddingBottom = "";
-  const feed = document.getElementById("noticeBoardFeed");
-  if (feed) feed.style.paddingBottom = "";
-  if (restoreScroll) {
-    const y = parseInt(document.body.dataset.chatScrollY || "0", 10);
-    delete document.body.dataset.chatScrollY;
-    window.scrollTo(0, y);
+  const input = document.getElementById("noticeInput");
+  if (input && document.activeElement === input) {
+    if (!chatTyping) enterChatTyping();
+    else scheduleChatComposeSync(false);
+  } else {
+    exitChatTyping();
   }
+}
+
+function resetChatComposeKeyboard() {
+  const input = document.getElementById("noticeInput");
+  if (input && document.activeElement === input) input.blur();
+  exitChatTyping();
 }
 
 function initChatComposeKeyboard() {
@@ -1984,24 +2001,28 @@ function initChatComposeKeyboard() {
   const input = document.getElementById("noticeInput");
   if (!input) return;
 
-  input.addEventListener("focus", function() {
-    syncChatComposeKeyboard();
-    setTimeout(syncChatComposeKeyboard, 50);
-    setTimeout(syncChatComposeKeyboard, 150);
-    setTimeout(syncChatComposeKeyboard, 350);
-  });
+  const compose = input.closest(".chatCompose");
+  if (compose) {
+    const sendBtn = compose.querySelector("button");
+    if (sendBtn) {
+      sendBtn.addEventListener("mousedown", function(e) { e.preventDefault(); });
+    }
+  }
+
+  input.addEventListener("focus", enterChatTyping);
   input.addEventListener("blur", function() {
     setTimeout(function() {
-      if (document.activeElement !== input) resetChatComposeKeyboard(true);
-    }, 100);
+      if (document.activeElement !== input) exitChatTyping();
+    }, 120);
   });
 
   if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", syncChatComposeKeyboard);
-    window.visualViewport.addEventListener("scroll", syncChatComposeKeyboard);
+    window.visualViewport.addEventListener("resize", function() {
+      if (chatTyping) scheduleChatComposeSync(false);
+    });
   }
   window.addEventListener("orientationchange", function() {
-    setTimeout(syncChatComposeKeyboard, 120);
+    if (chatTyping) setTimeout(function() { applyChatComposePosition(true); }, 200);
   });
 }
 
@@ -2081,11 +2102,7 @@ function renderNoticeBoard() {
     return html;
   }).join("");
   scrollNoticeFeedToBottom();
-  if (document.body.classList.contains("chatKeyboardOpen")) {
-    const compose = document.querySelector("#tabTeam.active .chatCompose");
-    const feed = document.getElementById("noticeBoardFeed");
-    if (compose && feed) feed.style.paddingBottom = (compose.offsetHeight + 10) + "px";
-  }
+  if (chatTyping) applyChatComposePosition(false);
 }
 
 function scrollNoticeFeedToBottom() {
@@ -2114,7 +2131,7 @@ async function postNoticeMessage() {
   });
   input.value = "";
   renderNoticeBoard();
-  syncChatComposeKeyboard();
+  if (chatTyping) applyChatComposePosition(true);
   input.focus();
 
   try {
