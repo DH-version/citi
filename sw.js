@@ -1,4 +1,4 @@
-const CACHE = "gpn-v41";
+const CACHE = "gpn-v42";
 
 const ASSETS = [
   "./",
@@ -27,11 +27,13 @@ self.addEventListener("notificationclick", function(event) {
   const data = event.notification.data || {};
   let docId = data.docId || "";
   const pushType = data.type || "";
-  if (!docId && event.notification.tag && event.notification.tag !== "gpn-push") {
+  if (!docId && event.notification.tag && event.notification.tag.indexOf("chat-") !== 0 && event.notification.tag !== "gpn-push") {
     docId = event.notification.tag;
   }
   let url = "./index.html";
-  if (docId) {
+  if (pushType === "team_chat") {
+    url += "?tab=team&type=team_chat";
+  } else if (docId) {
     url += "?job=" + encodeURIComponent(docId);
     if (pushType) url += "&type=" + encodeURIComponent(pushType);
   }
@@ -47,7 +49,12 @@ self.addEventListener("notificationclick", function(event) {
             });
           }
           client.focus();
-          client.postMessage({ type: "openJob", docId: docId, pushType: pushType });
+          client.postMessage({
+            type: "openPush",
+            pushType: pushType,
+            docId: docId,
+            tab: pushType === "team_chat" ? "team" : ""
+          });
           return;
         }
       }
