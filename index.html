@@ -36,6 +36,8 @@
   --radius-xs:6px;
   --shadow:0 8px 32px rgba(0,0,0,.45);
   --shadow-sm:0 2px 12px rgba(0,0,0,.28);
+  --bottom-nav-h:68px;
+  --chat-compose-h:60px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
 
@@ -344,6 +346,7 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   -webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;gap:4px;
   padding:12px 10px;
+  padding-bottom:calc(var(--chat-compose-h) + 12px);
   background:#0a1018;
   border:1px solid var(--border);
   border-top:none;
@@ -366,16 +369,27 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .chatBubbleOther{background:#1f2c34;border-radius:10px 10px 10px 2px}
 .chatText{color:#e9edef;font-size:15px;line-height:1.45;word-break:break-word;white-space:pre-wrap}
 .chatBubbleMeta{font-size:10px;color:rgba(255,255,255,.55);text-align:right;margin-top:4px}
-.noticeCompose,.chatCompose{
+#tabTeam.active .teamNoticeLayout{
+  padding-bottom:0;
+}
+#tabTeam.active .noticeCompose,
+#tabTeam.active .chatCompose{
+  position:fixed;
+  left:0;right:0;
+  max-width:430px;margin:0 auto;
+  z-index:210;
   flex:0 0 auto;
   display:flex;gap:6px;align-items:stretch;
   padding:6px;
-  padding-bottom:calc(6px + env(safe-area-inset-bottom));
+  bottom:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
   background:#0b141a;
   border:1px solid var(--border);
   border-top:1px solid #2a3942;
-  border-radius:0 0 var(--radius-sm) var(--radius-sm);
+  border-radius:0;
   box-sizing:border-box;
+}
+.noticeCompose,.chatCompose{
+  display:flex;gap:6px;align-items:stretch;
 }
 body.chatKeyboardOpen{
   padding-bottom:0!important;
@@ -383,15 +397,17 @@ body.chatKeyboardOpen{
 body.chatKeyboardOpen .bottomNav{
   display:none!important;
 }
-body.chatKeyboardOpen .appHeader,
-body.chatKeyboardOpen .syncWrap,
 body.chatKeyboardOpen #tabTeam > h3,
 body.chatKeyboardOpen #tabTeam > .teamToggle{
   display:none;
 }
-body.chatKeyboardOpen #tabTeam.active{
-  height:calc(100dvh - env(safe-area-inset-top) - 16px)!important;
-  max-height:calc(100dvh - env(safe-area-inset-top) - 16px)!important;
+body.chatKeyboardOpen #tabTeam.active .noticeCompose,
+body.chatKeyboardOpen #tabTeam.active .chatCompose{
+  bottom:var(--chat-kb-bottom, 0px);
+  padding-bottom:6px;
+}
+body.chatKeyboardOpen #tabTeam.active .chatFeed{
+  padding-bottom:calc(var(--chat-compose-pad, 72px));
 }
 .noticeCompose input,.chatCompose input{
   flex:1;margin:0!important;padding:12px 14px!important;
@@ -1370,6 +1386,12 @@ function switchTab(tabId, btn) {
   document.querySelectorAll(".navTab").forEach(function(t) { t.classList.remove("active"); });
   document.getElementById(tabId).classList.add("active");
   btn.classList.add("active");
+  if (tabId === "tabTeam" && teamView === "notice") {
+    setTimeout(function() {
+      measureChatCompose();
+      scrollNoticeFeedToBottom();
+    }, 50);
+  }
 }
 
 function resolveOperator(name) {
@@ -1860,7 +1882,10 @@ function setTeamView(view) {
     if (input) input.blur();
     resetChatComposeKeyboard();
   } else {
-    scrollNoticeFeedToBottom();
+    setTimeout(function() {
+      measureChatCompose();
+      scrollNoticeFeedToBottom();
+    }, 50);
   }
 }
 
@@ -1877,23 +1902,66 @@ function mergeNoticeSnapshot(realMessages) {
 }
 
 let chatTyping = false;
+let chatKbRaf = null;
 
 function isTeamChatActive() {
   const tab = document.getElementById("tabTeam");
   return tab && tab.classList.contains("active") && teamView === "notice";
 }
 
+function measureChatCompose() {
+  const compose = document.querySelector("#tabTeam.active .chatCompose");
+  if (!compose) return 60;
+  const h = compose.offsetHeight;
+  if (h > 0) {
+    document.documentElement.style.setProperty("--chat-compose-h", h + "px");
+  }
+  return h || 60;
+}
+
+function updateChatKeyboardPosition() {
+  if (!chatTyping || !isTeamChatActive()) return;
+  const composeH = measureChatCompose();
+  const vv = window.visualViewport;
+  let bottom = 0;
+  if (vv) {
+    bottom = Math.max(0, Math.round(window.innerHeight - vv.offsetTop - vv.height));
+  }
+  if (bottom < 50) {
+    bottom = Math.round(window.innerHeight * 0.34);
+  }
+  document.documentElement.style.setProperty("--chat-kb-bottom", bottom + "px");
+  document.documentElement.style.setProperty("--chat-compose-pad", (composeH + 16) + "px");
+  scrollNoticeFeedToBottom();
+}
+
+function scheduleChatKeyboardUpdate() {
+  if (chatKbRaf) return;
+  chatKbRaf = requestAnimationFrame(function() {
+    chatKbRaf = null;
+    updateChatKeyboardPosition();
+  });
+}
+
 function enterChatTyping() {
   if (!isTeamChatActive()) return;
   chatTyping = true;
   document.body.classList.add("chatKeyboardOpen");
-  scrollNoticeFeedToBottom();
+  updateChatKeyboardPosition();
+  setTimeout(updateChatKeyboardPosition, 250);
 }
 
 function exitChatTyping() {
   if (!chatTyping) return;
   chatTyping = false;
   document.body.classList.remove("chatKeyboardOpen");
+  document.documentElement.style.removeProperty("--chat-kb-bottom");
+  document.documentElement.style.removeProperty("--chat-compose-pad");
+  if (chatKbRaf) {
+    cancelAnimationFrame(chatKbRaf);
+    chatKbRaf = null;
+  }
+  measureChatCompose();
 }
 
 function resetChatComposeKeyboard() {
@@ -1918,6 +1986,12 @@ function initChatComposeKeyboard() {
       if (document.activeElement !== input) exitChatTyping();
     }, 100);
   });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", function() {
+      if (chatTyping) scheduleChatKeyboardUpdate();
+    });
+  }
+  measureChatCompose();
 }
 
 function subscribeNoticeBoard() {
@@ -1996,6 +2070,7 @@ function renderNoticeBoard() {
     return html;
   }).join("");
   scrollNoticeFeedToBottom();
+  if (chatTyping) scheduleChatKeyboardUpdate();
 }
 
 function scrollNoticeFeedToBottom() {
@@ -2003,6 +2078,9 @@ function scrollNoticeFeedToBottom() {
   if (!feed) return;
   requestAnimationFrame(function() {
     feed.scrollTop = feed.scrollHeight;
+    requestAnimationFrame(function() {
+      feed.scrollTop = feed.scrollHeight;
+    });
   });
 }
 
@@ -2024,6 +2102,7 @@ async function postNoticeMessage() {
   });
   input.value = "";
   renderNoticeBoard();
+  if (chatTyping) updateChatKeyboardPosition();
   input.focus();
 
   try {
