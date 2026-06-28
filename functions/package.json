@@ -1,0 +1,13 @@
+{
+  "name": "gpn-push-functions",
+  "description": "Phase 1 push notifications for Geelong Premium Network",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.7.0",
+    "firebase-functions": "^4.9.0"
+  },
+  "private": true
+}
