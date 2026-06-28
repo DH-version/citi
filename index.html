@@ -343,11 +343,11 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;gap:4px;
-  padding:12px 10px 72px;
+  padding:12px 10px;
   background:#0a1018;
   border:1px solid var(--border);
   border-top:none;
-  border-radius:0 0 var(--radius-sm) var(--radius-sm);
+  border-radius:0;
 }
 .noticeFeedEmpty,.chatFeedEmpty{
   text-align:center;color:#8696a0;font-size:13px;font-weight:600;
@@ -366,28 +366,16 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .chatBubbleOther{background:#1f2c34;border-radius:10px 10px 10px 2px}
 .chatText{color:#e9edef;font-size:15px;line-height:1.45;word-break:break-word;white-space:pre-wrap}
 .chatBubbleMeta{font-size:10px;color:rgba(255,255,255,.55);text-align:right;margin-top:4px}
-#tabTeam.active .noticeCompose,#tabTeam.active .chatCompose{
-  position:fixed;
-  left:0;right:0;
-  max-width:430px;margin:0 auto;
+.noticeCompose,.chatCompose{
+  flex:0 0 auto;
+  display:flex;gap:6px;align-items:stretch;
   padding:6px;
   padding-bottom:calc(6px + env(safe-area-inset-bottom));
-  bottom:calc(62px + env(safe-area-inset-bottom));
   background:#0b141a;
+  border:1px solid var(--border);
   border-top:1px solid #2a3942;
-  z-index:160;
+  border-radius:0 0 var(--radius-sm) var(--radius-sm);
   box-sizing:border-box;
-  display:flex;gap:6px;align-items:stretch;
-}
-body.chatKeyboardOpen .chatCompose{
-  z-index:210;
-  padding-bottom:6px;
-  bottom:auto!important;
-}
-html.chatKeyboardOpen,
-html.chatKeyboardOpen body{
-  overflow:hidden;
-  overscroll-behavior:none;
 }
 body.chatKeyboardOpen{
   padding-bottom:0!important;
@@ -399,24 +387,12 @@ body.chatKeyboardOpen .appHeader,
 body.chatKeyboardOpen .syncWrap,
 body.chatKeyboardOpen #tabTeam > h3,
 body.chatKeyboardOpen #tabTeam > .teamToggle{
-  visibility:hidden;
-  pointer-events:none;
+  display:none;
 }
 body.chatKeyboardOpen #tabTeam.active{
-  height:calc(100dvh - 16px - env(safe-area-inset-top))!important;
-  max-height:calc(100dvh - 16px - env(safe-area-inset-top))!important;
+  height:calc(100dvh - env(safe-area-inset-top) - 16px)!important;
+  max-height:calc(100dvh - env(safe-area-inset-top) - 16px)!important;
 }
-#tabTeam.active .noticeFeed,#tabTeam.active .chatFeed{
-  margin-bottom:58px;
-  scroll-behavior:auto;
-  -webkit-overflow-scrolling:touch;
-}
-body.chatKeyboardOpen #tabTeam.active .noticeFeed,
-body.chatKeyboardOpen #tabTeam.active .chatFeed{
-  margin-bottom:0;
-  padding-bottom:var(--chat-feed-pad, 72px);
-}
-.noticeCompose,.chatCompose{display:flex;gap:8px;align-items:center;flex:0 0 auto}
 .noticeCompose input,.chatCompose input{
   flex:1;margin:0!important;padding:12px 14px!important;
   background:#1f2c34!important;color:#e9edef!important;font-weight:600!important;
@@ -1900,121 +1876,24 @@ function mergeNoticeSnapshot(realMessages) {
   noticeMessages = realMessages.concat(stillPending);
 }
 
-let chatKeyboardBound = false;
 let chatTyping = false;
-let chatSyncRaf = null;
-let chatKeyboardTimer = null;
-let lastChatGap = -1;
-let chatBaseInnerHeight = 0;
 
 function isTeamChatActive() {
   const tab = document.getElementById("tabTeam");
   return tab && tab.classList.contains("active") && teamView === "notice";
 }
 
-function getChatKeyboardGap() {
-  const vv = window.visualViewport;
-  if (!vv) return 0;
-  return Math.max(0, Math.round(window.innerHeight - vv.offsetTop - vv.height));
-}
-
-function estimateKeyboardHeight() {
-  const gap = getChatKeyboardGap();
-  if (gap >= 80) return gap;
-  const innerDelta = chatBaseInnerHeight > 0 ? chatBaseInnerHeight - window.innerHeight : 0;
-  if (innerDelta >= 80) return innerDelta;
-  return Math.max(280, Math.round(window.innerHeight * 0.4));
-}
-
-function getChatComposeTop(composeH) {
-  const vv = window.visualViewport;
-  const pad = 6;
-  const h = composeH || 60;
-  if (vv) {
-    const gap = getChatKeyboardGap();
-    if (gap >= 80) {
-      return Math.round(vv.offsetTop + vv.height - h - pad);
-    }
-  }
-  return Math.round(window.innerHeight - estimateKeyboardHeight() - h - pad);
-}
-
-function setChatKeyboardOpen(on) {
-  document.documentElement.classList.toggle("chatKeyboardOpen", on);
-  document.body.classList.toggle("chatKeyboardOpen", on);
-}
-
-function applyChatComposePosition(forceScroll) {
-  if (!chatTyping || !isTeamChatActive()) return;
-  const compose = document.querySelector("#tabTeam.active .chatCompose");
-  if (!compose) return;
-
-  const composeH = compose.offsetHeight || 60;
-  const topPos = getChatComposeTop(composeH);
-  if (!forceScroll && lastChatGap >= 0 && Math.abs(topPos - lastChatGap) < 2) return;
-  lastChatGap = topPos;
-
-  compose.style.top = topPos + "px";
-  document.documentElement.style.setProperty("--chat-feed-pad", (composeH + 16) + "px");
-
-  if (forceScroll) scrollNoticeFeedToBottom();
-}
-
-function scheduleChatComposeSync(forceScroll) {
-  if (chatSyncRaf) return;
-  chatSyncRaf = requestAnimationFrame(function() {
-    chatSyncRaf = null;
-    applyChatComposePosition(!!forceScroll);
-  });
-}
-
 function enterChatTyping() {
   if (!isTeamChatActive()) return;
   chatTyping = true;
-  lastChatGap = -1;
-  chatBaseInnerHeight = window.innerHeight;
-  setChatKeyboardOpen(true);
-  applyChatComposePosition(true);
-  if (chatKeyboardTimer) clearTimeout(chatKeyboardTimer);
-  chatKeyboardTimer = setTimeout(function() {
-    chatKeyboardTimer = null;
-    applyChatComposePosition(true);
-  }, 120);
-  setTimeout(function() { if (chatTyping) applyChatComposePosition(true); }, 320);
-  setTimeout(function() { if (chatTyping) applyChatComposePosition(false); }, 520);
+  document.body.classList.add("chatKeyboardOpen");
+  scrollNoticeFeedToBottom();
 }
 
 function exitChatTyping() {
   if (!chatTyping) return;
   chatTyping = false;
-  lastChatGap = -1;
-  chatBaseInnerHeight = 0;
-  setChatKeyboardOpen(false);
-  document.documentElement.style.removeProperty("--chat-feed-pad");
-  const compose = document.querySelector(".chatCompose");
-  if (compose) compose.style.top = "";
-  if (chatKeyboardTimer) {
-    clearTimeout(chatKeyboardTimer);
-    chatKeyboardTimer = null;
-  }
-  if (chatSyncRaf) {
-    cancelAnimationFrame(chatSyncRaf);
-    chatSyncRaf = null;
-  }
-}
-
-function syncChatComposeKeyboard() {
-  if (!isTeamChatActive()) {
-    exitChatTyping();
-    return;
-  }
-  const input = document.getElementById("noticeInput");
-  if (input && document.activeElement === input) {
-    if (!chatTyping) enterChatTyping();
-    else scheduleChatComposeSync(false);
-  } else {
-    exitChatTyping();
-  }
+  document.body.classList.remove("chatKeyboardOpen");
 }
 
 function resetChatComposeKeyboard() {
@@ -2024,11 +1903,8 @@ function resetChatComposeKeyboard() {
 }
 
 function initChatComposeKeyboard() {
-  if (chatKeyboardBound) return;
-  chatKeyboardBound = true;
   const input = document.getElementById("noticeInput");
   if (!input) return;
-
   const compose = input.closest(".chatCompose");
   if (compose) {
     const sendBtn = compose.querySelector("button");
@@ -2036,27 +1912,11 @@ function initChatComposeKeyboard() {
       sendBtn.addEventListener("mousedown", function(e) { e.preventDefault(); });
     }
   }
-
   input.addEventListener("focus", enterChatTyping);
-  input.addEventListener("input", function() {
-    if (chatTyping) scheduleChatComposeSync(false);
-  });
   input.addEventListener("blur", function() {
     setTimeout(function() {
       if (document.activeElement !== input) exitChatTyping();
-    }, 120);
-  });
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", function() {
-      if (chatTyping) scheduleChatComposeSync(false);
-    });
-    window.visualViewport.addEventListener("scroll", function() {
-      if (chatTyping) scheduleChatComposeSync(false);
-    });
-  }
-  window.addEventListener("orientationchange", function() {
-    if (chatTyping) setTimeout(function() { applyChatComposePosition(true); }, 200);
+    }, 100);
   });
 }
 
@@ -2136,7 +1996,6 @@ function renderNoticeBoard() {
     return html;
   }).join("");
   scrollNoticeFeedToBottom();
-  if (chatTyping) applyChatComposePosition(false);
 }
 
 function scrollNoticeFeedToBottom() {
@@ -2165,7 +2024,6 @@ async function postNoticeMessage() {
   });
   input.value = "";
   renderNoticeBoard();
-  if (chatTyping) applyChatComposePosition(true);
   input.focus();
 
   try {
