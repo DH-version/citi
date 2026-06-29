@@ -864,6 +864,13 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   font-size:16px;box-sizing:border-box;
 }
 #cancelReasonInput::placeholder{color:var(--text-dim);font-weight:500}
+#completedByNameInput{
+  width:100%;padding:12px;margin:6px 0 0;
+  background:var(--surface);color:#0f172a;font-weight:600;
+  border:1px solid #cbd5e1;border-radius:var(--radius-sm);
+  font-size:16px;box-sizing:border-box;
+}
+#completedByNameInput::placeholder{color:var(--text-dim);font-weight:500}
 #quickBookingModal.open{align-items:center;justify-content:center;padding:16px}
 .pinModalSheet input{text-align:center;font-size:22px;letter-spacing:6px}
 .fareInputWrap{
@@ -1175,8 +1182,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <h3 id="fareModalTitle" class="modalTitleGreen">Enter Fare</h3>
     <p id="fareModalHint" class="modalSubtitle" style="margin-bottom:8px">Trip fare to complete this job</p>
     <div id="completedByRow" style="display:none;margin-bottom:8px">
-      <div class="filterLabel">Completed by</div>
+      <div id="completedByLabel" class="filterLabel">Completed by</div>
       <select id="completedBySelect"></select>
+      <input id="completedByNameInput" type="text" placeholder="Driver name" autocomplete="off" enterkeyhint="next" style="display:none">
     </div>
     <div class="fareInputWrap">
       <span class="farePrefix">$</span>
@@ -2280,6 +2288,8 @@ function buildJobDetailListHtml(job, docId, source) {
   const isActive = job.status === "available" || job.status === "accepted";
   if (source === "previous" && job.status === "completed") {
     html += jdLineHtml("Completed By", (job.completedBy || "—").toUpperCase(), "blue");
+    const fareLabel = formatFareDisplay(job.fare);
+    if (fareLabel) html += jdLineHtml("Fare", fareLabel.toUpperCase(), "gold");
   } else if (source === "previous" && job.status === "cancelled") {
     html += jdLineHtml("Canceled By", (job.canceledBy || "—").toUpperCase(), "white");
     if (job.cancelReason) {
@@ -2448,7 +2458,13 @@ function canAcceptJob(job) {
 }
 
 function showDispatchInGroup(job) {
-  return job.status === "available" && isQuickOrReadyJob(job) && getAcceptWindowRemainingMs(job) === 0;
+  return job.status === "available" && isQuickOrReadyJob(job) &&
+    getAcceptWindowRemainingMs(job) === 0 && !job.groupDispatched;
+}
+
+function showGroupCompleteButton(job) {
+  return job.status === "available" && isQuickOrReadyJob(job) &&
+    getAcceptWindowRemainingMs(job) === 0 && !!job.groupDispatched;
 }
 
 function formatCountdownMs(ms) {
@@ -2475,6 +2491,10 @@ function buildAvailableActionsHtml(job) {
   if (!isAccepted && showDispatchInGroup(job)) {
     return '<div class="jobActions" onclick="event.stopPropagation()">' +
       '<button class="btnGroupDispatch" onclick="dispatchInGroup(\'' + job.docId + '\')">DISPATCH IN GROUP</button></div>';
+  }
+  if (!isAccepted && showGroupCompleteButton(job)) {
+    return '<div class="jobActions" onclick="event.stopPropagation()">' +
+      '<button class="btnComplete" onclick="completeGroupJob(\'' + job.docId + '\')">✓ COMPLETE</button></div>';
   }
   if (isAccepted && isJobAcceptedByMe(job)) {
     return '<div class="acceptedBanner">ACCEPTED · ' + escapeHtml((job.acceptedBy || "").toUpperCase()) + '</div>' +
@@ -2853,6 +2873,14 @@ function subscribePreviousJobsFallback() {
       })).slice(0, 80);
       if (!previousFilterActive) scheduleRenderPrevious();
     });
+}
+
+function markJobGroupDispatchedLocally(docId) {
+  availableJobs = availableJobs.map(function(j) {
+    if (j.docId === docId) return Object.assign({}, j, { groupDispatched: true });
+    return j;
+  });
+  scheduleRenderAvailable();
 }
 
 function applyOptimisticComplete(docId, op, fare) {
@@ -3665,6 +3693,9 @@ async function openJobModalAsync(docId, source) {
   if (source === "available" && showDispatchInGroup(job)) {
     actions += '<button class="btnGroupDispatch" onclick="dispatchInGroup(\'' + docId + '\');closeJobModal()">DISPATCH IN GROUP</button>';
   }
+  if (source === "available" && showGroupCompleteButton(job)) {
+    actions += '<button class="btnComplete" onclick="completeGroupJob(\'' + docId + '\')">✓ COMPLETE</button>';
+  }
   if (source === "available" && job.status === "accepted" && isJobAcceptedByMe(job)) {
     actions += '<button class="btnComplete" onclick="completeJob(\'' + docId + '\')">✓ COMPLETE</button>';
     actions += '<button class="btnRecall" onclick="recallJob(\'' + docId + '\')">RECALL</button>';
@@ -3862,6 +3893,10 @@ function resetFareModal() {
   document.getElementById("fareModalHint").textContent = "Trip fare to complete this job";
   document.getElementById("fareConfirmBtn").textContent = "Complete Job";
   document.getElementById("completedByRow").style.display = "none";
+  document.getElementById("completedBySelect").style.display = "";
+  document.getElementById("completedByNameInput").style.display = "none";
+  document.getElementById("completedByNameInput").value = "";
+  document.getElementById("completedByLabel").textContent = "Completed by";
   pendingFreeDispatchDocId = null;
 }
 
@@ -3890,7 +3925,7 @@ function buildGroupDispatchText(job) {
     String(job.pickup || "").trim().split(",")[0].trim() ||
     "Pickup";
   const dropLabel = extractDropLabelFromAddress(job.drop);
-  return line1 + "\n" + pickupSub + "\n" + dropLabel;
+  return line1 + "\n" + pickupSub + "\nTo\n" + dropLabel;
 }
 
 function openWhatsAppWithText(text) {
@@ -3898,35 +3933,56 @@ function openWhatsAppWithText(text) {
   window.location.href = url;
 }
 
-function showGroupDispatchFareModal(docId) {
+function showGroupCompleteModal(docId) {
   pendingFreeDispatchDocId = docId;
   pendingCompleteDocId = docId;
   const job = findJobById(docId);
-  document.getElementById("fareModalTitle").textContent = "Dispatch in Group";
-  document.getElementById("fareModalHint").textContent = "Who completed the job and what was the fare?";
+  document.getElementById("fareModalTitle").textContent = "Complete Job";
+  document.getElementById("fareModalHint").textContent = "Enter name and fare for this job";
   document.getElementById("fareConfirmBtn").textContent = "Complete Job";
-  const sel = document.getElementById("completedBySelect");
-  sel.innerHTML = AUTHORIZED_OPERATORS.map(function(n) {
-    return '<option value="' + n + '">' + n + '</option>';
-  }).join("");
-  const me = getCurrentOperator();
-  if (me && AUTHORIZED_OPERATORS.indexOf(me) !== -1) sel.value = me;
+  document.getElementById("completedByLabel").textContent = "Name";
+  document.getElementById("completedBySelect").style.display = "none";
+  const nameEl = document.getElementById("completedByNameInput");
+  nameEl.style.display = "block";
+  nameEl.value = "";
   document.getElementById("completedByRow").style.display = "block";
   const fareEl = document.getElementById("fareInput");
   fareEl.value = job && job.price ? String(job.price).replace(/[^0-9.]/g, "") : "";
   document.getElementById("fareModal").classList.add("open");
-  focusModalInput(fareEl, true);
+  focusModalInput(nameEl, false);
 }
 
-function dispatchInGroup(docId) {
+function completeGroupJob(docId) {
+  if (!requireOperator("complete jobs")) return;
+  resetFareModal();
+  showGroupCompleteModal(docId);
+}
+
+async function dispatchInGroup(docId) {
   if (!requireOperator("dispatch in group")) return;
+  if (!firebaseReady || !db) {
+    alert("Not connected — try again in a moment");
+    return;
+  }
   const job = findJobById(docId);
   if (!job) return;
   const text = buildGroupDispatchText(job);
+  const op = getCurrentOperator();
+  markJobGroupDispatchedLocally(docId);
+  try {
+    await db.collection("jobs").doc(docId).update({
+      groupDispatched: true,
+      groupDispatchedBy: op,
+      groupDispatchedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (err) {
+    alert("Dispatch in group failed: " + err.message);
+    subscribeAvailableJobs();
+    return;
+  }
   copyToClipboard(text).then(function(ok) {
     openWhatsAppWithText(text);
     showToast(ok ? "Copied — opening WhatsApp" : "Opening WhatsApp — copy manually if needed", !ok);
-    setTimeout(function() { showGroupDispatchFareModal(docId); }, 600);
   });
 }
 
@@ -3955,9 +4011,9 @@ async function confirmCompleteJob() {
   const isFreeDispatch = !!pendingFreeDispatchDocId;
   let completedBy = op;
   if (isFreeDispatch) {
-    completedBy = document.getElementById("completedBySelect").value;
+    completedBy = document.getElementById("completedByNameInput").value.trim();
     if (!completedBy) {
-      alert("Select who completed the job");
+      alert("Enter the name");
       return;
     }
   }
@@ -3982,11 +4038,14 @@ async function confirmCompleteJob() {
       acceptedBySession: firebase.firestore.FieldValue.delete()
     });
     if (pts > 0) {
-      try {
-        await addProspectPoints(completedBy, pts);
-      } catch (pe) {
-        console.error("Prospect points failed", pe);
-        alert("Job completed but points update failed — use Prospect tab to adjust");
+      const who = resolveOperator(completedBy);
+      if (who) {
+        try {
+          await addProspectPoints(who, pts);
+        } catch (pe) {
+          console.error("Prospect points failed", pe);
+          alert("Job completed but points update failed — use Prospect tab to adjust");
+        }
       }
     }
     closeFareModal();
