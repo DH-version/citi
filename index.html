@@ -1325,6 +1325,7 @@ let paymentArray = [], priceType = "None";
 let autocompleteService, map;
 let db, firebaseReady = false;
 let firebaseRetryTimer = null;
+let firebaseLastSyncAt = 0;
 let firebaseSubscriptionsStarted = false;
 let messaging = null;
 let pushSwRegistration = null;
@@ -1731,10 +1732,15 @@ function startFirebaseSubscriptions() {
 }
 
 function markFirebaseConnected() {
+  firebaseLastSyncAt = Date.now();
   setSyncStatus("Connected — live sync active", false);
 }
 
 function markFirebaseReconnecting() {
+  if (firebaseReady && firebaseLastSyncAt && (Date.now() - firebaseLastSyncAt) < 120000) {
+    setSyncStatus("Connected — live sync active", false);
+    return;
+  }
   setSyncStatus("Reconnecting…", true);
 }
 
@@ -1756,6 +1762,11 @@ function initializeFirebase() {
     repairProspectTierGap();
     renderOperatorFilterRow();
     restoreOperatorSession();
+    db.collection("jobs").limit(1).get().then(function() {
+      markFirebaseConnected();
+    }).catch(function() {
+      scheduleFirebaseRetry();
+    });
   } catch (err) {
     console.error(err);
     if (firebase.apps.length) {
@@ -3577,6 +3588,9 @@ function subscribeAvailableJobs() {
         subscribeAvailableJobsFallback();
         return;
       }
+      if (isFirebaseNetworkError(err) && db) {
+        db.enableNetwork().catch(function() {});
+      }
       markFirebaseReconnecting();
       if (availableUnsub) availableUnsub();
       setTimeout(subscribeAvailableJobs, 3000);
@@ -3929,8 +3943,13 @@ function buildGroupDispatchText(job) {
 }
 
 function openWhatsAppWithText(text) {
-  const url = "https://wa.me/?text=" + encodeURIComponent(text);
-  window.location.href = url;
+  const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
+  try {
+    const opened = window.open(url, "_blank", "noopener,noreferrer");
+    if (!opened) window.location.assign(url);
+  } catch (e) {
+    window.location.assign(url);
+  }
 }
 
 function showGroupCompleteModal(docId) {
@@ -3958,31 +3977,45 @@ function completeGroupJob(docId) {
   showGroupCompleteModal(docId);
 }
 
-async function dispatchInGroup(docId) {
+function revertJobGroupDispatchedLocally(docId) {
+  availableJobs = availableJobs.map(function(j) {
+    if (j.docId === docId) {
+      const copy = Object.assign({}, j);
+      delete copy.groupDispatched;
+      return copy;
+    }
+    return j;
+  });
+  scheduleRenderAvailable();
+}
+
+function dispatchInGroup(docId) {
   if (!requireOperator("dispatch in group")) return;
-  if (!firebaseReady || !db) {
-    alert("Not connected — try again in a moment");
-    return;
-  }
   const job = findJobById(docId);
   if (!job) return;
   const text = buildGroupDispatchText(job);
   const op = getCurrentOperator();
+
+  openWhatsAppWithText(text);
+  copyToClipboard(text).then(function(ok) {
+    showToast(ok ? "Copied — opening WhatsApp" : "Opening WhatsApp — copy manually if needed", !ok);
+  });
+
   markJobGroupDispatchedLocally(docId);
-  try {
-    await db.collection("jobs").doc(docId).update({
-      groupDispatched: true,
-      groupDispatchedBy: op,
-      groupDispatchedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch (err) {
-    alert("Dispatch in group failed: " + err.message);
-    subscribeAvailableJobs();
+
+  if (!firebaseReady || !db) {
+    showToast("Saved locally — will sync Complete button when connected", true);
     return;
   }
-  copyToClipboard(text).then(function(ok) {
-    openWhatsAppWithText(text);
-    showToast(ok ? "Copied — opening WhatsApp" : "Opening WhatsApp — copy manually if needed", !ok);
+
+  db.collection("jobs").doc(docId).update({
+    groupDispatched: true,
+    groupDispatchedBy: op,
+    groupDispatchedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(err) {
+    console.error("Dispatch in group sync failed:", err);
+    revertJobGroupDispatchedLocally(docId);
+    showToast("Could not sync — try Dispatch in Group again", true);
   });
 }
 
@@ -4807,6 +4840,14 @@ window.addEventListener("DOMContentLoaded", function() {
         initializeFirebase();
       } else if (db) {
         db.enableNetwork().catch(function() {});
+        if (firebaseLastSyncAt && (Date.now() - firebaseLastSyncAt) > 60000) {
+          markFirebaseReconnecting();
+          if (availableUnsub) {
+            availableUnsub();
+            availableUnsub = null;
+          }
+          subscribeAvailableJobs();
+        }
       }
       const op = getCurrentOperator();
       if (op) refreshPushTokenIfNeeded(op);
