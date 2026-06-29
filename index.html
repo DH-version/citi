@@ -696,7 +696,7 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   font-size:clamp(18px,5vw,26px);font-weight:700;color:#f87171;
   line-height:1;font-variant-numeric:tabular-nums;
 }
-.btnFreeDispatch{
+.btnGroupDispatch{
   background:linear-gradient(180deg,#ea580c 0%,#c2410c 100%)!important;
   color:#fff!important;border-color:rgba(251,146,60,.35)!important;
 }
@@ -845,6 +845,13 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 }
 .filterSearchRow{display:flex;gap:6px}
 .filterSearchRow button{flex:1;margin:0}
+.filterPanel input[type="text"],.filterPanel input[type="tel"]{
+  width:100%;padding:10px 12px;margin-bottom:6px;
+  background:var(--bg-card);color:var(--text);font-weight:600;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:16px;box-sizing:border-box;
+}
+.filterPanel input::placeholder{color:var(--text-dim);font-weight:500}
 .operatorStatus.ready{color:var(--green-bright);font-weight:600}
 .phoneHint{color:var(--green-bright)}
 #pinModal.open{align-items:center;justify-content:center;padding:16px}
@@ -1075,6 +1082,12 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <button class="btnFilter" onclick="toggleFilterPanel()">Filter</button>
   </div>
   <div id="filterPanel" class="filterPanel">
+    <div class="filterLabel">Customer lookup</div>
+    <input id="customerLookupName" type="text" placeholder="Search by passenger name" autocomplete="off" autocapitalize="words">
+    <input id="customerLookupPhone" type="tel" inputmode="numeric" placeholder="Search by phone number" autocomplete="off">
+    <div class="filterSearchRow" style="margin-bottom:10px">
+      <button class="btnPrimary" onclick="runCustomerLookup()">Find Customer Jobs</button>
+    </div>
     <div class="filterLabel">Operator</div>
     <div class="filterRow" id="operatorFilterRow"></div>
     <div class="filterLabel">Type</div>
@@ -1303,6 +1316,8 @@ let selectedVehicle = "None", selectedTime = "None", selectedAMPM = "None";
 let paymentArray = [], priceType = "None";
 let autocompleteService, map;
 let db, firebaseReady = false;
+let firebaseRetryTimer = null;
+let firebaseSubscriptionsStarted = false;
 let messaging = null;
 let pushSwRegistration = null;
 let pushTokenSaved = "";
@@ -1311,6 +1326,7 @@ let availableJobs = [], previousJobs = [], completedJobs = [], filterResultJobs 
 let teamOperators = AUTHORIZED_OPERATORS.slice();
 let selectedFilterOperator = "", selectedFilterType = "";
 let previousFilterActive = false;
+let customerLookupActive = false;
 let pendingDeleteDocId = null;
 let pendingCancelDocId = null;
 let pendingCompleteDocId = null;
@@ -1669,27 +1685,81 @@ function updateOperatorAccess(isValid, showInvalid) {
   document.body.classList.toggle("appLocked", !isValid);
 }
 
+function isFirebaseIndexError(err) {
+  if (!err) return false;
+  var msg = String(err.message || err.code || "").toLowerCase();
+  return err.code === "failed-precondition" || msg.indexOf("index") !== -1;
+}
+
+function isFirebaseNetworkError(err) {
+  if (!err) return false;
+  return err.code === "unavailable" || err.code === "deadline-exceeded" ||
+    err.code === "resource-exhausted" || err.code === "internal";
+}
+
+function scheduleFirebaseRetry() {
+  if (firebaseRetryTimer) return;
+  firebaseRetryTimer = setTimeout(function() {
+    firebaseRetryTimer = null;
+    initializeFirebase();
+  }, 4000);
+}
+
+function getFirestoreDb() {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  return firebase.firestore();
+}
+
+function startFirebaseSubscriptions() {
+  if (firebaseSubscriptionsStarted) return;
+  firebaseSubscriptionsStarted = true;
+  subscribeAvailableJobs();
+  subscribeCompletedJobs();
+  subscribeCustomers();
+  subscribeProspectScores();
+  subscribeNoticeBoard();
+}
+
+function markFirebaseConnected() {
+  setSyncStatus("Connected — live sync active", false);
+}
+
+function markFirebaseReconnecting() {
+  setSyncStatus("Reconnecting…", true);
+}
+
 function initializeFirebase() {
   try {
     if (!firebaseConfig.projectId || firebaseConfig.projectId === "YOUR_PROJECT_ID") {
       setSyncStatus("Add Firebase config in firebase-config.js", true);
+      scheduleFirebaseRetry();
       return;
     }
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
+    db = getFirestoreDb();
+    db.enablePersistence({ synchronizeTabs: true }).catch(function(e) {
+      console.warn("Offline cache unavailable:", e && e.code ? e.code : e);
+    });
+    db.enableNetwork().catch(function() {});
     firebaseReady = true;
-    setSyncStatus("Connected — live sync active", false);
-    subscribeAvailableJobs();
-    subscribeCompletedJobs();
-    subscribeCustomers();
-    subscribeProspectScores();
-    subscribeNoticeBoard();
+    markFirebaseConnected();
+    startFirebaseSubscriptions();
     repairProspectTierGap();
     renderOperatorFilterRow();
     restoreOperatorSession();
   } catch (err) {
     console.error(err);
-    setSyncStatus("Firebase error — check config", true);
+    if (firebase.apps.length) {
+      db = firebase.firestore();
+      firebaseReady = true;
+      markFirebaseConnected();
+      startFirebaseSubscriptions();
+      restoreOperatorSession();
+      return;
+    }
+    markFirebaseReconnecting();
+    scheduleFirebaseRetry();
   }
 }
 
@@ -2377,7 +2447,7 @@ function canAcceptJob(job) {
   return job.status === "available" && (!isQuickOrReadyJob(job) || getAcceptWindowRemainingMs(job) > 0);
 }
 
-function showFreeToDispatch(job) {
+function showDispatchInGroup(job) {
   return job.status === "available" && isQuickOrReadyJob(job) && getAcceptWindowRemainingMs(job) === 0;
 }
 
@@ -2402,9 +2472,9 @@ function buildAvailableActionsHtml(job) {
     return '<div class="jobActions" onclick="event.stopPropagation()">' +
       '<button class="btnAccept btnAcceptJob" onclick="acceptJob(\'' + job.docId + '\')">✓ ACCEPT JOB</button></div>';
   }
-  if (!isAccepted && showFreeToDispatch(job)) {
+  if (!isAccepted && showDispatchInGroup(job)) {
     return '<div class="jobActions" onclick="event.stopPropagation()">' +
-      '<button class="btnFreeDispatch" onclick="freeToDispatch(\'' + job.docId + '\')">FREE TO DISPATCH</button></div>';
+      '<button class="btnGroupDispatch" onclick="dispatchInGroup(\'' + job.docId + '\')">DISPATCH IN GROUP</button></div>';
   }
   if (isAccepted && isJobAcceptedByMe(job)) {
     return '<div class="acceptedBanner">ACCEPTED · ' + escapeHtml((job.acceptedBy || "").toUpperCase()) + '</div>' +
@@ -2732,8 +2802,28 @@ function getJobClosedTime(job) {
   return 0;
 }
 
+function getJobPickupSortMs(job) {
+  if (job.date) {
+    const parts = String(job.timeInput || "00:00").split(":");
+    let h = parseInt(parts[0], 10) || 0;
+    const m = parseInt(parts[1], 10) || 0;
+    const ampm = job.ampm || "None";
+    if (ampm === "PM" && h < 12) h += 12;
+    if (ampm === "AM" && h === 12) h = 0;
+    const d = new Date(job.date + "T" + String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":00");
+    if (!isNaN(d.getTime())) return d.getTime();
+    const day = new Date(job.date + "T00:00:00");
+    if (!isNaN(day.getTime())) return day.getTime();
+  }
+  if (job.sortKey) return job.sortKey;
+  if (job.dispatchedAt) return getJobDispatchedMs(job);
+  return getJobClosedTime(job);
+}
+
 function sortPreviousJobs(jobs) {
-  return jobs.slice().sort(function(a, b) { return getJobClosedTime(b) - getJobClosedTime(a); });
+  return jobs.slice().sort(function(a, b) {
+    return getJobPickupSortMs(a) - getJobPickupSortMs(b);
+  });
 }
 
 function subscribeCompletedJobs() {
@@ -2839,9 +2929,61 @@ function applyPreviousFilterClient(op) {
     return (j.operator || "").trim().toLowerCase() === key &&
       j.status !== "available" && j.status !== "accepted";
   });
+  filterResultJobs = sortPreviousJobs(filterResultJobs);
   document.getElementById("previousListHint").textContent =
     "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + op;
   scheduleRenderPrevious();
+}
+
+function runCustomerLookup() {
+  if (!requireOperator("search previous jobs")) return;
+  const nameQ = (document.getElementById("customerLookupName").value || "").trim().toLowerCase();
+  const phoneQ = normalizePhone(document.getElementById("customerLookupPhone").value || "");
+  if (!nameQ && phoneQ.length < 6) {
+    alert("Enter a passenger name or phone number (at least 6 digits)");
+    return;
+  }
+  customerLookupActive = true;
+  previousFilterActive = true;
+  selectedFilterOperator = "";
+  selectedFilterType = "";
+  stopFilterSubscription();
+  document.querySelectorAll(".filterOpBtn").forEach(function(b) { b.classList.remove("selected"); });
+  document.getElementById("filterDispatched").classList.remove("selected");
+  document.getElementById("filterCompleted").classList.remove("selected");
+
+  function applyCustomerFilter(sourceJobs) {
+    filterResultJobs = sourceJobs.filter(function(j) {
+      if (j.status === "available" || j.status === "accepted") return false;
+      const nameMatch = !nameQ || String(j.name || "").trim().toLowerCase().indexOf(nameQ) !== -1;
+      const phoneMatch = phoneQ.length < 6 || normalizePhone(j.phone || "").indexOf(phoneQ) !== -1;
+      if (nameQ && phoneQ.length >= 6) return nameMatch && phoneMatch;
+      if (nameQ) return nameMatch;
+      return phoneMatch;
+    });
+    filterResultJobs = sortPreviousJobs(filterResultJobs);
+    let hint = "Showing " + filterResultJobs.length + " job(s)";
+    if (nameQ) hint += " matching \"" + document.getElementById("customerLookupName").value.trim() + "\"";
+    if (phoneQ.length >= 6) hint += " · phone " + formatPhoneDisplay(phoneQ);
+    document.getElementById("previousListHint").textContent = hint;
+    scheduleRenderPrevious();
+  }
+
+  if (historyJobs.length) {
+    applyCustomerFilter(historyJobs);
+    return;
+  }
+  if (!firebaseReady || !db) {
+    applyCustomerFilter(completedJobs);
+    return;
+  }
+  db.collection("jobs").limit(500).get().then(function(snap) {
+    historyJobs = docsToJobs(snap.docs);
+    applyCustomerFilter(historyJobs);
+  }).catch(function(err) {
+    console.error("Customer lookup failed", err);
+    applyCustomerFilter(completedJobs.concat(historyJobs));
+  });
 }
 
 function applyPreviousFilter() {
@@ -2849,6 +2991,7 @@ function applyPreviousFilter() {
   if (!selectedFilterOperator) { alert("Select an operator"); return; }
   if (!selectedFilterType) { alert("Select Dispatched or Completed"); return; }
 
+  customerLookupActive = false;
   previousFilterActive = true;
   stopFilterSubscription();
 
@@ -2874,7 +3017,7 @@ function applyPreviousFilter() {
         return j.status !== "available" && j.status !== "accepted";
       });
     }
-    filterResultJobs = jobs;
+    filterResultJobs = sortPreviousJobs(jobs);
     document.getElementById("previousListHint").textContent =
       "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + op;
     scheduleRenderPrevious();
@@ -2899,18 +3042,23 @@ function clearPreviousFilter() {
   selectedFilterOperator = "";
   selectedFilterType = "";
   previousFilterActive = false;
+  customerLookupActive = false;
   filterResultJobs = [];
   stopFilterSubscription();
   document.querySelectorAll(".filterOpBtn").forEach(function(b) { b.classList.remove("selected"); });
   document.getElementById("filterDispatched").classList.remove("selected");
   document.getElementById("filterCompleted").classList.remove("selected");
+  const nameEl = document.getElementById("customerLookupName");
+  const phoneEl = document.getElementById("customerLookupPhone");
+  if (nameEl) nameEl.value = "";
+  if (phoneEl) phoneEl.value = "";
   document.getElementById("previousListHint").textContent = "Tap to view or reload into New Booking";
   scheduleRenderPrevious();
 }
 
 function getPreviousJobsToRender() {
-  if (previousFilterActive) return filterResultJobs;
-  return completedJobs;
+  if (previousFilterActive) return sortPreviousJobs(filterResultJobs);
+  return sortPreviousJobs(completedJobs);
 }
 
 function focusModalInput(input, selectAll) {
@@ -3369,6 +3517,7 @@ function subscribeAvailableJobs() {
   availableUnsub = db.collection("jobs")
     .where("status", "in", ["available", "accepted"])
     .onSnapshot(function(snap) {
+      markFirebaseConnected();
       const changes = snap.docChanges();
       availableJobs = snap.docs.map(function(d) {
         return Object.assign({ docId: d.id }, d.data());
@@ -3395,8 +3544,43 @@ function subscribeAvailableJobs() {
       }
       jobsListenerReady = true;
     }, function(err) {
-      console.error(err);
-      setSyncStatus("Firestore index needed for status — check console", true);
+      console.error("Available jobs listener:", err);
+      if (isFirebaseIndexError(err)) {
+        subscribeAvailableJobsFallback();
+        return;
+      }
+      markFirebaseReconnecting();
+      if (availableUnsub) availableUnsub();
+      setTimeout(subscribeAvailableJobs, 3000);
+    });
+}
+
+function subscribeAvailableJobsFallback() {
+  if (availableUnsub) availableUnsub();
+  availableUnsub = db.collection("jobs")
+    .limit(250)
+    .onSnapshot(function(snap) {
+      markFirebaseConnected();
+      availableJobs = snap.docs.map(function(d) {
+        return Object.assign({ docId: d.id }, d.data());
+      }).filter(function(job) {
+        return job.status === "available" || job.status === "accepted";
+      });
+      availableJobs.sort(function(a, b) {
+        if (a.status !== b.status) {
+          if (a.status === "available") return -1;
+          if (b.status === "available") return 1;
+        }
+        return (a.sortKey || 0) - (b.sortKey || 0);
+      });
+      scheduleRenderAvailable();
+      updateAvailableBadges();
+      jobsListenerReady = true;
+    }, function(err) {
+      console.error("Available jobs fallback failed:", err);
+      markFirebaseReconnecting();
+      if (availableUnsub) availableUnsub();
+      setTimeout(subscribeAvailableJobs, 5000);
     });
 }
 
@@ -3478,8 +3662,8 @@ async function openJobModalAsync(docId, source) {
   if (source === "available" && canAcceptJob(job)) {
     actions += '<button class="btnAccept btnAcceptJob" onclick="acceptJob(\'' + docId + '\');closeJobModal()">✓ ACCEPT JOB</button>';
   }
-  if (source === "available" && showFreeToDispatch(job)) {
-    actions += '<button class="btnFreeDispatch" onclick="freeToDispatch(\'' + docId + '\');closeJobModal()">FREE TO DISPATCH</button>';
+  if (source === "available" && showDispatchInGroup(job)) {
+    actions += '<button class="btnGroupDispatch" onclick="dispatchInGroup(\'' + docId + '\');closeJobModal()">DISPATCH IN GROUP</button>';
   }
   if (source === "available" && job.status === "accepted" && isJobAcceptedByMe(job)) {
     actions += '<button class="btnComplete" onclick="completeJob(\'' + docId + '\')">✓ COMPLETE</button>';
@@ -3696,12 +3880,29 @@ async function completeJob(docId) {
   focusModalInput(fareEl, true);
 }
 
-function freeToDispatch(docId) {
-  if (!requireOperator("complete jobs")) return;
+function buildGroupDispatchText(job) {
+  const time = String(job.time || "").trim();
+  let line1 = "Quick";
+  if (time.toLowerCase() === "ready now") line1 = "RN";
+  else if (time.toLowerCase() === "quick") line1 = "Quick";
+  else if (time) line1 = time.toUpperCase();
+  const pickupSub = extractSuburbFromAddress(job.pickup) ||
+    String(job.pickup || "").trim().split(",")[0].trim() ||
+    "Pickup";
+  const dropLabel = extractDropLabelFromAddress(job.drop);
+  return line1 + "\n" + pickupSub + "\n" + dropLabel;
+}
+
+function openWhatsAppWithText(text) {
+  const url = "https://wa.me/?text=" + encodeURIComponent(text);
+  window.location.href = url;
+}
+
+function showGroupDispatchFareModal(docId) {
   pendingFreeDispatchDocId = docId;
   pendingCompleteDocId = docId;
   const job = findJobById(docId);
-  document.getElementById("fareModalTitle").textContent = "Free to Dispatch";
+  document.getElementById("fareModalTitle").textContent = "Dispatch in Group";
   document.getElementById("fareModalHint").textContent = "Who completed the job and what was the fare?";
   document.getElementById("fareConfirmBtn").textContent = "Complete Job";
   const sel = document.getElementById("completedBySelect");
@@ -3715,6 +3916,22 @@ function freeToDispatch(docId) {
   fareEl.value = job && job.price ? String(job.price).replace(/[^0-9.]/g, "") : "";
   document.getElementById("fareModal").classList.add("open");
   focusModalInput(fareEl, true);
+}
+
+function dispatchInGroup(docId) {
+  if (!requireOperator("dispatch in group")) return;
+  const job = findJobById(docId);
+  if (!job) return;
+  const text = buildGroupDispatchText(job);
+  copyToClipboard(text).then(function(ok) {
+    openWhatsAppWithText(text);
+    showToast(ok ? "Copied — opening WhatsApp" : "Opening WhatsApp — copy manually if needed", !ok);
+    setTimeout(function() { showGroupDispatchFareModal(docId); }, 600);
+  });
+}
+
+function freeToDispatch(docId) {
+  dispatchInGroup(docId);
 }
 
 function closeFareModal() {
@@ -3986,6 +4203,19 @@ function extractSuburbFromAddress(address) {
     }
   }
   return "";
+}
+
+function extractDropLabelFromAddress(address) {
+  const suburb = extractSuburbFromAddress(address);
+  if (suburb) return suburb;
+  const raw = String(address || "").trim();
+  if (!raw) return "Drop-off";
+  let place = raw.split(",")[0].trim();
+  place = place.replace(/^\d+[a-z]?\s*[-\/]?\s*/i, "");
+  place = place.replace(/^(unit|shop|level|suite|apt|flat)\s*[\d\w]+\s*[\/,\s]*/i, "");
+  place = place.replace(/\s+(vic|victoria)\b.*$/i, "").replace(/\b\d{4}\b/g, "").trim();
+  if (!place) place = raw.split(",")[0].trim();
+  return titleCase(place) || "Drop-off";
 }
 
 function newJobAlertText(job) {
@@ -4514,6 +4744,11 @@ window.addEventListener("DOMContentLoaded", function() {
   handleNotificationDeepLink();
   document.addEventListener("visibilitychange", function() {
     if (document.visibilityState === "visible") {
+      if (!firebaseReady) {
+        initializeFirebase();
+      } else if (db) {
+        db.enableNetwork().catch(function() {});
+      }
       const op = getCurrentOperator();
       if (op) refreshPushTokenIfNeeded(op);
       if (document.getElementById("tabTeam") && document.getElementById("tabTeam").classList.contains("active") && teamView === "notice") {
