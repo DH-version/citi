@@ -727,8 +727,8 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .jcActBox:active{transform:scale(.95)}
 .jdActionRow .jcActBox{width:34px;height:34px;min-width:34px;font-size:15px!important}
 .jdList{background:var(--bg-card)}
-.availToggle{display:flex;gap:6px;margin-bottom:8px}
-.availToggle button{flex:1;margin:0;font-size:11px;padding:10px 6px}
+.availToggle{display:flex;gap:4px;margin-bottom:8px}
+.availToggle button{flex:1;margin:0;font-size:10px;padding:10px 4px;line-height:1.2}
 .qbTimeRow{display:flex;gap:8px;margin-bottom:6px}
 .qbTimeRow button{flex:1;margin:0;font-weight:700;font-size:15px;padding:14px 12px}
 .qbTimeRow button.qbSelected{
@@ -1075,6 +1075,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <div class="availToggle">
     <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
     <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Later Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
+    <button id="availGroupBtn" class="filterTypeBtn" onclick="setAvailableView('group')">Group Dispatch<span id="groupBadge" class="filterBadge" style="display:none">0</span></button>
   </div>
   <div id="availableBookingsBg" class="cityNightSurface cityNightListWrap">
     <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
@@ -1107,7 +1108,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button class="btnSecondary" onclick="clearPreviousFilter()">Clear</button>
     </div>
   </div>
-  <div id="previousListHint" class="listHeader">Tap to view or reload into New Booking</div>
+  <div id="previousListHint" class="listHeader">Most recent completed at top · tap to view or reload</div>
   <div id="previousList" class="jobList"></div>
 </div>
 
@@ -1357,6 +1358,7 @@ let renderPreviousScheduled = false, renderAvailableScheduled = false;
 let customersCache = [], customersUnsub = null;
 let mainCustomerFieldMap = null, quickCustomerFieldMap = null;
 let availableView = "current", quickSelectedTime = "None";
+const groupReadyMarkedIds = new Set();
 let deviceId = localStorage.getItem("deviceId") || ("d_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10));
 localStorage.setItem("deviceId", deviceId);
 let sessionId = localStorage.getItem("sessionId") || ("s_" + Date.now() + "_" + Math.random().toString(36).slice(2));
@@ -2447,6 +2449,44 @@ function isCurrentJob(job) {
   return !isFutureJob(job);
 }
 
+function isGroupDispatchQueueJob(job) {
+  return job.status === "available" && isQuickOrReadyJob(job) && getAcceptWindowRemainingMs(job) === 0;
+}
+
+function isCurrentBookingJob(job) {
+  if (!isCurrentJob(job)) return false;
+  if (job.status === "accepted") return true;
+  return !isGroupDispatchQueueJob(job);
+}
+
+function matchesAvailableView(job, view) {
+  if (view === "future") return isFutureJob(job);
+  if (view === "group") return isGroupDispatchQueueJob(job) && isCurrentJob(job);
+  return isCurrentBookingJob(job);
+}
+
+function tryMarkGroupDispatchReady(docId) {
+  if (groupReadyMarkedIds.has(docId) || !firebaseReady || !db) return;
+  const job = findJobById(docId);
+  if (!job || job.groupDispatchReady || !isGroupDispatchQueueJob(job)) return;
+  groupReadyMarkedIds.add(docId);
+  db.collection("jobs").doc(docId).update({
+    groupDispatchReady: true,
+    groupDispatchReadyAt: firebase.firestore.FieldValue.serverTimestamp()
+  }).catch(function(err) {
+    groupReadyMarkedIds.delete(docId);
+    console.warn("groupDispatchReady failed", err);
+  });
+}
+
+function scanGroupDispatchReadyJobs() {
+  availableJobs.forEach(function(job) {
+    if (isGroupDispatchQueueJob(job) && !job.groupDispatchReady) {
+      tryMarkGroupDispatchReady(job.docId);
+    }
+  });
+}
+
 function isQuickOrReadyJob(job) {
   const t = String(job.time || "").trim().toLowerCase();
   return t === "quick" || t === "ready now";
@@ -2490,7 +2530,8 @@ function jobCountdownHtml(job) {
   const remain = getAcceptWindowRemainingMs(job);
   return '<div class="jcHeadActs" onclick="event.stopPropagation()">' +
     '<div class="jcHeadBoxLbl">ACCEPT IN</div>' +
-    '<div class="jcCountdown" data-dispatch-ms="' + dispatchMs + '">' + formatCountdownMs(remain) + '</div></div>';
+    '<div class="jcCountdown" data-dispatch-ms="' + dispatchMs + '" data-doc-id="' + job.docId + '">' +
+    formatCountdownMs(remain) + '</div></div>';
 }
 
 function buildAvailableActionsHtml(job) {
@@ -2556,7 +2597,11 @@ function ensureCountdownTicker() {
       const dispatchMs = parseInt(el.getAttribute("data-dispatch-ms"), 10);
       const remain = Math.max(0, ACCEPT_WINDOW_MS - (Date.now() - dispatchMs));
       el.textContent = formatCountdownMs(remain);
-      if (remain === 0) needsRerender = true;
+      if (remain === 0) {
+        needsRerender = true;
+        const docId = el.getAttribute("data-doc-id");
+        if (docId) tryMarkGroupDispatchReady(docId);
+      }
     });
     if (needsRerender) scheduleRenderAvailable();
   }, 1000);
@@ -2564,20 +2609,28 @@ function ensureCountdownTicker() {
 
 function updateAvailableBadges() {
   const currentCount = availableJobs.filter(function(j) {
-    return j.status === "available" && isCurrentJob(j);
+    return j.status === "available" && isCurrentBookingJob(j);
   }).length;
   const futureCount = availableJobs.filter(function(j) {
     return j.status === "available" && isFutureJob(j);
   }).length;
+  const groupCount = availableJobs.filter(function(j) {
+    return isGroupDispatchQueueJob(j) && isCurrentJob(j);
+  }).length;
   const navBadge = document.getElementById("availableBadge");
   if (navBadge) {
-    navBadge.textContent = currentCount;
-    navBadge.style.display = currentCount ? "inline" : "none";
+    navBadge.textContent = currentCount + groupCount;
+    navBadge.style.display = (currentCount + groupCount) ? "inline" : "none";
   }
   const futureBadge = document.getElementById("futureBadge");
   if (futureBadge) {
     futureBadge.textContent = futureCount;
     futureBadge.style.display = futureCount ? "inline" : "none";
+  }
+  const groupBadge = document.getElementById("groupBadge");
+  if (groupBadge) {
+    groupBadge.textContent = groupCount;
+    groupBadge.style.display = groupCount ? "inline" : "none";
   }
 }
 
@@ -2585,9 +2638,13 @@ function setAvailableView(view) {
   availableView = view;
   document.getElementById("availCurrentBtn").classList.toggle("selected", view === "current");
   document.getElementById("availFutureBtn").classList.toggle("selected", view === "future");
-  document.getElementById("availableListHint").textContent = view === "future"
-    ? "Next-day & later scheduled jobs"
-    : "Today · Quick & Ready Now · Accept to take";
+  document.getElementById("availGroupBtn").classList.toggle("selected", view === "group");
+  const hints = {
+    current: "Today · Quick & Ready Now · Accept to take",
+    future: "Next-day & later scheduled jobs",
+    group: "Accept window ended · Dispatch in group or complete"
+  };
+  document.getElementById("availableListHint").textContent = hints[view] || hints.current;
   scheduleRenderAvailable();
 }
 
@@ -2851,9 +2908,17 @@ function getJobPickupSortMs(job) {
   return getJobClosedTime(job);
 }
 
+function getJobCompletedSortMs(job) {
+  const ts = job.completedAt || job.canceledAt || job.dispatchedAt;
+  if (!ts) return 0;
+  if (ts.seconds) return ts.seconds * 1000;
+  if (ts.toDate) return ts.toDate().getTime();
+  return 0;
+}
+
 function sortPreviousJobs(jobs) {
   return jobs.slice().sort(function(a, b) {
-    return getJobPickupSortMs(a) - getJobPickupSortMs(b);
+    return getJobCompletedSortMs(b) - getJobCompletedSortMs(a);
   });
 }
 
@@ -3199,7 +3264,12 @@ function jobCardHeaderGridHtml(job, docId, source, opts) {
       headClass += " jcHeadNoActs";
     }
   } else if (docId && source === "available" && isQuickOrReadyJob(job) && job.status === "available") {
-    rightHtml = jobCountdownHtml(job);
+    if (isGroupDispatchQueueJob(job)) {
+      rightHtml = '<div class="jcHeadActs"><div class="jcHeadBoxLbl">GROUP</div>' +
+        '<div class="jcCountdown" style="font-size:11px">DISPATCH</div></div>';
+    } else {
+      rightHtml = jobCountdownHtml(job);
+    }
   } else if (docId && source === "available") {
     headClass += " jcHeadNoActs";
   }
@@ -3558,6 +3628,8 @@ function subscribeAvailableJobs() {
     .onSnapshot(function(snap) {
       markFirebaseConnected();
       const changes = snap.docChanges();
+      const prevMap = {};
+      availableJobs.forEach(function(j) { prevMap[j.docId] = j; });
       availableJobs = snap.docs.map(function(d) {
         return Object.assign({ docId: d.id }, d.data());
       });
@@ -3570,6 +3642,7 @@ function subscribeAvailableJobs() {
       });
       scheduleRenderAvailable();
       updateAvailableBadges();
+      scanGroupDispatchReadyJobs();
 
       if (jobsListenerReady) {
         changes.forEach(function(change) {
@@ -3577,6 +3650,14 @@ function subscribeAvailableJobs() {
             const job = change.doc.data();
             if (job.status === "available" && job.sessionId !== sessionId && !pushTokenSaved) {
               showNewJobAlert(Object.assign({ docId: change.doc.id }, job));
+            }
+          }
+          if (change.type === "modified") {
+            const after = Object.assign({ docId: change.doc.id }, change.doc.data());
+            const prev = prevMap[after.docId];
+            if (after.status === "available" && after.groupDispatchReady &&
+                (!prev || !prev.groupDispatchReady) && after.sessionId !== sessionId && !pushTokenSaved) {
+              showGroupDispatchAlert(after);
             }
           }
         });
@@ -3617,6 +3698,7 @@ function subscribeAvailableJobsFallback() {
       });
       scheduleRenderAvailable();
       updateAvailableBadges();
+      scanGroupDispatchReadyJobs();
       jobsListenerReady = true;
     }, function(err) {
       console.error("Available jobs fallback failed:", err);
@@ -3629,7 +3711,7 @@ function subscribeAvailableJobsFallback() {
 function renderAvailableList() {
   const el = document.getElementById("availableList");
   const jobs = availableJobs.filter(function(job) {
-    return availableView === "future" ? isFutureJob(job) : isCurrentJob(job);
+    return matchesAvailableView(job, availableView);
   }).sort(function(a, b) {
     if (availableView === "future") return (a.sortKey || 0) - (b.sortKey || 0);
     if (a.status !== b.status) {
@@ -3639,7 +3721,12 @@ function renderAvailableList() {
     return (a.sortKey || 0) - (b.sortKey || 0);
   });
   if (!jobs.length) {
-    el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No ' + (availableView === "future" ? "later" : "current") + ' bookings<br><span style="font-size:11px;font-weight:700">Same-day jobs here · Next-day jobs under Later</span></div>';
+    const emptyLabels = { current: "current", future: "later", group: "group dispatch" };
+    const label = emptyLabels[availableView] || "current";
+    el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No ' + label + ' bookings<br><span style="font-size:11px;font-weight:700">' +
+      (availableView === "group"
+        ? "Quick & Ready jobs move here when accept time ends"
+        : "Same-day jobs here · Next-day jobs under Later") + '</span></div>';
     return;
   }
   el.innerHTML = jobs.map(function(job) {
@@ -4199,7 +4286,8 @@ async function openJobFromNotification(docId, playAlert) {
       console.warn("Job fetch failed", e);
     }
   }
-  if (job && isFutureJob(job)) setAvailableView("future");
+  if (job && isGroupDispatchQueueJob(job)) setAvailableView("group");
+  else if (job && isFutureJob(job)) setAvailableView("future");
   else setAvailableView("current");
 
   const source = job && job.status === "completed" ? "completed" : "available";
@@ -4322,12 +4410,36 @@ function newJobAlertText(job) {
   return "JOB-" + job.id + " · " + route;
 }
 
+function groupDispatchAlertText(job) {
+  const pickupSub = extractSuburbFromAddress(job.pickup);
+  const dropSub = extractSuburbFromAddress(job.drop);
+  if (!pickupSub && !dropSub) {
+    return "GROUP DISPATCH · JOB-" + job.id + " — tap to view";
+  }
+  let route = ((pickupSub || "Pickup") + " → " + (dropSub || "Drop-off")).toUpperCase();
+  const name = (job.name || "").trim();
+  if (name) return "GROUP DISPATCH · " + titleCase(name) + " · " + route;
+  return "GROUP DISPATCH · JOB-" + job.id + " · " + route;
+}
+
+function showGroupDispatchAlert(job) {
+  alertNewJobArrival();
+  const toast = document.getElementById("alertToast");
+  document.getElementById("alertText").textContent = groupDispatchAlertText(job);
+  toast.classList.add("show");
+  toast.dataset.docId = job.docId;
+  toast.dataset.openView = "group";
+  if (alertTimeout) clearTimeout(alertTimeout);
+  alertTimeout = setTimeout(dismissAlert, 8000);
+}
+
 function showNewJobAlert(job) {
   alertNewJobArrival();
   const toast = document.getElementById("alertToast");
   document.getElementById("alertText").textContent = newJobAlertText(job);
   toast.classList.add("show");
   toast.dataset.docId = job.docId;
+  toast.dataset.openView = "";
   if (alertTimeout) clearTimeout(alertTimeout);
   alertTimeout = setTimeout(dismissAlert, 8000);
 }
@@ -4339,9 +4451,12 @@ function dismissAlert() {
 
 document.getElementById("alertToast").addEventListener("click", function() {
   const docId = this.dataset.docId;
+  const openView = this.dataset.openView;
   dismissAlert();
   if (docId) {
     switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
+    if (openView === "group") setAvailableView("group");
+    else setAvailableView("current");
     setTimeout(function() { openJobModal(docId, "available"); }, 200);
   }
 });
