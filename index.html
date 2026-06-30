@@ -727,8 +727,21 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .jcActBox:active{transform:scale(.95)}
 .jdActionRow .jcActBox{width:34px;height:34px;min-width:34px;font-size:15px!important}
 .jdList{background:var(--bg-card)}
-.availToggle{display:flex;gap:4px;margin-bottom:8px}
-.availToggle button{flex:1;margin:0;font-size:10px;padding:10px 4px;line-height:1.2}
+.availToggle{display:flex;gap:6px;margin-bottom:8px}
+.availToggle button{flex:1;margin:0;font-size:11px;padding:10px 6px;line-height:1.2}
+#tabAvailable .availToggle{flex-direction:column;gap:8px}
+.availToggleRow{display:flex;gap:6px;width:100%}
+.availToggleRow button{flex:1;margin:0;font-size:11px;padding:10px 6px;line-height:1.2}
+.availGroupRow{width:100%}
+.availGroupRow button{
+  width:100%;margin:0;font-size:14px;font-weight:800;padding:14px 12px;line-height:1.2;
+  letter-spacing:.3px;text-transform:uppercase;
+}
+.availGroupRow button.selected{
+  background:linear-gradient(180deg,#e8c547 0%,#c9a227 100%)!important;
+  color:#1a1200!important;border-color:var(--gold)!important;
+  box-shadow:0 0 0 2px var(--gold-soft)!important;
+}
 .qbTimeRow{display:flex;gap:8px;margin-bottom:6px}
 .qbTimeRow button{flex:1;margin:0;font-weight:700;font-size:15px;padding:14px 12px}
 .qbTimeRow button.qbSelected{
@@ -1073,9 +1086,13 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="tabAvailable" class="tabPanel">
   <h3>Available Bookings</h3>
   <div class="availToggle">
-    <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
-    <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Later Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
-    <button id="availGroupBtn" class="filterTypeBtn" onclick="setAvailableView('group')">Group Dispatch<span id="groupBadge" class="filterBadge" style="display:none">0</span></button>
+    <div class="availToggleRow">
+      <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
+      <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Later Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
+    </div>
+    <div class="availGroupRow">
+      <button id="availGroupBtn" class="filterTypeBtn" onclick="setAvailableView('group')">Group Dispatch<span id="groupBadge" class="filterBadge" style="display:none">0</span></button>
+    </div>
   </div>
   <div id="availableBookingsBg" class="cityNightSurface cityNightListWrap">
     <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
