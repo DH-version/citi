@@ -1243,6 +1243,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button class="btnPurple" style="flex:1" onclick="sendFollowUpMarketing()">Marketing</button>
       <button class="btnPrimary" style="flex:1" onclick="sendFollowUpCompliance()">Compliance</button>
     </div>
+    <div class="pinActions" style="margin-top:8px">
+      <button class="btnFollowUp" style="flex:1" onclick="sendFollowUpDiscount()">Discount</button>
+    </div>
     <button class="btnSecondary modalCancelFull" onclick="closeFollowUpModal()">Cancel</button>
   </div>
 </div>
@@ -1345,6 +1348,7 @@ let db, firebaseReady = false;
 let firebaseRetryTimer = null;
 let firebaseLastSyncAt = 0;
 let firebaseSubscriptionsStarted = false;
+let firestoreResetting = false;
 let messaging = null;
 let pushSwRegistration = null;
 let pushTokenSaved = "";
@@ -1733,6 +1737,56 @@ function scheduleFirebaseRetry() {
   }, 4000);
 }
 
+function isFirestoreCorruptionError(err) {
+  if (!err) return false;
+  const msg = String(err.message || "").toLowerCase();
+  return err.code === "internal" ||
+    msg.indexOf("internal assertion") !== -1 ||
+    msg.indexOf("unexpected state") !== -1;
+}
+
+function teardownFirebaseSubscriptions() {
+  if (availableUnsub) { availableUnsub(); availableUnsub = null; }
+  if (completedUnsub) { completedUnsub(); completedUnsub = null; }
+  if (filterUnsub) { filterUnsub(); filterUnsub = null; }
+  if (customersUnsub) { customersUnsub(); customersUnsub = null; }
+  if (noticeUnsub) { noticeUnsub(); noticeUnsub = null; }
+  if (prospectUnsub) { prospectUnsub(); prospectUnsub = null; }
+  if (operatorSessionUnsub) { operatorSessionUnsub(); operatorSessionUnsub = null; }
+  firebaseSubscriptionsStarted = false;
+}
+
+async function resetFirestoreClient() {
+  if (firestoreResetting || !firebase.apps.length) return false;
+  firestoreResetting = true;
+  try {
+    teardownFirebaseSubscriptions();
+    if (db) await db.terminate();
+    try {
+      await firebase.firestore().clearPersistence();
+    } catch (e) {
+      console.warn("clearPersistence:", e);
+    }
+    db = firebase.firestore();
+    db.enableNetwork().catch(function() {});
+    firebaseReady = true;
+    markFirebaseConnected();
+    startFirebaseSubscriptions();
+    repairProspectTierGap();
+    renderOperatorFilterRow();
+    restoreOperatorSession();
+    return true;
+  } catch (err) {
+    console.error("Firestore reset failed", err);
+    firebaseReady = false;
+    markFirebaseReconnecting();
+    scheduleFirebaseRetry();
+    return false;
+  } finally {
+    firestoreResetting = false;
+  }
+}
+
 function getFirestoreDb() {
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
@@ -1771,21 +1825,34 @@ function initializeFirebase() {
       return;
     }
     db = getFirestoreDb();
-    db.enablePersistence({ synchronizeTabs: true }).catch(function(e) {
-      console.warn("Offline cache unavailable:", e && e.code ? e.code : e);
-    });
     db.enableNetwork().catch(function() {});
-    firebaseReady = true;
-    markFirebaseConnected();
-    startFirebaseSubscriptions();
-    repairProspectTierGap();
-    renderOperatorFilterRow();
-    restoreOperatorSession();
-    db.collection("jobs").limit(1).get().then(function() {
+
+    function finishFirebaseStart() {
+      firebaseReady = true;
       markFirebaseConnected();
-    }).catch(function() {
-      scheduleFirebaseRetry();
-    });
+      startFirebaseSubscriptions();
+      repairProspectTierGap();
+      renderOperatorFilterRow();
+      restoreOperatorSession();
+      db.collection("jobs").limit(1).get().then(function() {
+        markFirebaseConnected();
+      }).catch(function() {
+        scheduleFirebaseRetry();
+      });
+    }
+
+    if (localStorage.getItem("gpnFirestoreCacheClearedV55") !== "1") {
+      db.clearPersistence().then(function() {
+        localStorage.setItem("gpnFirestoreCacheClearedV55", "1");
+        finishFirebaseStart();
+      }).catch(function() {
+        localStorage.setItem("gpnFirestoreCacheClearedV55", "1");
+        finishFirebaseStart();
+      });
+      return;
+    }
+
+    finishFirebaseStart();
   } catch (err) {
     console.error(err);
     if (firebase.apps.length) {
@@ -2203,11 +2270,30 @@ async function postNoticeMessage() {
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
   } catch (err) {
+    if (isFirestoreCorruptionError(err)) {
+      const reset = await resetFirestoreClient();
+      if (reset) {
+        try {
+          await db.collection("noticeBoard").add({
+            operator: op,
+            message: text,
+            sessionId: sessionId,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+          return;
+        } catch (retryErr) {
+          err = retryErr;
+        }
+      }
+    }
     noticeMessages = noticeMessages.filter(function(m) { return m.id !== tempId; });
     renderNoticeBoard();
     input.value = text;
     input.focus();
-    alert("Could not post message: " + err.message);
+    const msg = isFirestoreCorruptionError(err)
+      ? "Chat sync error — close and reopen the app, then try again"
+      : err.message;
+    alert("Could not post message: " + msg);
   }
 }
 
@@ -4932,6 +5018,12 @@ function sendFollowUpMarketing() {
 function sendFollowUpCompliance() {
   const name = titleCase(document.getElementById("name").value);
   const msg = "Hi " + name + ",\n\nThanks for riding with Geelong City Cabs today.\n\nWe'd like to hear about your recent trip. If you experienced any concerns or would like us to contact you, please reply to this message with your comments.\n\n🚖 Geelong City Cabs\n🛡️ Compliance Team\n📞 0426 885 690\n🌎 www.geelongcitytaxicab.com.au";
+  openFollowUpSms(msg);
+}
+
+function sendFollowUpDiscount() {
+  const name = titleCase(document.getElementById("name").value);
+  const msg = "Hi " + name + ",\n\nThanks for your trip with Geelong City Cabs.\nEnjoy 10% OFF your next ride with promo code GCABS10." + SIGNATURE;
   openFollowUpSms(msg);
 }
 
