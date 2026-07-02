@@ -867,7 +867,23 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .filterPanel input::placeholder{color:var(--text-dim);font-weight:500}
 .operatorStatus.ready{color:var(--green-bright);font-weight:600}
 .phoneHint{color:var(--green-bright)}
-#pinModal.open{align-items:center;justify-content:center;padding:16px}
+#operatorLoginModal.open{align-items:center;justify-content:center;padding:16px}
+#opLoginName{
+  width:100%;padding:12px;margin:8px 0;
+  background:var(--surface);color:#0f172a;font-weight:600;
+  border:1px solid #cbd5e1;border-radius:var(--radius-sm);
+  font-size:16px;box-sizing:border-box;
+}
+#opLoginPin,#opLoginPinConfirm{
+  width:100%;padding:12px;margin:8px 0;
+  background:var(--surface);color:#0f172a;font-weight:700;
+  border:1px solid #cbd5e1;border-radius:var(--radius-sm);
+  font-size:22px;letter-spacing:6px;text-align:center;
+  box-sizing:border-box;
+}
+.operatorSwitchBtn{
+  width:100%;margin-top:6px;font-size:12px;padding:10px;
+}
 #fareModal.open{align-items:center;justify-content:center;padding:16px}
 #cancelReasonModal.open{align-items:center;justify-content:center;padding:16px}
 #cancelReasonInput{
@@ -984,8 +1000,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="tabNew" class="tabPanel active">
 
   <div class="operatorRow">
-    <input id="operator" placeholder="Operator Name" autocomplete="off" autocapitalize="words">
-    <div id="operatorStatus" class="operatorStatus">Enter your operator name to enable the app</div>
+    <input id="operator" placeholder="Not signed in" autocomplete="off" autocapitalize="words" readonly>
+    <button type="button" id="operatorSwitchBtn" class="btnSecondary operatorSwitchBtn" style="display:none" onclick="switchOperatorAccount()">Switch operator</button>
+    <div id="operatorStatus" class="operatorStatus">Sign in to enable the app</div>
   </div>
 
   <div id="bookingForm" class="locked">
@@ -1161,6 +1178,21 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <thead><tr><th>Operator</th><th class="prospectPointsHead">Points</th></tr></thead>
       <tbody id="prospectTableBody"></tbody>
     </table>
+  </div>
+</div>
+
+<!-- OPERATOR LOGIN MODAL -->
+<div id="operatorLoginModal" class="modalOverlay">
+  <div class="modalSheet pinModalSheet pinModalRounded">
+    <h3 class="modalTitleGold">Operator Sign In</h3>
+    <p id="operatorLoginHint" class="modalSubtitle">Choose your name and enter your 4-digit PIN</p>
+    <select id="opLoginName"></select>
+    <input id="opLoginPin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="PIN ••••" autocomplete="off" enterkeyhint="done">
+    <input id="opLoginPinConfirm" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Confirm PIN ••••" autocomplete="off" enterkeyhint="done" style="display:none">
+    <div class="pinActions">
+      <button id="operatorLoginBtn" class="btnPrimary" onclick="confirmOperatorLogin()">Sign In</button>
+    </div>
+    <p class="modalSubtitle" style="margin-top:8px;font-size:11px">Max 6 operators · first time? enter PIN twice to set up</p>
   </div>
 </div>
 
@@ -1340,10 +1372,14 @@ const GEELONG_SUBURBS = [
 const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 330 596\n🌎 www.geelongcitytaxicab.com.au";
 const AUTHORIZED_OPERATORS = ["Danial", "Najaf", "Mudassir", "Asif", "Khizar", "Tuqeer"];
 const PROSPECT_ORDER = ["Tuqeer", "Khizar", "Asif", "Mudassir", "Najaf", "Danial"];
+const MAX_OPERATOR_PINS = 6;
 
 let selectedVehicle = "None", selectedTime = "None", selectedAMPM = "None";
 let paymentArray = [], priceType = "None";
 let autocompleteService, map;
+let mapsScriptLoading = false;
+let mapsScriptLoaded = false;
+let operatorPinMap = {};
 let db, firebaseReady = false;
 let firebaseRetryTimer = null;
 let firebaseLastSyncAt = 0;
@@ -1500,7 +1536,7 @@ function getCurrentOperator() {
 function requireOperator(actionLabel) {
   const op = getCurrentOperator();
   if (!op) {
-    alert("Enter your operator name first" + (actionLabel ? " to " + actionLabel : ""));
+    showOperatorLoginModal(actionLabel ? "Sign in to " + actionLabel : "");
     switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
     return "";
   }
@@ -1509,17 +1545,167 @@ function requireOperator(actionLabel) {
 
 function initOperatorField() {
   renderOperatorFilterRow();
+  renderOperatorLoginSelect();
   bindOperatorFieldEvents();
-  restoreOperatorSession();
+  bindMapsLazyLoad();
+  updateOperatorAccess(false);
+}
+
+function renderOperatorLoginSelect() {
+  const sel = document.getElementById("opLoginName");
+  if (!sel) return;
+  sel.innerHTML = AUTHORIZED_OPERATORS.map(function(n) {
+    return '<option value="' + n + '">' + n + '</option>';
+  }).join("");
+}
+
+function getOperatorPinSession() {
+  try {
+    const s = JSON.parse(sessionStorage.getItem("operatorPinSession") || "null");
+    if (s && s.deviceId === deviceId && resolveOperator(s.operator)) {
+      return resolveOperator(s.operator);
+    }
+  } catch (e) {}
+  return "";
+}
+
+function saveOperatorPinSession(canonical) {
+  sessionStorage.setItem("operatorPinSession", JSON.stringify({
+    operator: canonical,
+    deviceId: deviceId,
+    at: Date.now()
+  }));
+}
+
+async function loadOperatorPins() {
+  if (!firebaseReady || !db) return;
+  try {
+    const snap = await db.collection("operatorPins").get();
+    operatorPinMap = {};
+    snap.docs.forEach(function(d) {
+      const data = d.data() || {};
+      const op = resolveOperator(data.operator || d.id);
+      if (op && data.pin) operatorPinMap[op] = String(data.pin);
+    });
+  } catch (e) {
+    console.warn("loadOperatorPins failed", e);
+  }
+}
+
+function showOperatorLoginModal(hint) {
+  const modal = document.getElementById("operatorLoginModal");
+  if (!modal) return;
+  document.getElementById("opLoginPin").value = "";
+  document.getElementById("opLoginPinConfirm").value = "";
+  showOperatorPinConfirm(false);
+  document.getElementById("operatorLoginHint").textContent = hint ||
+    "Choose your name and enter your 4-digit PIN";
+  modal.classList.add("open");
+  focusModalInput(document.getElementById("opLoginPin"), false);
+}
+
+function hideOperatorLoginModal() {
+  const modal = document.getElementById("operatorLoginModal");
+  if (modal) modal.classList.remove("open");
+}
+
+function showOperatorPinConfirm(show) {
+  const confirmEl = document.getElementById("opLoginPinConfirm");
+  confirmEl.style.display = show ? "block" : "none";
+  confirmEl.value = "";
+  document.getElementById("operatorLoginBtn").textContent = show ? "Set PIN & Sign In" : "Sign In";
+  if (show) {
+    document.getElementById("operatorLoginHint").textContent =
+      "First time — choose a 4-digit PIN and confirm it";
+  }
+}
+
+async function initOperatorAuth() {
+  renderOperatorLoginSelect();
+  await loadOperatorPins();
+  const sessionOp = getOperatorPinSession();
+  if (sessionOp) {
+    completeOperatorSignIn(sessionOp, true);
+    return;
+  }
+  showOperatorLoginModal();
+}
+
+async function confirmOperatorLogin() {
+  if (!firebaseReady || !db) {
+    alert("Still connecting — wait a moment and try again");
+    return;
+  }
+  const canonical = resolveOperator(document.getElementById("opLoginName").value);
+  if (!canonical) {
+    alert("Choose a valid operator name");
+    return;
+  }
+  const pin = document.getElementById("opLoginPin").value.trim();
+  if (!/^\d{4}$/.test(pin)) {
+    alert("Enter a 4-digit PIN");
+    return;
+  }
+  await loadOperatorPins();
+  const existingPin = operatorPinMap[canonical];
+  const confirmVisible = document.getElementById("opLoginPinConfirm").style.display !== "none";
+
+  if (!existingPin) {
+    if (!confirmVisible) {
+      if (Object.keys(operatorPinMap).length >= MAX_OPERATOR_PINS) {
+        alert("All 6 operator PINs are already set. Ask admin to reset yours in Firebase.");
+        return;
+      }
+      showOperatorPinConfirm(true);
+      focusModalInput(document.getElementById("opLoginPinConfirm"), false);
+      return;
+    }
+    if (pin !== document.getElementById("opLoginPinConfirm").value.trim()) {
+      alert("PINs do not match");
+      return;
+    }
+    try {
+      await db.collection("operatorPins").doc(canonical).set({
+        operator: canonical,
+        pin: pin,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        setByDevice: deviceId
+      });
+      operatorPinMap[canonical] = pin;
+    } catch (e) {
+      alert("Could not save PIN: " + e.message);
+      return;
+    }
+  } else if (existingPin !== pin) {
+    alert("Wrong PIN");
+    return;
+  }
+
+  completeOperatorSignIn(canonical, false);
+}
+
+function completeOperatorSignIn(canonical, silent) {
+  saveOperatorPinSession(canonical);
+  saveOperatorLocally(canonical);
+  watchOperatorSession(canonical);
+  if (firebaseReady) claimOperatorSession(canonical, silent);
+  hideOperatorLoginModal();
+  processPendingOpenJob();
+}
+
+function switchOperatorAccount() {
+  const op = getCurrentOperator();
+  if (op) releaseOperatorSession(op);
+  sessionStorage.removeItem("operatorPinSession");
+  removePushTokenForDevice();
+  document.getElementById("operator").value = "";
+  localStorage.removeItem("operatorName");
+  localStorage.removeItem("operatorSession");
+  updateOperatorAccess(false);
+  showOperatorLoginModal("Sign in with your operator name and PIN");
 }
 
 function bindOperatorFieldEvents() {
-  const el = document.getElementById("operator");
-  if (!el.dataset.bound) {
-    el.dataset.bound = "1";
-    el.addEventListener("input", onOperatorInput);
-    el.addEventListener("blur", onOperatorBlur);
-  }
   const phoneEl = document.getElementById("phone");
   if (!mainCustomerFieldMap) {
     mainCustomerFieldMap = {
@@ -1556,35 +1742,13 @@ function watchOperatorSession(operatorName) {
 }
 
 async function restoreOperatorSession() {
-  let canonical = "";
-  try {
-    const saved = JSON.parse(localStorage.getItem("operatorSession") || "null");
-    if (saved && saved.deviceId === deviceId && resolveOperator(saved.operator)) {
-      canonical = resolveOperator(saved.operator);
-    }
-  } catch (e) {}
-  if (!canonical) {
-    const legacy = localStorage.getItem("operatorName");
-    if (legacy && resolveOperator(legacy)) canonical = resolveOperator(legacy);
-  }
-  if (canonical && firebaseReady) {
-    try {
-      const doc = await db.collection("operatorSessions").doc(canonical).get();
-      if (doc.exists && doc.data().deviceId && doc.data().deviceId !== deviceId) {
-        canonical = "";
-        localStorage.removeItem("operatorName");
-        localStorage.removeItem("operatorSession");
-      }
-    } catch (e) { console.error(e); }
-  }
-  if (canonical) {
-    saveOperatorLocally(canonical);
-    watchOperatorSession(canonical);
-    if (firebaseReady) claimOperatorSession(canonical, true);
+  const sessionOp = getOperatorPinSession();
+  if (sessionOp) {
+    saveOperatorLocally(sessionOp);
+    watchOperatorSession(sessionOp);
+    if (firebaseReady) claimOperatorSession(sessionOp, true);
     else processPendingOpenJob();
   } else {
-    localStorage.removeItem("operatorName");
-    localStorage.removeItem("operatorSession");
     updateOperatorAccess(false);
   }
 }
@@ -1654,6 +1818,7 @@ function signOutOperator(forced, otherDeviceId) {
     operatorSessionUnsub = null;
   }
   removePushTokenForDevice();
+  sessionStorage.removeItem("operatorPinSession");
   document.getElementById("operator").value = "";
   localStorage.removeItem("operatorName");
   localStorage.removeItem("operatorSession");
@@ -1663,6 +1828,7 @@ function signOutOperator(forced, otherDeviceId) {
   }
   releaseOperatorSession(op);
   switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
+  showOperatorLoginModal();
 }
 
 async function onOperatorInput() {
@@ -1703,15 +1869,19 @@ async function onOperatorBlur() {
 
 function updateOperatorAccess(isValid, showInvalid) {
   const status = document.getElementById("operatorStatus");
+  const switchBtn = document.getElementById("operatorSwitchBtn");
   if (isValid) {
     status.textContent = "Signed in as: " + getCurrentOperator();
     status.className = "operatorStatus ready";
-  } else if (showInvalid && document.getElementById("operator").value.trim()) {
-    status.textContent = "Name not recognised — use Danial, Najaf, Mudassir, Asif, Khizar or Tuqeer";
+    if (switchBtn) switchBtn.style.display = "block";
+  } else if (showInvalid) {
+    status.textContent = "Sign in required";
     status.className = "operatorStatus invalid";
+    if (switchBtn) switchBtn.style.display = "none";
   } else {
-    status.textContent = "Enter your operator name to enable the app";
+    status.textContent = "Sign in to enable the app";
     status.className = "operatorStatus";
+    if (switchBtn) switchBtn.style.display = "none";
   }
   document.getElementById("bookingForm").classList.toggle("locked", !isValid);
   document.body.classList.toggle("appLocked", !isValid);
@@ -1774,7 +1944,7 @@ async function resetFirestoreClient() {
     startFirebaseSubscriptions();
     repairProspectTierGap();
     renderOperatorFilterRow();
-    restoreOperatorSession();
+    initOperatorAuth();
     return true;
   } catch (err) {
     console.error("Firestore reset failed", err);
@@ -1799,9 +1969,11 @@ function startFirebaseSubscriptions() {
   firebaseSubscriptionsStarted = true;
   subscribeAvailableJobs();
   subscribeCompletedJobs();
-  subscribeCustomers();
-  subscribeProspectScores();
-  subscribeNoticeBoard();
+  setTimeout(function() {
+    subscribeCustomers();
+    subscribeProspectScores();
+    subscribeNoticeBoard();
+  }, 1200);
 }
 
 function markFirebaseConnected() {
@@ -1833,7 +2005,7 @@ function initializeFirebase() {
       startFirebaseSubscriptions();
       repairProspectTierGap();
       renderOperatorFilterRow();
-      restoreOperatorSession();
+      initOperatorAuth();
       db.collection("jobs").limit(1).get().then(function() {
         markFirebaseConnected();
       }).catch(function() {
@@ -1860,7 +2032,7 @@ function initializeFirebase() {
       firebaseReady = true;
       markFirebaseConnected();
       startFirebaseSubscriptions();
-      restoreOperatorSession();
+      initOperatorAuth();
       return;
     }
     markFirebaseReconnecting();
@@ -4133,13 +4305,19 @@ function buildGroupDispatchText(job) {
 }
 
 function openWhatsAppWithText(text) {
-  const url = "https://api.whatsapp.com/send?text=" + encodeURIComponent(text);
-  try {
-    const opened = window.open(url, "_blank", "noopener,noreferrer");
-    if (!opened) window.location.assign(url);
-  } catch (e) {
-    window.location.assign(url);
-  }
+  const encoded = encodeURIComponent(text);
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const url = isMobile
+    ? "whatsapp://send?text=" + encoded
+    : "https://api.whatsapp.com/send?text=" + encoded;
+  const link = document.createElement("a");
+  link.href = url;
+  link.style.display = "none";
+  document.body.appendChild(link);
+  link.click();
+  setTimeout(function() {
+    if (link.parentNode) link.parentNode.removeChild(link);
+  }, 100);
 }
 
 function showGroupCompleteModal(docId) {
@@ -4783,13 +4961,45 @@ function sendQuickConfirmation() {
 }
 
 function initializeGoogleMaps() {
-  if (!window.google) return;
+  if (!window.google || !window.google.maps) return;
+  if (mapsScriptLoaded) return;
+  mapsScriptLoaded = true;
   autocompleteService = new google.maps.places.AutocompleteService();
   map = new google.maps.Map(document.createElement("div"));
   setupAutocomplete("pickup", "pickupList");
   setupAutocomplete("drop", "dropList");
   setupAutocomplete("qbPickup", "qbPickupList");
   setupAutocomplete("qbDrop", "qbDropList");
+}
+
+function ensureGoogleMapsLoaded() {
+  if (mapsScriptLoaded) {
+    if (!autocompleteService) initializeGoogleMaps();
+    return;
+  }
+  if (mapsScriptLoading) return;
+  mapsScriptLoading = true;
+  const s = document.createElement("script");
+  s.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAPS_API_KEY + "&libraries=places";
+  s.async = true;
+  s.onload = function() {
+    mapsScriptLoading = false;
+    initializeGoogleMaps();
+  };
+  s.onerror = function() {
+    mapsScriptLoading = false;
+    console.warn("Google Maps failed to load");
+  };
+  document.head.appendChild(s);
+}
+
+function bindMapsLazyLoad() {
+  ["pickup", "drop", "qbPickup", "qbDrop"].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el || el.dataset.mapsLazy) return;
+    el.dataset.mapsLazy = "1";
+    el.addEventListener("focus", ensureGoogleMapsLoaded, { once: true });
+  });
 }
 
 function setupAutocomplete(inputId, listId) {
@@ -5049,10 +5259,6 @@ window.addEventListener("DOMContentLoaded", function() {
   document.body.addEventListener("click", function() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   }, { once: true });
-  const s = document.createElement("script");
-  s.src = "https://maps.googleapis.com/maps/api/js?key=" + GOOGLE_MAPS_API_KEY + "&libraries=places";
-  s.async = true; s.defer = true; s.onload = initializeGoogleMaps;
-  document.head.appendChild(s);
 
   if ("serviceWorker" in navigator) {
     ensureServiceWorker();
@@ -5085,6 +5291,12 @@ window.addEventListener("DOMContentLoaded", function() {
   });
   document.getElementById("fareInput").addEventListener("keydown", function(e) {
     if (e.key === "Enter") confirmCompleteJob();
+  });
+  document.getElementById("opLoginPin").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") confirmOperatorLogin();
+  });
+  document.getElementById("opLoginPinConfirm").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") confirmOperatorLogin();
   });
 });
 </script>
