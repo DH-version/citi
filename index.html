@@ -326,7 +326,7 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   border:1px solid var(--border);border-radius:var(--radius-sm);
   padding:10px;padding-bottom:24px;background:rgba(7,11,18,.55);
 }
-#adminContent{display:block}
+#adminContent{display:none}
 .adminLocked{
   text-align:center;padding:36px 16px;color:var(--text-muted);
 }
@@ -1385,6 +1385,10 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 
   <div id="teamAdminPanel" class="teamAdminLayout" style="display:none">
     <div class="listHeader">Admin · Operators &amp; app settings</div>
+    <div id="adminLocked" class="adminLocked">
+      <p>Enter master PIN to access admin tools</p>
+      <button class="btnPrimary" onclick="promptAdminUnlock()">Enter PIN</button>
+    </div>
     <div id="adminContent">
       <div class="adminSection">
         <div class="adminSectionTitle">Operator Accounts</div>
@@ -1924,12 +1928,17 @@ function setAdminUnlocked(unlocked) {
 }
 
 function updateAdminPanelVisibility() {
+  const unlocked = isAdminUnlocked();
+  const lockedEl = document.getElementById("adminLocked");
   const contentEl = document.getElementById("adminContent");
-  if (contentEl) contentEl.style.display = "block";
-  renderAdminOperatorList();
-  renderAdminProspectSetup();
-  syncAdminAcceptWindowInputs();
-  syncAdminBroadcastInputs();
+  if (lockedEl) lockedEl.style.display = unlocked ? "none" : "block";
+  if (contentEl) contentEl.style.display = unlocked ? "block" : "none";
+  if (unlocked) {
+    renderAdminOperatorList();
+    renderAdminProspectSetup();
+    syncAdminAcceptWindowInputs();
+    syncAdminBroadcastInputs();
+  }
 }
 
 function syncAdminAcceptWindowInputs() {
@@ -3206,6 +3215,7 @@ function setTeamView(view) {
       return loadOperatorPins();
     }).then(function() {
       updateAdminPanelVisibility();
+      if (!isAdminUnlocked()) promptAdminUnlock();
     });
     const input = document.getElementById("noticeInput");
     if (input) input.blur();
