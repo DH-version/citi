@@ -1,4 +1,4 @@
-const CACHE = "gpn-v73";
+const CACHE = "gpn-v77";
 
 const ASSETS = [
   "./",
@@ -83,6 +83,12 @@ self.addEventListener("activate", function(event) {
       return Promise.all(
         keys.filter(function(k) { return k !== CACHE; }).map(function(k) { return caches.delete(k); })
       );
+    }).then(function() {
+      return self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    }).then(function(clientList) {
+      clientList.forEach(function(client) {
+        client.postMessage({ type: "appUpdateReady", version: CACHE });
+      });
     })
   );
   self.clients.claim();
