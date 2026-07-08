@@ -1,4 +1,4 @@
-const CACHE = "gpn-v57";
+const CACHE = "gpn-v65";
 
 const ASSETS = [
   "./",
@@ -38,23 +38,22 @@ self.addEventListener("notificationclick", function(event) {
     if (pushType) url += "&type=" + encodeURIComponent(pushType);
   }
   const targetUrl = new URL(url, self.location.href).href;
+  const msg = {
+    type: "openPush",
+    pushType: pushType,
+    docId: docId,
+    tab: pushType === "team_chat" ? "team" : ""
+  };
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(function(list) {
       for (var i = 0; i < list.length; i++) {
         var client = list[i];
         if ("focus" in client) {
-          if ("navigate" in client) {
-            return client.focus().then(function() {
-              return client.navigate(targetUrl);
-            });
-          }
           client.focus();
-          client.postMessage({
-            type: "openPush",
-            pushType: pushType,
-            docId: docId,
-            tab: pushType === "team_chat" ? "team" : ""
-          });
+          client.postMessage(msg);
+          if ("navigate" in client) {
+            return client.navigate(targetUrl).catch(function() {});
+          }
           return;
         }
       }
