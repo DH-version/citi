@@ -896,6 +896,22 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-events:none}
 
 .autocomplete-container{position:relative;width:100%}
+.routeSwapBlock{
+  display:flex;align-items:stretch;gap:8px;margin:3px 0;
+}
+.routeSwapFields{
+  flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;
+}
+.routeSwapBtn{
+  flex:0 0 40px;width:40px;align-self:center;margin:0!important;padding:0!important;
+  min-height:72px;border-radius:10px!important;
+  background:#eff6ff!important;border:1px solid #bfdbfe!important;
+  color:#1d4ed8!important;box-shadow:none!important;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;line-height:1;font-weight:700;
+}
+.routeSwapBtn:active{transform:scale(.94);background:#dbeafe!important}
+.routeSwapBtn svg{display:block;width:22px;height:22px;pointer-events:none}
 .autocomplete-list{
   position:absolute;top:100%;left:0;right:0;
   background:#fff;border:1px solid #ddd;border-radius:8px;
@@ -982,29 +998,41 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .filterPanel input::placeholder{color:var(--text-dim);font-weight:500}
 .operatorStatus.ready{color:var(--green-bright);font-weight:600}
 .phoneHint{color:var(--green-bright)}
-#operatorLoginModal.open{align-items:center;justify-content:center;padding:16px;background:rgba(4,8,14,.92)}
+#operatorLoginModal.open{
+  align-items:center;justify-content:center;padding:16px;
+  background-color:#0a1018;
+  background-image:
+    linear-gradient(180deg,rgba(7,11,18,.34) 0%,rgba(10,16,24,.4) 50%,rgba(7,11,18,.48) 100%),
+    var(--city-bg,url("./bg-night.png"));
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
 .loginWoodPanel{
   width:100%;max-width:300px;padding:22px 20px 20px;border-radius:14px;position:relative;overflow:hidden;
   background:
-    linear-gradient(180deg,rgba(255,255,255,.12) 0%,transparent 18%,transparent 62%,rgba(0,0,0,.15) 100%),
-    repeating-linear-gradient(92deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 5px),
-    linear-gradient(180deg,#4a3220 0%,#6b4528 22%,#5a3822 55%,#3f2a18 100%);
-  border:2px solid rgba(255,255,255,.88);
-  box-shadow:0 0 28px rgba(212,175,55,.22),0 12px 40px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.15);
+    linear-gradient(180deg,rgba(59,130,246,.22) 0%,transparent 35%),
+    linear-gradient(165deg,#1e3a5f 0%,#152238 50%,#0f172a 100%);
+  border:1px solid rgba(96,165,250,.45);
+  box-shadow:0 0 28px rgba(59,130,246,.18),0 12px 40px rgba(0,0,0,.65),inset 0 1px 0 rgba(147,197,253,.12);
 }
 .loginWoodPanel::after{
-  content:"";position:absolute;left:8%;right:8%;top:58%;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);pointer-events:none;
+  content:"";position:absolute;left:0;right:0;top:0;height:3px;
+  background:linear-gradient(90deg,transparent,rgba(96,165,250,.65),transparent);pointer-events:none;
 }
 .loginWoodTitle{
   text-align:center;color:#fff;font-size:18px;font-weight:700;margin-bottom:18px;
-  text-shadow:0 1px 3px rgba(0,0,0,.45);letter-spacing:.3px;
+  text-shadow:0 1px 4px rgba(0,0,0,.5);letter-spacing:.3px;
 }
 .loginWoodInput{
   width:100%;padding:12px 14px;margin:0 0 10px;
-  background:#eceff3;color:#1e293b;font-weight:600;font-size:16px;
-  border:1px solid rgba(255,255,255,.65);border-radius:8px;box-sizing:border-box;
-  box-shadow:inset 0 2px 4px rgba(0,0,0,.12);
+  background:#f8fafc;color:#0f172a;font-weight:600;font-size:16px;
+  border:1px solid rgba(148,163,184,.5);border-radius:8px;box-sizing:border-box;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.08);
+}
+.loginWoodInput:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(59,130,246,.25);
 }
 .loginWoodInput::placeholder{color:#64748b;font-weight:500}
 .loginWoodInputPin{font-size:20px;letter-spacing:5px;text-align:center}
@@ -1012,21 +1040,21 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   display:flex;align-items:center;gap:7px;margin:4px 0 14px;padding-left:2px;
 }
 .loginSaveRow input[type=checkbox]{
-  width:14px;height:14px;margin:0;accent-color:var(--gold);flex-shrink:0;
+  width:14px;height:14px;margin:0;accent-color:var(--blue);flex-shrink:0;
 }
 .loginSaveRow label{
-  font-size:11px;color:rgba(255,255,255,.88);font-weight:600;cursor:pointer;user-select:none;
+  font-size:11px;color:rgba(226,232,240,.92);font-weight:600;cursor:pointer;user-select:none;
 }
 .loginWoodBtn{
   width:100%;padding:13px 12px;margin:0;
-  background:linear-gradient(180deg,#3f2a18 0%,#2a1a10 100%);
+  background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%);
   color:#fff;font-size:15px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
-  border:2px solid rgba(255,255,255,.9);border-radius:9px;
-  box-shadow:0 4px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);
+  border:1px solid rgba(147,197,253,.45);border-radius:9px;
+  box-shadow:0 4px 14px rgba(37,99,235,.35),inset 0 1px 0 rgba(255,255,255,.15);
 }
 .loginWoodBtn:active{transform:scale(.98)}
 .loginWoodHint{
-  text-align:center;font-size:10px;color:rgba(255,255,255,.65);margin-top:10px;line-height:1.35;
+  text-align:center;font-size:10px;color:rgba(191,219,254,.85);margin-top:10px;line-height:1.35;
 }
 .signedInBar{
   text-align:center;font-size:12px;font-weight:600;color:var(--gold);
@@ -1139,7 +1167,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 </header>
 <div class="syncWrap"><div id="syncStatus" class="syncStatus">Connecting…</div></div>
 
-<div id="alertToast" class="alertToast" onclick="dismissAlert()">
+<div id="alertToast" class="alertToast">
   <h4>NEW JOB</h4>
   <p id="alertText">Tap to view</p>
 </div>
@@ -1165,14 +1193,20 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   </div>
   <div id="phoneHint" class="phoneHint">Customer found — details filled</div>
 
-  <div class="autocomplete-container">
-    <input id="pickup" placeholder="Pickup Location" autocomplete="off">
-    <div id="pickupList" class="autocomplete-list"></div>
-  </div>
-
-  <div class="autocomplete-container">
-    <input id="drop" placeholder="Drop Location" autocomplete="off">
-    <div id="dropList" class="autocomplete-list"></div>
+  <div class="routeSwapBlock">
+    <div class="routeSwapFields">
+      <div class="autocomplete-container">
+        <input id="pickup" placeholder="Pickup Location" autocomplete="off">
+        <div id="pickupList" class="autocomplete-list"></div>
+      </div>
+      <div class="autocomplete-container">
+        <input id="drop" placeholder="Drop Location" autocomplete="off">
+        <div id="dropList" class="autocomplete-list"></div>
+      </div>
+    </div>
+    <button type="button" class="routeSwapBtn" onclick="swapRouteFields('pickup','drop')" title="Swap pickup and drop-off" aria-label="Swap pickup and drop-off">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16"/><path d="M4 7l3-3 3 3"/><path d="M17 20V4"/><path d="M14 17l3 3 3-3"/></svg>
+    </button>
   </div>
 
   <input id="jobNotes" class="notesInline" type="text" placeholder="Notes (optional)" autocomplete="off">
@@ -1542,13 +1576,20 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <div id="qbPhoneList" class="phoneSuggestList"></div>
     </div>
     <div class="qbFieldLabel">Pickup &amp; Drop <span style="font-weight:500;text-transform:none">(or use name + notes)</span></div>
-    <div class="autocomplete-container">
-      <input id="qbPickup" class="qbField" placeholder="Pickup Location" autocomplete="off">
-      <div id="qbPickupList" class="autocomplete-list"></div>
-    </div>
-    <div class="autocomplete-container">
-      <input id="qbDrop" class="qbField" placeholder="Drop-off Location" autocomplete="off">
-      <div id="qbDropList" class="autocomplete-list"></div>
+    <div class="routeSwapBlock">
+      <div class="routeSwapFields">
+        <div class="autocomplete-container">
+          <input id="qbPickup" class="qbField" placeholder="Pickup Location" autocomplete="off">
+          <div id="qbPickupList" class="autocomplete-list"></div>
+        </div>
+        <div class="autocomplete-container">
+          <input id="qbDrop" class="qbField" placeholder="Drop-off Location" autocomplete="off">
+          <div id="qbDropList" class="autocomplete-list"></div>
+        </div>
+      </div>
+      <button type="button" class="routeSwapBtn" onclick="swapRouteFields('qbPickup','qbDrop')" title="Swap pickup and drop-off" aria-label="Swap pickup and drop-off">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16"/><path d="M4 7l3-3 3 3"/><path d="M17 20V4"/><path d="M14 17l3 3 3-3"/></svg>
+      </button>
     </div>
     <textarea id="qbNotes" class="notesBox qbNotes" placeholder="Notes — driver instructions, special requests…"></textarea>
     <div class="pinActions">
@@ -1676,6 +1717,19 @@ let alertTimeout = null;
 let opToastTimeout = null;
 let audioCtx = null;
 
+function swapRouteFields(pickupId, dropId) {
+  const pickupEl = document.getElementById(pickupId);
+  const dropEl = document.getElementById(dropId);
+  if (!pickupEl || !dropEl) return;
+  const tmp = pickupEl.value;
+  pickupEl.value = dropEl.value;
+  dropEl.value = tmp;
+  [pickupId + "List", dropId + "List"].forEach(function(listId) {
+    const list = document.getElementById(listId);
+    if (list) list.classList.remove("active");
+  });
+}
+
 function showToast(msg, isError) {
   const el = document.getElementById("opToast");
   if (!el) return;
@@ -1721,7 +1775,7 @@ function validateMainDispatch() {
 
 function switchTab(tabId, btn) {
   if (tabId !== "tabNew" && !getCurrentOperator()) {
-    alert("Enter your operator name first");
+    showOperatorLoginModal("Sign in to continue");
     return;
   }
   document.querySelectorAll(".tabPanel").forEach(function(p) { p.classList.remove("active"); });
@@ -5549,6 +5603,7 @@ async function openJobFromNotification(docId, playAlert, pushType) {
     sessionStorage.setItem("pendingOpenJob", docId);
     sessionStorage.setItem("pendingOpenJobType", pushType);
     sessionStorage.setItem("pendingOpenJobAlert", playAlert ? "1" : "0");
+    showOperatorLoginModal("Sign in to view this job");
     return;
   }
   sessionStorage.removeItem("pendingOpenJob");
@@ -5619,16 +5674,21 @@ function routePushNotification(pushType, docId, playAlert) {
 function queueOpenJobFromPush(docId, playAlert, pushType) {
   pushType = pushType || "";
   if (pushType === "team_chat") {
-    let tries = 0;
-    function attemptChat() {
-      if (getCurrentOperator()) {
-        openTeamChatFromPush();
-        return;
-      }
+    if (!getCurrentOperator()) {
       sessionStorage.setItem("pendingPushTab", "team");
-      if (tries++ < 80) setTimeout(attemptChat, 50);
+      showOperatorLoginModal("Sign in to open Team Chat");
+      return;
     }
-    attemptChat();
+    openTeamChatFromPush();
+    return;
+  }
+  if (!getCurrentOperator()) {
+    if (docId) {
+      sessionStorage.setItem("pendingOpenJob", docId);
+      sessionStorage.setItem("pendingOpenJobType", pushType);
+      sessionStorage.setItem("pendingOpenJobAlert", playAlert ? "1" : "0");
+    }
+    showOperatorLoginModal(docId ? "Sign in to view this job" : "Sign in to continue");
     return;
   }
   let tries = 0;
@@ -5638,18 +5698,27 @@ function queueOpenJobFromPush(docId, playAlert, pushType) {
       return;
     }
     if (firebaseReady && !getCurrentOperator()) {
-      sessionStorage.setItem("pendingOpenJob", docId);
-      sessionStorage.setItem("pendingOpenJobType", pushType);
-      sessionStorage.setItem("pendingOpenJobAlert", playAlert ? "1" : "0");
+      if (docId) {
+        sessionStorage.setItem("pendingOpenJob", docId);
+        sessionStorage.setItem("pendingOpenJobType", pushType);
+        sessionStorage.setItem("pendingOpenJobAlert", playAlert ? "1" : "0");
+      }
+      showOperatorLoginModal("Sign in to view this job");
       return;
     }
     if (tries++ < 80) setTimeout(attempt, 50);
-    else openJobFromNotification(docId, playAlert, pushType);
+    else if (getCurrentOperator()) openJobFromNotification(docId, playAlert, pushType);
+    else showOperatorLoginModal("Sign in to view this job");
   }
   attempt();
 }
 
 function openTeamChatFromPush() {
+  if (!getCurrentOperator()) {
+    sessionStorage.setItem("pendingPushTab", "team");
+    showOperatorLoginModal("Sign in to open Team Chat");
+    return;
+  }
   const tabBtn = document.querySelector('[data-tab="tabTeam"]');
   if (tabBtn) switchTab("tabTeam", tabBtn);
   setTeamView("notice");
@@ -5783,12 +5852,18 @@ document.getElementById("alertToast").addEventListener("click", function() {
   const docId = this.dataset.docId;
   const openView = this.dataset.openView;
   dismissAlert();
-  if (docId) {
-    switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
-    if (openView === "group") setAvailableView("group");
-    else setAvailableView("current");
-    setTimeout(function() { openJobModal(docId, "available"); }, 200);
+  if (!docId) return;
+  if (!getCurrentOperator()) {
+    sessionStorage.setItem("pendingOpenJob", docId);
+    sessionStorage.setItem("pendingOpenJobType", openView === "group" ? "group_dispatch" : "new_job");
+    sessionStorage.setItem("pendingOpenJobAlert", "0");
+    showOperatorLoginModal("Sign in to view this job");
+    return;
   }
+  switchTab("tabAvailable", document.querySelector('[data-tab="tabAvailable"]'));
+  if (openView === "group") setAvailableView("group");
+  else setAvailableView("current");
+  setTimeout(function() { openJobModal(docId, "available"); }, 200);
 });
 
 function clearFormRefresh() {
