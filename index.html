@@ -315,8 +315,91 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   background:#fff!important;
   color:#000!important;
 }
-.teamToggle{display:flex;gap:6px;margin-bottom:10px}
-.teamToggle button{flex:1;margin:0;font-size:11px;padding:10px 6px}
+.teamToggle{display:flex;gap:6px;margin-bottom:10px;width:100%}
+.teamToggle button{flex:1;margin:0;font-size:10px;padding:10px 4px;line-height:1.2;min-width:0}
+#tabTeam .teamAdminLayout{
+  display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;
+}
+#teamAdminPanel{
+  flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:10px;background:rgba(7,11,18,.55);
+}
+.adminLocked{
+  text-align:center;padding:36px 16px;color:var(--text-muted);
+}
+.adminLocked p{font-size:13px;margin-bottom:14px;line-height:1.45}
+.adminSection{
+  background:var(--bg-card);border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);padding:12px;margin-bottom:10px;
+}
+.adminSectionTitle{
+  font-size:11px;font-weight:800;color:var(--gold);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;
+}
+.adminOpRow{
+  display:flex;align-items:center;gap:8px;padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.adminOpRow:last-child{border-bottom:none}
+.adminOpName{flex:1;font-size:15px;font-weight:800;color:#fff;min-width:0}
+.adminOpStatus{font-size:10px;font-weight:700;color:var(--text-muted);margin-top:2px}
+.adminOpStatus.ready{color:var(--green-bright)}
+.adminOpActions{display:flex;gap:6px;flex:0 0 auto}
+.adminOpActions button{
+  margin:0!important;padding:8px 10px!important;font-size:10px!important;
+  font-weight:800!important;min-width:0!important;
+}
+.btnAdminDanger{background:linear-gradient(180deg,#ef4444 0%,#dc2626 100%)!important;color:#fff!important}
+.btnAdminReset{background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%)!important;color:#fff!important}
+.adminAddRow{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.adminAddRow input{
+  width:100%;padding:12px;font-size:16px;font-weight:600;
+  background:var(--bg-elevated);color:var(--text);border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);box-sizing:border-box;
+}
+.adminAddRow button{margin:0!important;padding:14px!important;font-weight:800!important}
+.adminHint{font-size:11px;color:var(--text-muted);line-height:1.4;margin-top:8px}
+.adminFeatureList{display:flex;flex-direction:column;gap:8px}
+.adminFeatureItem{
+  padding:10px 12px;border:1px dashed var(--border);
+  border-radius:var(--radius-sm);background:rgba(15,23,42,.45);
+}
+.adminFeatureItem strong{display:block;font-size:12px;color:#e2e8f0;margin-bottom:4px}
+.adminFeatureItem span{font-size:11px;color:var(--text-muted);line-height:1.35}
+.adminCount{font-size:11px;color:var(--text-muted);margin-bottom:8px;font-weight:600}
+.adminRow2{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.adminRow2 input,.adminRow2 select{
+  flex:1;padding:10px;font-size:15px;font-weight:600;
+  background:var(--bg-elevated);color:var(--text);border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);box-sizing:border-box;
+}
+.adminRow2 label{font-size:11px;font-weight:700;color:var(--text-muted);white-space:nowrap}
+.adminCheckList{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;max-height:160px;overflow-y:auto}
+.adminCheckRow{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;
+  background:var(--bg-elevated);border-radius:var(--radius-xs);
+  font-size:14px;font-weight:700;color:var(--text);cursor:pointer;
+}
+.adminCheckRow input{width:18px;height:18px;margin:0}
+.adminActivityLog{
+  max-height:200px;overflow-y:auto;font-size:11px;
+  border:1px solid var(--border);border-radius:var(--radius-xs);
+}
+.adminActivityRow{
+  display:flex;justify-content:space-between;gap:8px;padding:8px 10px;
+  border-bottom:1px solid var(--border);
+}
+.adminActivityRow:last-child{border-bottom:none}
+.adminActivityOp{font-weight:800;color:var(--gold)}
+.adminActivityActs{color:var(--text-muted);text-align:right;line-height:1.35}
+.adminToolBtn{width:100%;margin:0 0 8px!important;padding:12px!important;font-weight:800!important}
+.adminTextarea{
+  width:100%;min-height:72px;padding:10px;font-size:14px;font-weight:600;
+  background:var(--bg-elevated);color:var(--text);border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);box-sizing:border-box;resize:vertical;margin-bottom:8px;
+}
+.adminToggleRow{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;font-weight:600}
 #tabTeam.active{
   display:flex;flex-direction:column;
   height:calc(100dvh - 62px - env(safe-area-inset-top) - 12px);
@@ -410,6 +493,12 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   min-height:calc(100dvh - 62px - env(safe-area-inset-top) - 12px);
 }
 #tabAvailable.active h3,#tabAvailable.active .availToggle{flex:0 0 auto}
+#tabPrevious.active{
+  display:flex;flex-direction:column;
+  min-height:calc(100dvh - 62px - env(safe-area-inset-top) - 12px);
+}
+#tabPrevious.active .prevHeader,#tabPrevious.active #filterPanel{flex:0 0 auto}
+#tabPrevious.active #previousListWrap{flex:1;min-height:0}
 .noticeCompose,.chatCompose{display:flex;gap:8px;align-items:center;flex:0 0 auto}
 .noticeCompose input,.chatCompose input{
   flex:1;margin:0!important;padding:12px 14px!important;
@@ -454,40 +543,56 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 }
 .jdLineVal.blue{color:var(--blue)}
 .jdLineVal.gold{color:var(--gold)}
+.jdLineVal.green{color:var(--green-bright)}
 .jdLineVal.white{color:var(--text)}
 .jdCancelRow{padding:10px 12px;border-bottom:1px solid #333;text-align:center}
 .jdList .jcPerson,.jdList .jcRoute,.jdList .jcFooter,.jdList .jcHead{border-left:none;border-right:none}
 .qbField{font-size:17px;padding:13px;margin-bottom:8px}
-.jobList{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.jobList{display:flex;flex-direction:column;gap:12px;margin-top:4px;padding:2px 2px 14px}
+.jobList .jobCard{content-visibility:auto;contain-intrinsic-size:auto 220px}
 
 /* —— Job card (dispatch theme) —— */
 .jobCard{
-  background:var(--bg-card);
-  border:1px solid var(--border-strong);
-  border-radius:var(--radius);
+  position:relative;
+  background:linear-gradient(165deg,#1a2438 0%,#111827 55%,#0d1219 100%);
+  border:1px solid rgba(212,175,55,.28);
+  border-radius:14px;
   overflow:hidden;
   cursor:pointer;
   padding:0;
   margin:0;
-  box-shadow:var(--shadow-sm);
-  transition:border-color .15s ease,box-shadow .15s ease;
+  box-shadow:0 6px 20px rgba(0,0,0,.42),0 0 0 1px rgba(255,255,255,.05);
+  contain:layout style paint;
 }
-.jobCard:active{box-shadow:var(--shadow-sm);transform:scale(.998)}
-.jobCardAccepted{border-color:rgba(212,175,55,.45);box-shadow:0 0 0 1px var(--gold-soft)}
+.jobCard::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+  background:var(--gold);z-index:1;
+}
+.jobCard:active{transform:scale(.996);box-shadow:0 3px 12px rgba(0,0,0,.35)}
+.jobCardAccepted{
+  border-color:rgba(34,197,94,.45);
+  box-shadow:0 6px 22px rgba(34,197,94,.12),0 0 0 1px rgba(34,197,94,.2);
+}
+.jobCardAccepted::before{background:var(--green-bright)}
+.jobCardCountdown::before{background:#ef4444}
+.jobCardCountdown{border-color:rgba(248,113,113,.35)}
+.jobCardGroup::before{background:#ea580c}
+.jobCardGroup{border-color:rgba(234,88,12,.4)}
+.jobCardFuture::before{background:var(--blue)}
 .jcHead{
   display:flex;align-items:stretch;
-  border-bottom:1px solid var(--border);
-  background:var(--bg-card);min-height:72px;
+  border-bottom:1px solid rgba(148,163,184,.18);
+  background:rgba(15,23,42,.55);min-height:78px;
 }
 .jcHeadJob{
-  flex:0 0 26%;display:flex;align-items:center;justify-content:center;
-  padding:8px 6px;border-right:1px solid var(--border);
-  font-size:clamp(13px,4.2vw,18px);font-weight:700;color:var(--gold);
-  text-align:center;line-height:1.15;
-  word-break:break-word;
+  flex:0 0 28%;display:flex;align-items:center;justify-content:center;
+  padding:10px 8px;border-right:1px solid rgba(148,163,184,.18);
+  font-size:clamp(16px,4.8vw,22px);font-weight:800;color:var(--gold);
+  text-align:center;line-height:1.1;
+  word-break:break-word;letter-spacing:.02em;
 }
 .jcHeadTimeLine{
-  font-size:clamp(14px,4.5vw,20px);font-weight:700;color:var(--gold);
+  font-size:clamp(15px,4.8vw,22px);font-weight:800;color:var(--gold);
   line-height:1.1;
 }
 .jcHeadBoxLbl{
@@ -506,22 +611,22 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 }
 .jcPerson{
   display:flex;align-items:center;
-  border-bottom:1px solid var(--border);min-height:58px;
-  background:var(--bg-card);
+  border-bottom:1px solid rgba(148,163,184,.18);min-height:64px;
+  background:rgba(18,28,40,.65);
 }
 .jcAvatar{
-  flex:0 0 52px;display:flex;align-items:center;justify-content:center;
-  font-size:26px;opacity:.9;
+  flex:0 0 56px;display:flex;align-items:center;justify-content:center;
+  font-size:28px;opacity:.95;
 }
 .jcName{
-  font-size:18px;font-weight:700;color:var(--text);
-  line-height:1.15;
+  font-size:20px;font-weight:800;color:#fff;
+  line-height:1.15;letter-spacing:.02em;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .jcPhone{
   display:flex;align-items:center;gap:4px;
-  color:var(--blue);font-size:14px;font-weight:600;
-  text-decoration:none;margin-top:3px;
+  color:#60a5fa;font-size:15px;font-weight:700;
+  text-decoration:none;margin-top:4px;
 }
 .jcRoute{border-bottom:1px solid var(--border)}
 .jcAddrRow+.jcAddrRow{border-top:1px solid var(--border)}
@@ -540,30 +645,30 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   background:var(--surface);padding:8px 10px;min-width:0;
 }
 .jcAddrText{
-  flex:1;font-size:13px;font-weight:600;color:#0f172a;
-  line-height:1.2;
+  flex:1;font-size:15px;font-weight:700;color:#0f172a;
+  line-height:1.25;
   word-break:break-word;overflow:hidden;
   display:flex;align-items:center;gap:5px;
 }
 .jcMapsBtn{
   flex:0 0 auto;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  min-width:54px;height:38px;margin-left:4px;padding:2px 4px;
+  min-width:56px;height:42px;margin-left:4px;padding:2px 4px;
   background:#eff6ff;border-radius:var(--radius-xs);
-  text-decoration:none;font-size:7px;font-weight:700;line-height:1.05;
+  text-decoration:none;font-size:8px;font-weight:800;line-height:1.05;
   color:#1d4ed8;text-transform:uppercase;text-align:center;
   border:1px solid #bfdbfe;
 }
 .jcFooter{
-  display:flex;border-bottom:1px solid var(--border);
-  background:var(--bg-card);
+  display:flex;border-bottom:1px solid rgba(148,163,184,.18);
+  background:rgba(15,23,42,.45);
 }
 .jcFootCol{
-  flex:1;padding:8px 6px;text-align:center;
-  border-right:1px solid var(--border);
+  flex:1;padding:10px 6px;text-align:center;
+  border-right:1px solid rgba(148,163,184,.18);
 }
-.jcFootLbl{font-size:9px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px}
-.jcFootVal{font-size:12px;font-weight:700;line-height:1.15}
+.jcFootLbl{font-size:9px;color:#94a3b8;font-weight:700;text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.jcFootVal{font-size:13px;font-weight:800;line-height:1.15}
 .jcFootVal.blue{color:var(--blue)}
 .jcFootVal.gold{color:var(--gold)}
 .jcPersonInfo{flex:1;min-width:0;padding:6px 0}
@@ -574,7 +679,7 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   font-size:14px;font-weight:700;color:var(--text);
   background:var(--bg-card);
 }
-.jcAddrRow{display:flex;align-items:stretch;min-height:50px}
+.jcAddrRow{display:flex;align-items:stretch;min-height:54px}
 .jcAddrPin{flex:0 0 auto;font-size:14px;line-height:1}
 .jcAddrPinPickup{color:#166534}
 .jcAddrPinDrop{color:#1e40af}
@@ -603,9 +708,10 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .jcExtraFull{color:var(--text-muted);font-size:12px;font-weight:500;line-height:1.35;word-break:break-word}
 .jobActions{display:flex;gap:0;margin:0}
 .jobActions button{
-  flex:1;margin:0!important;border-radius:0 0 var(--radius-xs) var(--radius-xs)!important;
-  border:none!important;padding:14px 8px!important;
-  font-size:14px!important;font-weight:700!important;
+  flex:1;margin:0!important;border-radius:0 0 14px 14px!important;
+  border:none!important;padding:16px 8px!important;
+  font-size:15px!important;font-weight:800!important;
+  letter-spacing:.04em!important;
 }
 .btnAccept,.btnAcceptJob{background:linear-gradient(180deg,#22c55e 0%,#16a34a 100%)!important;color:#fff!important}
 .btnComplete{background:linear-gradient(180deg,#22c55e 0%,#16a34a 100%)!important;color:#fff!important}
@@ -623,9 +729,15 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 }
 .emptyState .icon{font-size:28px;margin-bottom:8px;opacity:.7}
 .listHeader{
-  font-size:11px;color:#cbd5e1;margin-bottom:8px;
-  font-weight:500;letter-spacing:.02em;line-height:1.4;
-  text-shadow:0 1px 3px rgba(0,0,0,.45);
+  font-size:11px;color:#e2e8f0;margin-bottom:10px;
+  font-weight:700;letter-spacing:.08em;line-height:1.35;
+  text-transform:uppercase;
+  padding:10px 12px;
+  background:rgba(7,11,18,.72);
+  border:1px solid rgba(148,163,184,.2);
+  border-left:4px solid var(--gold);
+  border-radius:var(--radius-sm);
+  text-shadow:0 1px 2px rgba(0,0,0,.35);
 }
 .cityNightSurface .emptyState{color:#e2e8f0;text-shadow:0 1px 4px rgba(0,0,0,.5)}
 .btnQuickBooking{
@@ -675,9 +787,14 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 }
 .prospectToolbar{display:flex;gap:8px;margin-bottom:10px}
 .prospectToolbar button{flex:1;margin:0;font-size:11px}
-.jcHeadActs{
-  flex:0 0 30%;display:flex;align-items:center;justify-content:center;
-  gap:5px;padding:6px 5px;min-width:0;
+.jcHeadActs.jcHeadCountdown{
+  flex:0 0 40%;flex-direction:column;gap:6px;padding:10px 8px;min-width:110px;
+}
+.jcHeadActs.jcHeadCountdown .jcHeadBoxLbl{font-size:10px;letter-spacing:.1em}
+.jcCountdown{
+  font-size:clamp(36px,14vw,56px);font-weight:900;color:#f87171;
+  line-height:1;font-variant-numeric:tabular-nums;
+  text-shadow:0 2px 10px rgba(248,113,113,.4);width:100%;text-align:center;
 }
 .jcHeadActs .jcActBox{
   flex:1;width:auto;height:auto;min-height:0;
@@ -692,9 +809,9 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .jcHeadActs .jcActTxt{font-size:8px;letter-spacing:.04em;display:block}
 .jcHeadActs .jcActEdit{color:var(--gold)!important;border-color:rgba(212,175,55,.5)!important}
 .jcHeadActs .jcActDel{color:#f87171!important;border-color:rgba(248,113,113,.4)!important}
-.jcCountdown{
-  font-size:clamp(18px,5vw,26px);font-weight:700;color:#f87171;
-  line-height:1;font-variant-numeric:tabular-nums;
+.jcHeadActs{
+  flex:0 0 30%;display:flex;align-items:center;justify-content:center;
+  gap:5px;padding:6px 5px;min-width:0;
 }
 .btnGroupDispatch{
   background:linear-gradient(180deg,#ea580c 0%,#c2410c 100%)!important;
@@ -727,21 +844,8 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .jcActBox:active{transform:scale(.95)}
 .jdActionRow .jcActBox{width:34px;height:34px;min-width:34px;font-size:15px!important}
 .jdList{background:var(--bg-card)}
-.availToggle{display:flex;gap:6px;margin-bottom:8px}
-.availToggle button{flex:1;margin:0;font-size:11px;padding:10px 6px;line-height:1.2}
-#tabAvailable .availToggle{flex-direction:column;gap:8px}
-.availToggleRow{display:flex;gap:6px;width:100%}
-.availToggleRow button{flex:1;margin:0;font-size:11px;padding:10px 6px;line-height:1.2}
-.availGroupRow{width:100%}
-.availGroupRow button{
-  width:100%;margin:0;font-size:14px;font-weight:800;padding:14px 12px;line-height:1.2;
-  letter-spacing:.3px;text-transform:uppercase;
-}
-.availGroupRow button.selected{
-  background:linear-gradient(180deg,#e8c547 0%,#c9a227 100%)!important;
-  color:#1a1200!important;border-color:var(--gold)!important;
-  box-shadow:0 0 0 2px var(--gold-soft)!important;
-}
+.availToggle{display:flex;gap:6px;margin-bottom:8px;width:100%}
+.availToggle button{flex:1;margin:0;font-size:11px;padding:10px 6px;line-height:1.2;min-width:0}
 .qbTimeRow{display:flex;gap:8px;margin-bottom:6px}
 .qbTimeRow button{flex:1;margin:0;font-weight:700;font-size:15px;padding:14px 12px}
 .qbTimeRow button.qbSelected{
@@ -798,9 +902,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   position:fixed;bottom:0;left:0;right:0;
   max-width:430px;margin:0 auto;
   display:flex;
-  background:rgba(7,11,18,.94);
-  backdrop-filter:blur(16px);
-  -webkit-backdrop-filter:blur(16px);
+  background:#070b12;
   border-top:1px solid var(--border);
   z-index:200;
   padding-bottom:env(safe-area-inset-bottom,0);
@@ -867,23 +969,57 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .filterPanel input::placeholder{color:var(--text-dim);font-weight:500}
 .operatorStatus.ready{color:var(--green-bright);font-weight:600}
 .phoneHint{color:var(--green-bright)}
-#operatorLoginModal.open{align-items:center;justify-content:center;padding:16px}
-#opLoginName{
-  width:100%;padding:12px;margin:8px 0;
-  background:var(--surface);color:#0f172a;font-weight:600;
-  border:1px solid #cbd5e1;border-radius:var(--radius-sm);
-  font-size:16px;box-sizing:border-box;
+#operatorLoginModal.open{align-items:center;justify-content:center;padding:16px;background:rgba(4,8,14,.92)}
+.loginWoodPanel{
+  width:100%;max-width:300px;padding:22px 20px 20px;border-radius:14px;position:relative;overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.12) 0%,transparent 18%,transparent 62%,rgba(0,0,0,.15) 100%),
+    repeating-linear-gradient(92deg,transparent,transparent 3px,rgba(0,0,0,.04) 3px,rgba(0,0,0,.04) 5px),
+    linear-gradient(180deg,#4a3220 0%,#6b4528 22%,#5a3822 55%,#3f2a18 100%);
+  border:2px solid rgba(255,255,255,.88);
+  box-shadow:0 0 28px rgba(212,175,55,.22),0 12px 40px rgba(0,0,0,.65),inset 0 1px 0 rgba(255,255,255,.15);
 }
-#opLoginPin,#opLoginPinConfirm{
-  width:100%;padding:12px;margin:8px 0;
-  background:var(--surface);color:#0f172a;font-weight:700;
-  border:1px solid #cbd5e1;border-radius:var(--radius-sm);
-  font-size:22px;letter-spacing:6px;text-align:center;
-  box-sizing:border-box;
+.loginWoodPanel::after{
+  content:"";position:absolute;left:8%;right:8%;top:58%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);pointer-events:none;
 }
-.operatorSwitchBtn{
-  width:100%;margin-top:6px;font-size:12px;padding:10px;
+.loginWoodTitle{
+  text-align:center;color:#fff;font-size:18px;font-weight:700;margin-bottom:18px;
+  text-shadow:0 1px 3px rgba(0,0,0,.45);letter-spacing:.3px;
 }
+.loginWoodInput{
+  width:100%;padding:12px 14px;margin:0 0 10px;
+  background:#eceff3;color:#1e293b;font-weight:600;font-size:16px;
+  border:1px solid rgba(255,255,255,.65);border-radius:8px;box-sizing:border-box;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.12);
+}
+.loginWoodInput::placeholder{color:#64748b;font-weight:500}
+.loginWoodInputPin{font-size:20px;letter-spacing:5px;text-align:center}
+.loginSaveRow{
+  display:flex;align-items:center;gap:7px;margin:4px 0 14px;padding-left:2px;
+}
+.loginSaveRow input[type=checkbox]{
+  width:14px;height:14px;margin:0;accent-color:var(--gold);flex-shrink:0;
+}
+.loginSaveRow label{
+  font-size:11px;color:rgba(255,255,255,.88);font-weight:600;cursor:pointer;user-select:none;
+}
+.loginWoodBtn{
+  width:100%;padding:13px 12px;margin:0;
+  background:linear-gradient(180deg,#3f2a18 0%,#2a1a10 100%);
+  color:#fff;font-size:15px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
+  border:2px solid rgba(255,255,255,.9);border-radius:9px;
+  box-shadow:0 4px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.12);
+}
+.loginWoodBtn:active{transform:scale(.98)}
+.loginWoodHint{
+  text-align:center;font-size:10px;color:rgba(255,255,255,.65);margin-top:10px;line-height:1.35;
+}
+.signedInBar{
+  text-align:center;font-size:12px;font-weight:600;color:var(--gold);
+  padding:6px 8px 10px;letter-spacing:.2px;
+}
+.signedInBar strong{color:var(--green-bright);font-weight:700}
 #fareModal.open{align-items:center;justify-content:center;padding:16px}
 #cancelReasonModal.open{align-items:center;justify-content:center;padding:16px}
 #cancelReasonInput{
@@ -917,7 +1053,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 
 .modalOverlay{
   display:none;position:fixed;inset:0;
-  background:rgba(2,6,12,.72);backdrop-filter:blur(4px);
+  background:rgba(2,6,12,.88);
   z-index:300;align-items:flex-end;justify-content:center;
 }
 .modalOverlay.open{display:flex}
@@ -925,7 +1061,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   background:var(--bg-elevated);border:1px solid var(--border-strong);
   border-radius:var(--radius) var(--radius) 0 0;
   width:100%;max-width:430px;max-height:90vh;overflow-y:auto;
-  padding:0;animation:slideUp .28s cubic-bezier(.22,1,.36,1);
+  padding:0;animation:slideUp .18s ease-out;
   box-shadow:var(--shadow);
 }
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -999,11 +1135,8 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <!-- TAB 1: NEW BOOKING -->
 <div id="tabNew" class="tabPanel active">
 
-  <div class="operatorRow">
-    <input id="operator" placeholder="Not signed in" autocomplete="off" autocapitalize="words" readonly>
-    <button type="button" id="operatorSwitchBtn" class="btnSecondary operatorSwitchBtn" style="display:none" onclick="switchOperatorAccount()">Switch operator</button>
-    <div id="operatorStatus" class="operatorStatus">Sign in to enable the app</div>
-  </div>
+  <input id="operator" type="hidden" value="">
+  <div id="signedInBar" class="signedInBar" style="display:none">Signed in as <strong id="signedInName"></strong></div>
 
   <div id="bookingForm" class="locked">
   <button type="button" class="btnQuickBooking" onclick="openQuickBooking()">Quick Booking</button>
@@ -1103,13 +1236,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 <div id="tabAvailable" class="tabPanel">
   <h3>Available Bookings</h3>
   <div class="availToggle">
-    <div class="availToggleRow">
-      <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
-      <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Later Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
-    </div>
-    <div class="availGroupRow">
-      <button id="availGroupBtn" class="filterTypeBtn" onclick="setAvailableView('group')">Group Dispatch<span id="groupBadge" class="filterBadge" style="display:none">0</span></button>
-    </div>
+    <button id="availCurrentBtn" class="filterTypeBtn selected" onclick="setAvailableView('current')">Current Bookings</button>
+    <button id="availFutureBtn" class="filterTypeBtn" onclick="setAvailableView('future')">Later Bookings<span id="futureBadge" class="filterBadge" style="display:none">0</span></button>
+    <button id="availGroupBtn" class="filterTypeBtn" onclick="setAvailableView('group')">Group Dispatch<span id="groupBadge" class="filterBadge" style="display:none">0</span></button>
   </div>
   <div id="availableBookingsBg" class="cityNightSurface cityNightListWrap">
     <div id="availableListHint" class="listHeader">Quick &amp; Ready Now jobs · Accept to take</div>
@@ -1130,8 +1259,8 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
     <div class="filterSearchRow" style="margin-bottom:10px">
       <button class="btnPrimary" onclick="runCustomerLookup()">Find Customer Jobs</button>
     </div>
-    <div class="filterLabel">Operator</div>
-    <div class="filterRow" id="operatorFilterRow"></div>
+    <div class="filterLabel">Operator Name</div>
+    <input id="filterOperatorName" type="text" placeholder="Operator name" autocomplete="off" autocapitalize="words">
     <div class="filterLabel">Type</div>
     <div class="filterRow">
       <button id="filterDispatched" class="filterTypeBtn" onclick="setFilterType('dispatched')">Dispatched</button>
@@ -1142,8 +1271,10 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <button class="btnSecondary" onclick="clearPreviousFilter()">Clear</button>
     </div>
   </div>
-  <div id="previousListHint" class="listHeader">Most recent completed at top · tap to view or reload</div>
-  <div id="previousList" class="jobList"></div>
+  <div id="previousListWrap" class="cityNightSurface cityNightListWrap">
+    <div id="previousListHint" class="listHeader">Most recent completed at top · tap to view or reload</div>
+    <div id="previousList" class="jobList"></div>
+  </div>
 </div>
 
 <!-- TAB 4: TEAM INFO -->
@@ -1152,6 +1283,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <div class="teamToggle availToggle">
     <button id="teamNoticeBtn" class="filterTypeBtn selected" onclick="setTeamView('notice')">Team Chat</button>
     <button id="teamProspectBtn" class="filterTypeBtn" onclick="setTeamView('prospect')">Prospect Tracker</button>
+    <button id="teamAdminBtn" class="filterTypeBtn" onclick="setTeamView('admin')">Admin Area</button>
   </div>
 
   <div id="teamNoticePanel" class="teamNoticeLayout">
@@ -1179,20 +1311,110 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <tbody id="prospectTableBody"></tbody>
     </table>
   </div>
+
+  <div id="teamAdminPanel" class="teamAdminLayout" style="display:none">
+    <div class="listHeader">Admin · Operators &amp; app settings</div>
+    <div id="adminLocked" class="adminLocked">
+      <p>Master PIN required for admin access</p>
+      <button class="btnPrimary" onclick="promptAdminUnlock()">Unlock Admin Area</button>
+    </div>
+    <div id="adminContent" style="display:none">
+      <div class="adminSection">
+        <div class="adminSectionTitle">Operator Accounts</div>
+        <div id="adminOpCount" class="adminCount"></div>
+        <div id="adminOperatorList" class="adminOperatorList"></div>
+        <div class="adminAddRow">
+          <input id="adminNewOpName" type="text" placeholder="New operator name" autocomplete="off" autocapitalize="words">
+          <input id="adminNewOpPin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Set 4-digit PIN (optional — they can set on first login)">
+          <button class="btnSuccess" onclick="adminAddOperator()">+ Add Operator</button>
+        </div>
+        <p class="adminHint">Remove operator deletes their PIN. Reset PIN clears it so they set a new one at next login.</p>
+      </div>
+      <div class="adminSection">
+        <div class="adminSectionTitle">1 · Force Sign-Out All Devices</div>
+        <p class="adminHint">Logs every operator out on every phone immediately.</p>
+        <button type="button" class="btnAdminDanger adminToolBtn" onclick="adminForceSignOutAll()">Sign Out Everyone</button>
+      </div>
+      <div class="adminSection">
+        <div class="adminSectionTitle">2 · Broadcast Team Message</div>
+        <textarea id="adminBroadcastText" class="adminTextarea" placeholder="Pinned message shown on next login (e.g. road closure, policy update)"></textarea>
+        <div class="adminToggleRow">
+          <input id="adminBroadcastActive" type="checkbox" checked>
+          <label for="adminBroadcastActive">Show on operator login</label>
+        </div>
+        <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveBroadcast()">Save Broadcast</button>
+        <button type="button" class="btnSecondary adminToolBtn" onclick="adminClearBroadcast()">Clear Broadcast</button>
+      </div>
+      <div class="adminSection">
+        <div class="adminSectionTitle">3 · Accept Window Times</div>
+        <div class="adminRow2">
+          <label>Quick (min)</label>
+          <input id="adminQuickMins" type="tel" inputmode="numeric" placeholder="1">
+        </div>
+        <div class="adminRow2">
+          <label>Ready Now (min)</label>
+          <input id="adminReadyMins" type="tel" inputmode="numeric" placeholder="2">
+        </div>
+        <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveAcceptWindows()">Save Countdown Times</button>
+      </div>
+      <div class="adminSection">
+        <div class="adminSectionTitle">4 · Job Cleanup</div>
+        <div class="adminRow2">
+          <label>Older than (days)</label>
+          <input id="adminCleanupDays" type="tel" inputmode="numeric" value="30">
+        </div>
+        <div class="adminToggleRow"><input id="adminCleanupCancelled" type="checkbox" checked><label for="adminCleanupCancelled">Delete cancelled jobs</label></div>
+        <div class="adminToggleRow"><input id="adminCleanupCompleted" type="checkbox"><label for="adminCleanupCompleted">Delete completed jobs</label></div>
+        <button type="button" class="btnAdminDanger adminToolBtn" onclick="adminJobCleanup()">Run Cleanup</button>
+        <p id="adminCleanupResult" class="adminHint"></p>
+      </div>
+      <div class="adminSection">
+        <div class="adminSectionTitle">5 · Push Notification Test</div>
+        <p class="adminHint">Sends a test alert to all registered devices. Deploy admin push function first.</p>
+        <button type="button" class="btnPrimary adminToolBtn" onclick="adminSendTestPush()">Send Test Push to All</button>
+      </div>
+      <div class="adminSection">
+        <div class="adminSectionTitle">6 · Operator Activity (Today)</div>
+        <button type="button" class="btnSecondary adminToolBtn" onclick="loadAdminActivityLog()">Refresh Activity</button>
+        <div id="adminActivityLog" class="adminActivityLog"><div class="adminHint" style="padding:10px">Tap refresh to load today&apos;s activity</div></div>
+      </div>
+      <div class="adminSection">
+        <div class="adminSectionTitle">7 · Prospect Tracker Operators</div>
+        <p class="adminHint">Choose who appears on the Prospect Tracker points table.</p>
+        <div id="adminProspectList" class="adminCheckList"></div>
+        <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveProspectOperators()">Save Prospect List</button>
+      </div>
+      <div class="adminSection">
+        <div class="adminSectionTitle">8 · Master PIN Change</div>
+        <div class="adminRow2">
+          <input id="adminCurrentPin" type="tel" inputmode="numeric" maxlength="4" placeholder="Current PIN">
+        </div>
+        <div class="adminRow2">
+          <input id="adminNewPin" type="tel" inputmode="numeric" maxlength="4" placeholder="New 4-digit PIN">
+        </div>
+        <div class="adminRow2">
+          <input id="adminNewPinConfirm" type="tel" inputmode="numeric" maxlength="4" placeholder="Confirm new PIN">
+        </div>
+        <button type="button" class="btnPrimary adminToolBtn" onclick="adminChangeMasterPin()">Change Master PIN</button>
+        <p class="adminHint">Used for admin area, delete, edit, cancel, and prospect edit.</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- OPERATOR LOGIN MODAL -->
 <div id="operatorLoginModal" class="modalOverlay">
-  <div class="modalSheet pinModalSheet pinModalRounded">
-    <h3 class="modalTitleGold">Operator Sign In</h3>
-    <p id="operatorLoginHint" class="modalSubtitle">Choose your name and enter your 4-digit PIN</p>
-    <select id="opLoginName"></select>
-    <input id="opLoginPin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="PIN ••••" autocomplete="off" enterkeyhint="done">
-    <input id="opLoginPinConfirm" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Confirm PIN ••••" autocomplete="off" enterkeyhint="done" style="display:none">
-    <div class="pinActions">
-      <button id="operatorLoginBtn" class="btnPrimary" onclick="confirmOperatorLogin()">Sign In</button>
+  <div class="loginWoodPanel">
+    <h3 class="loginWoodTitle">User Login</h3>
+    <input id="opLoginName" class="loginWoodInput" type="text" placeholder="Name" autocomplete="off" autocapitalize="words" enterkeyhint="next">
+    <input id="opLoginPin" class="loginWoodInput loginWoodInputPin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="PIN" autocomplete="off" enterkeyhint="done">
+    <input id="opLoginPinConfirm" class="loginWoodInput loginWoodInputPin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Confirm PIN" autocomplete="off" enterkeyhint="done" style="display:none">
+    <div class="loginSaveRow">
+      <input id="opSaveLogin" type="checkbox">
+      <label for="opSaveLogin">Saved Login Info</label>
     </div>
-    <p class="modalSubtitle" style="margin-top:8px;font-size:11px">Max 6 operators · first time? enter PIN twice to set up</p>
+    <button id="operatorLoginBtn" type="button" class="loginWoodBtn" onclick="confirmOperatorLogin()">Login</button>
+    <p id="operatorLoginHint" class="loginWoodHint" style="display:none"></p>
   </div>
 </div>
 
@@ -1236,9 +1458,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
       <select id="completedBySelect"></select>
       <input id="completedByNameInput" type="text" placeholder="Driver name" autocomplete="off" enterkeyhint="next" style="display:none">
     </div>
-    <div class="fareInputWrap">
+    <div class="fareInputWrap" onclick="focusFareInput()">
       <span class="farePrefix">$</span>
-      <input id="fareInput" type="tel" inputmode="decimal" pattern="[0-9]*" placeholder="0.00" autocomplete="off" enterkeyhint="done" readonly>
+      <input id="fareInput" type="tel" inputmode="decimal" pattern="[0-9]*" placeholder="0.00" autocomplete="off" enterkeyhint="done">
     </div>
     <div class="pinActions">
       <button id="fareConfirmBtn" class="btnSuccess" onclick="confirmCompleteJob()">Complete Job</button>
@@ -1372,7 +1594,7 @@ const GEELONG_SUBURBS = [
 const SIGNATURE = "\n\n🚖 Geelong City Cabs\n📍 Bookings | Inquiries | Support\n📞 0420 303 581\n📞 0450 330 596\n🌎 www.geelongcitytaxicab.com.au";
 const AUTHORIZED_OPERATORS = ["Danial", "Najaf", "Mudassir", "Asif", "Khizar", "Tuqeer"];
 const PROSPECT_ORDER = ["Tuqeer", "Khizar", "Asif", "Mudassir", "Najaf", "Danial"];
-const MAX_OPERATOR_PINS = 6;
+const MAX_OPERATOR_PINS = 12;
 
 let selectedVehicle = "None", selectedTime = "None", selectedAMPM = "None";
 let paymentArray = [], priceType = "None";
@@ -1391,6 +1613,8 @@ let pushTokenSaved = "";
 let pushMessageBound = false;
 let availableJobs = [], previousJobs = [], completedJobs = [], filterResultJobs = [], historyJobs = [];
 let teamOperators = AUTHORIZED_OPERATORS.slice();
+let maxOperatorSlots = MAX_OPERATOR_PINS;
+let adminUnlocked = false;
 let selectedFilterOperator = "", selectedFilterType = "";
 let previousFilterActive = false;
 let customerLookupActive = false;
@@ -1400,7 +1624,17 @@ let pendingCompleteDocId = null;
 let pendingFreeDispatchDocId = null;
 let pendingEditDocId = null;
 let countdownTickTimer = null;
-const ACCEPT_WINDOW_MS = 120000;
+const DEFAULT_ACCEPT_WINDOW_QUICK_MS = 60000;
+const DEFAULT_ACCEPT_WINDOW_READY_MS = 120000;
+const DEFAULT_MASTER_PIN = "2814";
+let acceptWindowQuickMs = DEFAULT_ACCEPT_WINDOW_QUICK_MS;
+let acceptWindowReadyMs = DEFAULT_ACCEPT_WINDOW_READY_MS;
+let masterPin = DEFAULT_MASTER_PIN;
+let prospectOperatorList = [];
+let broadcastSettings = null;
+let signedInAtMs = 0;
+let appSettingsUnsub = null;
+let broadcastUnsub = null;
 let editingDocId = null;
 let pinAction = "";
 let prospectScores = {};
@@ -1409,13 +1643,13 @@ let prospectUnsub = null;
 let noticeUnsub = null;
 let noticeMessages = [];
 let teamView = "notice";
-const DELETE_PIN = "2814";
 let availableUnsub = null, completedUnsub = null, filterUnsub = null, operatorSessionUnsub = null;
 let renderPreviousScheduled = false, renderAvailableScheduled = false;
 let customersCache = [], customersUnsub = null;
 let mainCustomerFieldMap = null, quickCustomerFieldMap = null;
 let availableView = "current", quickSelectedTime = "None";
 const groupReadyMarkedIds = new Set();
+const groupDispatchAlertedIds = new Set();
 let deviceId = localStorage.getItem("deviceId") || ("d_" + Date.now() + "_" + Math.random().toString(36).slice(2, 10));
 localStorage.setItem("deviceId", deviceId);
 let sessionId = localStorage.getItem("sessionId") || ("s_" + Date.now() + "_" + Math.random().toString(36).slice(2));
@@ -1523,10 +1757,583 @@ function ensureCityBackgroundPanels() {
 function resolveOperator(name) {
   if (!name) return "";
   const key = String(name).trim().toLowerCase();
-  for (let i = 0; i < AUTHORIZED_OPERATORS.length; i++) {
-    if (AUTHORIZED_OPERATORS[i].toLowerCase() === key) return AUTHORIZED_OPERATORS[i];
+  for (let i = 0; i < teamOperators.length; i++) {
+    if (teamOperators[i].toLowerCase() === key) return teamOperators[i];
   }
   return "";
+}
+
+function titleCaseOperatorName(name) {
+  const raw = String(name || "").trim();
+  if (!raw) return "";
+  return raw.split(/\s+/).map(function(part) {
+    return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+  }).join(" ");
+}
+
+function getMasterPin() {
+  return String(masterPin || DEFAULT_MASTER_PIN);
+}
+
+function getProspectOrder() {
+  if (prospectOperatorList.length) {
+    return prospectOperatorList.filter(function(n) {
+      return teamOperators.indexOf(n) !== -1;
+    });
+  }
+  const order = PROSPECT_ORDER.filter(function(n) {
+    return teamOperators.indexOf(n) !== -1;
+  });
+  teamOperators.forEach(function(n) {
+    if (order.indexOf(n) === -1) order.unshift(n);
+  });
+  return order;
+}
+
+async function loadOperatorRoster() {
+  if (!firebaseReady || !db) return;
+  try {
+    const doc = await db.collection("settings").doc("operatorRoster").get();
+    if (doc.exists && doc.data().operators && doc.data().operators.length) {
+      teamOperators = doc.data().operators.map(titleCaseOperatorName).filter(Boolean);
+      if (doc.data().maxOperators) maxOperatorSlots = parseInt(doc.data().maxOperators, 10) || MAX_OPERATOR_PINS;
+    } else {
+      await db.collection("settings").doc("operatorRoster").set({
+        operators: AUTHORIZED_OPERATORS.slice(),
+        maxOperators: MAX_OPERATOR_PINS,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      teamOperators = AUTHORIZED_OPERATORS.slice();
+    }
+  } catch (e) {
+    console.warn("loadOperatorRoster failed", e);
+    teamOperators = AUTHORIZED_OPERATORS.slice();
+  }
+}
+
+async function saveOperatorRoster(updatedBy) {
+  if (!firebaseReady || !db) return;
+  await db.collection("settings").doc("operatorRoster").set({
+    operators: teamOperators.slice(),
+    maxOperators: maxOperatorSlots,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedBy: updatedBy || getCurrentOperator() || ""
+  }, { merge: true });
+}
+
+function isAdminUnlocked() {
+  try {
+    return sessionStorage.getItem("adminUnlocked") === deviceId;
+  } catch (e) {
+    return adminUnlocked;
+  }
+}
+
+function setAdminUnlocked(unlocked) {
+  adminUnlocked = !!unlocked;
+  if (unlocked) sessionStorage.setItem("adminUnlocked", deviceId);
+  else sessionStorage.removeItem("adminUnlocked");
+  updateAdminPanelVisibility();
+}
+
+function updateAdminPanelVisibility() {
+  const unlocked = isAdminUnlocked();
+  const lockedEl = document.getElementById("adminLocked");
+  const contentEl = document.getElementById("adminContent");
+  if (lockedEl) lockedEl.style.display = unlocked ? "none" : "block";
+  if (contentEl) contentEl.style.display = unlocked ? "block" : "none";
+  if (unlocked) {
+    renderAdminOperatorList();
+    renderAdminProspectSetup();
+    syncAdminAcceptWindowInputs();
+    syncAdminBroadcastInputs();
+  }
+}
+
+function syncAdminAcceptWindowInputs() {
+  const q = document.getElementById("adminQuickMins");
+  const r = document.getElementById("adminReadyMins");
+  if (q) q.value = String(Math.round(acceptWindowQuickMs / 60000));
+  if (r) r.value = String(Math.round(acceptWindowReadyMs / 60000));
+}
+
+function syncAdminBroadcastInputs() {
+  const text = document.getElementById("adminBroadcastText");
+  const active = document.getElementById("adminBroadcastActive");
+  if (!text || !active) return;
+  if (broadcastSettings) {
+    text.value = broadcastSettings.message || "";
+    active.checked = !!broadcastSettings.active;
+  }
+}
+
+function applyAppControlSettings(data) {
+  data = data || {};
+  if (data.acceptWindowQuickSec) acceptWindowQuickMs = parseInt(data.acceptWindowQuickSec, 10) * 1000;
+  else if (data.acceptWindowQuickMin) acceptWindowQuickMs = parseInt(data.acceptWindowQuickMin, 10) * 60000;
+  if (data.acceptWindowReadySec) acceptWindowReadyMs = parseInt(data.acceptWindowReadySec, 10) * 1000;
+  else if (data.acceptWindowReadyMin) acceptWindowReadyMs = parseInt(data.acceptWindowReadyMin, 10) * 60000;
+  if (data.masterPin && /^\d{4}$/.test(String(data.masterPin))) masterPin = String(data.masterPin);
+  if (isAdminUnlocked()) syncAdminAcceptWindowInputs();
+  if (data.forceSignOutAt && signedInAtMs && getCurrentOperator()) {
+    let ts = 0;
+    if (data.forceSignOutAt.seconds) ts = data.forceSignOutAt.seconds * 1000;
+    else if (data.forceSignOutAt.toDate) ts = data.forceSignOutAt.toDate().getTime();
+    if (ts > signedInAtMs) {
+      signOutOperator(true, null, "Signed out by admin — please sign in again.");
+    }
+  }
+}
+
+function subscribeAppSettings() {
+  if (!firebaseReady || !db) return;
+  if (appSettingsUnsub) appSettingsUnsub();
+  appSettingsUnsub = db.collection("settings").doc("appControl").onSnapshot(function(doc) {
+    applyAppControlSettings(doc.exists ? doc.data() : {});
+  }, function(err) { console.warn("appControl sync failed", err); });
+  if (broadcastUnsub) broadcastUnsub();
+  broadcastUnsub = db.collection("settings").doc("broadcast").onSnapshot(function(doc) {
+    if (doc.exists) {
+      const data = doc.data() || {};
+      broadcastSettings = {
+        message: data.message || "",
+        active: !!data.active,
+        postedBy: data.postedBy || "",
+        broadcastId: data.updatedAt && data.updatedAt.seconds ? String(data.updatedAt.seconds) : (data.message || "")
+      };
+    } else {
+      broadcastSettings = null;
+    }
+    if (isAdminUnlocked()) syncAdminBroadcastInputs();
+  });
+}
+
+function checkBroadcastAlert() {
+  if (!broadcastSettings || !broadcastSettings.active || !broadcastSettings.message) return;
+  const id = broadcastSettings.broadcastId || broadcastSettings.message;
+  if (localStorage.getItem("broadcastDismissed") === id) return;
+  const who = broadcastSettings.postedBy ? " from " + broadcastSettings.postedBy : "";
+  alert("TEAM NOTICE" + who + ":\n\n" + broadcastSettings.message);
+  localStorage.setItem("broadcastDismissed", id);
+}
+
+function renderAdminProspectSetup() {
+  const el = document.getElementById("adminProspectList");
+  if (!el) return;
+  const activeSet = {};
+  getProspectOrder().forEach(function(n) { activeSet[n] = true; });
+  el.innerHTML = teamOperators.map(function(name) {
+    const checked = !!activeSet[name];
+    return '<label class="adminCheckRow"><input type="checkbox" data-prospect-op="' + escapeHtml(name) + '"' +
+      (checked ? " checked" : "") + "> " + escapeHtml(name) + "</label>";
+  }).join("");
+}
+
+async function adminForceSignOutAll() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  if (!confirm("Sign out ALL operators on every device?")) return;
+  const adminOp = getCurrentOperator();
+  try {
+    const sessions = await db.collection("operatorSessions").get();
+    const batch = db.batch();
+    let count = 0;
+    sessions.docs.forEach(function(d) {
+      batch.delete(d.ref);
+      count++;
+      if (count >= 450) return;
+    });
+    if (count) await batch.commit();
+    await db.collection("settings").doc("appControl").set({
+      forceSignOutAt: firebase.firestore.FieldValue.serverTimestamp(),
+      forceSignOutBy: adminOp || ""
+    }, { merge: true });
+    showToast("All devices signed out");
+  } catch (e) {
+    showToast("Sign-out failed: " + e.message, true);
+  }
+}
+
+async function adminSaveBroadcast() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const msg = document.getElementById("adminBroadcastText").value.trim();
+  const active = document.getElementById("adminBroadcastActive").checked;
+  try {
+    await db.collection("settings").doc("broadcast").set({
+      message: msg,
+      active: active && !!msg,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      postedBy: getCurrentOperator() || ""
+    }, { merge: true });
+    if (active && msg) localStorage.removeItem("broadcastDismissed");
+    showToast("Broadcast saved");
+  } catch (e) {
+    showToast("Save failed: " + e.message, true);
+  }
+}
+
+async function adminClearBroadcast() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  try {
+    await db.collection("settings").doc("broadcast").set({
+      message: "",
+      active: false,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      postedBy: getCurrentOperator() || ""
+    }, { merge: true });
+    showToast("Broadcast cleared");
+  } catch (e) {
+    showToast("Clear failed: " + e.message, true);
+  }
+}
+
+async function adminSaveAcceptWindows() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const quickMin = parseInt(document.getElementById("adminQuickMins").value, 10);
+  const readyMin = parseInt(document.getElementById("adminReadyMins").value, 10);
+  if (!quickMin || quickMin < 1 || quickMin > 60 || !readyMin || readyMin < 1 || readyMin > 60) {
+    showToast("Enter 1–60 minutes for each", true);
+    return;
+  }
+  try {
+    await db.collection("settings").doc("appControl").set({
+      acceptWindowQuickMin: quickMin,
+      acceptWindowReadyMin: readyMin,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy: getCurrentOperator() || ""
+    }, { merge: true });
+    acceptWindowQuickMs = quickMin * 60000;
+    acceptWindowReadyMs = readyMin * 60000;
+    showToast("Countdown times saved");
+  } catch (e) {
+    showToast("Save failed: " + e.message, true);
+  }
+}
+
+function getTsMs(ts) {
+  if (!ts) return 0;
+  if (ts.toDate) return ts.toDate().getTime();
+  if (ts.seconds) return ts.seconds * 1000;
+  return 0;
+}
+
+function isTodayMelbourne(ts) {
+  const ms = getTsMs(ts);
+  if (!ms) return false;
+  const d = new Date(ms);
+  const now = new Date();
+  const opts = { timeZone: "Australia/Melbourne", year: "numeric", month: "numeric", day: "numeric" };
+  return d.toLocaleDateString("en-AU", opts) === now.toLocaleDateString("en-AU", opts);
+}
+
+async function adminJobCleanup() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const days = parseInt(document.getElementById("adminCleanupDays").value, 10) || 30;
+  const delCancelled = document.getElementById("adminCleanupCancelled").checked;
+  const delCompleted = document.getElementById("adminCleanupCompleted").checked;
+  const resultEl = document.getElementById("adminCleanupResult");
+  if (!delCancelled && !delCompleted) {
+    showToast("Select at least one job type", true);
+    return;
+  }
+  if (!confirm("Delete " + (delCancelled ? "cancelled" : "") + (delCancelled && delCompleted ? " and " : "") +
+      (delCompleted ? "completed" : "") + " jobs older than " + days + " days?")) return;
+  const cutoff = Date.now() - days * 86400000;
+  const statuses = [];
+  if (delCancelled) statuses.push("cancelled");
+  if (delCompleted) statuses.push("completed");
+  try {
+    if (resultEl) resultEl.textContent = "Scanning jobs…";
+    const snap = await db.collection("jobs").orderBy("dispatchedAt", "desc").limit(400).get();
+    const toDelete = [];
+    snap.docs.forEach(function(d) {
+      const job = d.data();
+      if (statuses.indexOf(job.status) === -1) return;
+      const closedMs = getTsMs(job.completedAt || job.canceledAt || job.dispatchedAt);
+      if (closedMs && closedMs < cutoff) toDelete.push(d.ref);
+    });
+    if (!toDelete.length) {
+      if (resultEl) resultEl.textContent = "No matching jobs to delete.";
+      showToast("Nothing to delete");
+      return;
+    }
+    let deleted = 0;
+    for (let i = 0; i < toDelete.length; i += 400) {
+      const batch = db.batch();
+      toDelete.slice(i, i + 400).forEach(function(ref) { batch.delete(ref); });
+      await batch.commit();
+      deleted += Math.min(400, toDelete.length - i);
+    }
+    if (resultEl) resultEl.textContent = "Deleted " + deleted + " job(s).";
+    showToast("Deleted " + deleted + " jobs");
+    subscribeCompletedJobs();
+  } catch (e) {
+    if (resultEl) resultEl.textContent = "Failed: " + e.message;
+    showToast("Cleanup failed: " + e.message, true);
+  }
+}
+
+async function adminSendTestPush() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  try {
+    await db.collection("adminCommands").add({
+      type: "test_push",
+      message: "GPN test push — " + new Date().toLocaleString("en-AU", { timeZone: "Australia/Melbourne" }),
+      requestedBy: getCurrentOperator() || "",
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast("Test push queued — check all phones");
+  } catch (e) {
+    showToast("Push test failed: " + e.message, true);
+  }
+}
+
+async function loadAdminActivityLog() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const el = document.getElementById("adminActivityLog");
+  if (el) el.innerHTML = '<div class="adminHint" style="padding:10px">Loading…</div>';
+  try {
+    const snap = await db.collection("jobs").orderBy("dispatchedAt", "desc").limit(250).get();
+    const stats = {};
+    teamOperators.forEach(function(n) {
+      stats[n] = { dispatched: 0, accepted: 0, completed: 0, cancelled: 0 };
+    });
+    snap.docs.forEach(function(d) {
+      const job = d.data();
+      const today = isTodayMelbourne(job.dispatchedAt) || isTodayMelbourne(job.completedAt) ||
+        isTodayMelbourne(job.canceledAt) || isTodayMelbourne(job.acceptedAt);
+      if (!today) return;
+      const op = resolveOperator(job.operator);
+      const acc = resolveOperator(job.acceptedBy);
+      const comp = resolveOperator(job.completedBy);
+      const can = resolveOperator(job.canceledBy);
+      if (op && stats[op]) stats[op].dispatched++;
+      if (acc && stats[acc]) stats[acc].accepted++;
+      if (comp && stats[comp]) stats[comp].completed++;
+      if (can && stats[can]) stats[can].cancelled++;
+    });
+    const rows = teamOperators.map(function(name) {
+      const s = stats[name] || { dispatched: 0, accepted: 0, completed: 0, cancelled: 0 };
+      const acts = "Disp " + s.dispatched + " · Acc " + s.accepted + " · Done " + s.completed + " · Can " + s.cancelled;
+      return '<div class="adminActivityRow"><div class="adminActivityOp">' + escapeHtml(name) +
+        '</div><div class="adminActivityActs">' + acts + "</div></div>";
+    }).join("");
+    if (el) el.innerHTML = rows || '<div class="adminHint" style="padding:10px">No activity today</div>';
+  } catch (e) {
+    if (el) el.innerHTML = '<div class="adminHint" style="padding:10px">Failed: ' + escapeHtml(e.message) + "</div>";
+  }
+}
+
+async function adminSaveProspectOperators() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const checked = [];
+  document.querySelectorAll("#adminProspectList input[data-prospect-op]:checked").forEach(function(inp) {
+    const name = resolveOperator(inp.getAttribute("data-prospect-op"));
+    if (name) checked.push(name);
+  });
+  if (!checked.length) {
+    showToast("Select at least one operator", true);
+    return;
+  }
+  try {
+    prospectOperatorList = checked;
+    await db.collection("settings").doc("prospectTracker").set({
+      prospectOperators: checked,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy: getCurrentOperator() || ""
+    }, { merge: true });
+    renderProspectTable();
+    showToast("Prospect list saved");
+  } catch (e) {
+    showToast("Save failed: " + e.message, true);
+  }
+}
+
+async function adminChangeMasterPin() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const current = document.getElementById("adminCurrentPin").value.trim();
+  const newPin = document.getElementById("adminNewPin").value.trim();
+  const confirm = document.getElementById("adminNewPinConfirm").value.trim();
+  if (current !== getMasterPin()) {
+    showToast("Current PIN is wrong", true);
+    return;
+  }
+  if (!/^\d{4}$/.test(newPin)) {
+    showToast("New PIN must be 4 digits", true);
+    return;
+  }
+  if (newPin !== confirm) {
+    showToast("New PINs do not match", true);
+    return;
+  }
+  try {
+    await db.collection("settings").doc("appControl").set({
+      masterPin: newPin,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy: getCurrentOperator() || ""
+    }, { merge: true });
+    masterPin = newPin;
+    document.getElementById("adminCurrentPin").value = "";
+    document.getElementById("adminNewPin").value = "";
+    document.getElementById("adminNewPinConfirm").value = "";
+    showToast("Master PIN changed");
+  } catch (e) {
+    showToast("PIN change failed: " + e.message, true);
+  }
+}
+
+function promptAdminUnlock() {
+  if (!requireOperator("access admin area")) return;
+  openPinModal("admin", null);
+}
+
+function renderAdminOperatorList() {
+  const listEl = document.getElementById("adminOperatorList");
+  const countEl = document.getElementById("adminOpCount");
+  if (!listEl) return;
+  if (countEl) {
+    countEl.textContent = teamOperators.length + " / " + maxOperatorSlots + " operators";
+  }
+  if (!teamOperators.length) {
+    listEl.innerHTML = '<div class="adminHint">No operators yet — add one below.</div>';
+    return;
+  }
+  listEl.innerHTML = teamOperators.map(function(name) {
+    const hasPin = !!operatorPinMap[name];
+    const status = hasPin ? "PIN set" : "No PIN — sets on first login";
+    const statusClass = hasPin ? "ready" : "";
+    const me = getCurrentOperator();
+    const isSelf = me && me === name;
+    return '<div class="adminOpRow">' +
+      '<div class="adminOpName">' + escapeHtml(name) +
+      (isSelf ? ' <span style="font-size:10px;color:var(--gold)">(you)</span>' : '') +
+      '<div class="adminOpStatus ' + statusClass + '">' + status + '</div></div>' +
+      '<div class="adminOpActions">' +
+      '<button type="button" class="btnAdminReset" data-admin-action="reset" data-op="' + escapeHtml(name) + '">Reset PIN</button>' +
+      (isSelf ? '' : '<button type="button" class="btnAdminDanger" data-admin-action="remove" data-op="' + escapeHtml(name) + '">Remove</button>') +
+      '</div></div>';
+  }).join("");
+  bindAdminOperatorActions();
+}
+
+function bindAdminOperatorActions() {
+  const list = document.getElementById("adminOperatorList");
+  if (!list || list.dataset.bound) return;
+  list.dataset.bound = "1";
+  list.addEventListener("click", function(e) {
+    const btn = e.target.closest("[data-admin-action]");
+    if (!btn) return;
+    const op = btn.getAttribute("data-op");
+    const action = btn.getAttribute("data-admin-action");
+    if (action === "reset") adminResetOperatorPin(op);
+    else if (action === "remove") adminRemoveOperator(op);
+  });
+}
+
+async function adminAddOperator() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const adminOp = getCurrentOperator();
+  if (!adminOp) return;
+  const name = titleCaseOperatorName(document.getElementById("adminNewOpName").value);
+  const pin = document.getElementById("adminNewOpPin").value.trim();
+  if (!name) {
+    showToast("Enter operator name", true);
+    return;
+  }
+  if (resolveOperator(name)) {
+    showToast("Operator already exists", true);
+    return;
+  }
+  if (teamOperators.length >= maxOperatorSlots) {
+    showToast("Max " + maxOperatorSlots + " operators reached", true);
+    return;
+  }
+  if (pin && !/^\d{4}$/.test(pin)) {
+    showToast("PIN must be 4 digits", true);
+    return;
+  }
+  try {
+    teamOperators.push(name);
+    await saveOperatorRoster(adminOp);
+    if (pin) {
+      await db.collection("operatorPins").doc(name).set({
+        operator: name,
+        pin: pin,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        setBy: adminOp
+      });
+      operatorPinMap[name] = pin;
+    }
+    document.getElementById("adminNewOpName").value = "";
+    document.getElementById("adminNewOpPin").value = "";
+    await loadOperatorPins();
+    renderAdminOperatorList();
+    renderAdminProspectSetup();
+    renderProspectTable();
+    showToast(name + " added");
+  } catch (e) {
+    teamOperators = teamOperators.filter(function(n) { return n !== name; });
+    showToast("Add failed: " + e.message, true);
+  }
+}
+
+async function adminRemoveOperator(name) {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const adminOp = getCurrentOperator();
+  if (!adminOp) return;
+  const canonical = resolveOperator(name);
+  if (!canonical) return;
+  if (canonical === adminOp) {
+    showToast("Cannot remove yourself while signed in", true);
+    return;
+  }
+  if (!confirm("Remove " + canonical + "? Their PIN will be deleted.")) return;
+  try {
+    teamOperators = teamOperators.filter(function(n) { return n !== canonical; });
+    await saveOperatorRoster(adminOp);
+    await db.collection("operatorPins").doc(canonical).delete();
+    delete operatorPinMap[canonical];
+    renderAdminOperatorList();
+    renderAdminProspectSetup();
+    renderProspectTable();
+    showToast(canonical + " removed");
+  } catch (e) {
+    showToast("Remove failed: " + e.message, true);
+    await loadOperatorRoster();
+  }
+}
+
+async function adminResetOperatorPin(name) {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const adminOp = getCurrentOperator();
+  if (!adminOp) return;
+  const canonical = resolveOperator(name);
+  if (!canonical) return;
+  const newPin = prompt("New 4-digit PIN for " + canonical + " (leave blank to clear — they set on next login):", "");
+  if (newPin === null) return;
+  const pin = newPin.trim();
+  if (pin && !/^\d{4}$/.test(pin)) {
+    showToast("PIN must be 4 digits", true);
+    return;
+  }
+  try {
+    if (pin) {
+      await db.collection("operatorPins").doc(canonical).set({
+        operator: canonical,
+        pin: pin,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        resetBy: adminOp
+      }, { merge: true });
+      operatorPinMap[canonical] = pin;
+      showToast("PIN updated for " + canonical);
+    } else {
+      await db.collection("operatorPins").doc(canonical).delete();
+      delete operatorPinMap[canonical];
+      showToast("PIN cleared for " + canonical);
+    }
+    renderAdminOperatorList();
+  } catch (e) {
+    showToast("Reset failed: " + e.message, true);
+  }
 }
 
 function getCurrentOperator() {
@@ -1545,18 +2352,35 @@ function requireOperator(actionLabel) {
 
 function initOperatorField() {
   renderOperatorFilterRow();
-  renderOperatorLoginSelect();
   bindOperatorFieldEvents();
   bindMapsLazyLoad();
   updateOperatorAccess(false);
 }
 
-function renderOperatorLoginSelect() {
-  const sel = document.getElementById("opLoginName");
-  if (!sel) return;
-  sel.innerHTML = AUTHORIZED_OPERATORS.map(function(n) {
-    return '<option value="' + n + '">' + n + '</option>';
-  }).join("");
+function loadSavedLoginFields() {
+  try {
+    const s = JSON.parse(localStorage.getItem("operatorSavedLogin") || "null");
+    if (s && s.saved) {
+      document.getElementById("opLoginName").value = s.name || "";
+      document.getElementById("opLoginPin").value = s.pin || "";
+      document.getElementById("opSaveLogin").checked = true;
+      return true;
+    }
+  } catch (e) {}
+  document.getElementById("opSaveLogin").checked = false;
+  return false;
+}
+
+function persistSavedLogin(name, pin, save) {
+  if (save) {
+    localStorage.setItem("operatorSavedLogin", JSON.stringify({
+      saved: true,
+      name: name,
+      pin: pin
+    }));
+  } else {
+    localStorage.removeItem("operatorSavedLogin");
+  }
 }
 
 function getOperatorPinSession() {
@@ -1584,7 +2408,8 @@ async function loadOperatorPins() {
     operatorPinMap = {};
     snap.docs.forEach(function(d) {
       const data = d.data() || {};
-      const op = resolveOperator(data.operator || d.id);
+      const rawName = data.operator || d.id;
+      const op = resolveOperator(rawName) || titleCaseOperatorName(rawName);
       if (op && data.pin) operatorPinMap[op] = String(data.pin);
     });
   } catch (e) {
@@ -1595,13 +2420,21 @@ async function loadOperatorPins() {
 function showOperatorLoginModal(hint) {
   const modal = document.getElementById("operatorLoginModal");
   if (!modal) return;
-  document.getElementById("opLoginPin").value = "";
-  document.getElementById("opLoginPinConfirm").value = "";
   showOperatorPinConfirm(false);
-  document.getElementById("operatorLoginHint").textContent = hint ||
-    "Choose your name and enter your 4-digit PIN";
+  loadSavedLoginFields();
+  const hintEl = document.getElementById("operatorLoginHint");
+  if (hint) {
+    hintEl.textContent = hint;
+    hintEl.style.display = "block";
+  } else {
+    hintEl.textContent = "";
+    hintEl.style.display = "none";
+  }
+  document.getElementById("operatorLoginBtn").textContent = "Login";
   modal.classList.add("open");
-  focusModalInput(document.getElementById("opLoginPin"), false);
+  const nameEl = document.getElementById("opLoginName");
+  if (!nameEl.value.trim()) focusModalInput(nameEl, false);
+  else focusModalInput(document.getElementById("opLoginPin"), false);
 }
 
 function hideOperatorLoginModal() {
@@ -1612,16 +2445,40 @@ function hideOperatorLoginModal() {
 function showOperatorPinConfirm(show) {
   const confirmEl = document.getElementById("opLoginPinConfirm");
   confirmEl.style.display = show ? "block" : "none";
-  confirmEl.value = "";
-  document.getElementById("operatorLoginBtn").textContent = show ? "Set PIN & Sign In" : "Sign In";
+  if (!show) confirmEl.value = "";
+  document.getElementById("operatorLoginBtn").textContent = show ? "Set PIN & Login" : "Login";
+  const hintEl = document.getElementById("operatorLoginHint");
   if (show) {
-    document.getElementById("operatorLoginHint").textContent =
-      "First time — choose a 4-digit PIN and confirm it";
+    hintEl.textContent = "Confirm your PIN to finish setup";
+    hintEl.style.display = "block";
+  } else if (!hintEl.dataset.keep) {
+    hintEl.textContent = "";
+    hintEl.style.display = "none";
   }
 }
 
 async function initOperatorAuth() {
-  renderOperatorLoginSelect();
+  await loadOperatorRoster();
+  if (firebaseReady && db) {
+    try {
+      const ctrl = await db.collection("settings").doc("appControl").get();
+      if (ctrl.exists) applyAppControlSettings(ctrl.data());
+      const bc = await db.collection("settings").doc("broadcast").get();
+      if (bc.exists) {
+        const data = bc.data() || {};
+        broadcastSettings = {
+          message: data.message || "",
+          active: !!data.active,
+          postedBy: data.postedBy || "",
+          broadcastId: data.updatedAt && data.updatedAt.seconds ? String(data.updatedAt.seconds) : (data.message || "")
+        };
+      }
+      const pt = await db.collection("settings").doc("prospectTracker").get();
+      if (pt.exists && pt.data().prospectOperators && pt.data().prospectOperators.length) {
+        prospectOperatorList = pt.data().prospectOperators.map(titleCaseOperatorName).filter(Boolean);
+      }
+    } catch (e) { console.warn("loadAppSettings failed", e); }
+  }
   await loadOperatorPins();
   const sessionOp = getOperatorPinSession();
   if (sessionOp) {
@@ -1638,7 +2495,7 @@ async function confirmOperatorLogin() {
   }
   const canonical = resolveOperator(document.getElementById("opLoginName").value);
   if (!canonical) {
-    alert("Choose a valid operator name");
+    alert("Name not on roster — ask admin to add you in Admin Area");
     return;
   }
   const pin = document.getElementById("opLoginPin").value.trim();
@@ -1652,10 +2509,6 @@ async function confirmOperatorLogin() {
 
   if (!existingPin) {
     if (!confirmVisible) {
-      if (Object.keys(operatorPinMap).length >= MAX_OPERATOR_PINS) {
-        alert("All 6 operator PINs are already set. Ask admin to reset yours in Firebase.");
-        return;
-      }
       showOperatorPinConfirm(true);
       focusModalInput(document.getElementById("opLoginPinConfirm"), false);
       return;
@@ -1677,32 +2530,26 @@ async function confirmOperatorLogin() {
       return;
     }
   } else if (existingPin !== pin) {
-    alert("Wrong PIN");
+    alert("Invalid name or PIN");
     return;
   }
 
+  const saveLogin = document.getElementById("opSaveLogin").checked;
+  const rawName = document.getElementById("opLoginName").value.trim();
+  persistSavedLogin(rawName, pin, saveLogin);
   completeOperatorSignIn(canonical, false);
 }
 
 function completeOperatorSignIn(canonical, silent) {
+  signedInAtMs = Date.now();
+  localStorage.setItem("signedInAtMs", String(signedInAtMs));
   saveOperatorPinSession(canonical);
   saveOperatorLocally(canonical);
   watchOperatorSession(canonical);
   if (firebaseReady) claimOperatorSession(canonical, silent);
   hideOperatorLoginModal();
+  checkBroadcastAlert();
   processPendingOpenJob();
-}
-
-function switchOperatorAccount() {
-  const op = getCurrentOperator();
-  if (op) releaseOperatorSession(op);
-  sessionStorage.removeItem("operatorPinSession");
-  removePushTokenForDevice();
-  document.getElementById("operator").value = "";
-  localStorage.removeItem("operatorName");
-  localStorage.removeItem("operatorSession");
-  updateOperatorAccess(false);
-  showOperatorLoginModal("Sign in with your operator name and PIN");
 }
 
 function bindOperatorFieldEvents() {
@@ -1743,6 +2590,7 @@ function watchOperatorSession(operatorName) {
 
 async function restoreOperatorSession() {
   const sessionOp = getOperatorPinSession();
+  signedInAtMs = parseInt(localStorage.getItem("signedInAtMs") || "0", 10) || Date.now();
   if (sessionOp) {
     saveOperatorLocally(sessionOp);
     watchOperatorSession(sessionOp);
@@ -1811,7 +2659,7 @@ async function releaseOperatorSession(operatorName) {
   } catch (e) { console.error(e); }
 }
 
-function signOutOperator(forced, otherDeviceId) {
+function signOutOperator(forced, otherDeviceId, reason) {
   const op = getCurrentOperator();
   if (operatorSessionUnsub) {
     operatorSessionUnsub();
@@ -1819,12 +2667,15 @@ function signOutOperator(forced, otherDeviceId) {
   }
   removePushTokenForDevice();
   sessionStorage.removeItem("operatorPinSession");
+  setAdminUnlocked(false);
+  signedInAtMs = 0;
+  localStorage.removeItem("signedInAtMs");
   document.getElementById("operator").value = "";
   localStorage.removeItem("operatorName");
   localStorage.removeItem("operatorSession");
   updateOperatorAccess(false);
   if (forced) {
-    alert(op + " signed in on another device. This device was signed out.");
+    alert(reason || (op + " signed in on another device. This device was signed out."));
   }
   releaseOperatorSession(op);
   switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
@@ -1868,20 +2719,14 @@ async function onOperatorBlur() {
 }
 
 function updateOperatorAccess(isValid, showInvalid) {
-  const status = document.getElementById("operatorStatus");
-  const switchBtn = document.getElementById("operatorSwitchBtn");
+  const signedInBar = document.getElementById("signedInBar");
+  const signedInName = document.getElementById("signedInName");
   if (isValid) {
-    status.textContent = "Signed in as: " + getCurrentOperator();
-    status.className = "operatorStatus ready";
-    if (switchBtn) switchBtn.style.display = "block";
-  } else if (showInvalid) {
-    status.textContent = "Sign in required";
-    status.className = "operatorStatus invalid";
-    if (switchBtn) switchBtn.style.display = "none";
+    if (signedInBar) signedInBar.style.display = "block";
+    if (signedInName) signedInName.textContent = getCurrentOperator();
   } else {
-    status.textContent = "Sign in to enable the app";
-    status.className = "operatorStatus";
-    if (switchBtn) switchBtn.style.display = "none";
+    if (signedInBar) signedInBar.style.display = "none";
+    if (signedInName) signedInName.textContent = "";
   }
   document.getElementById("bookingForm").classList.toggle("locked", !isValid);
   document.body.classList.toggle("appLocked", !isValid);
@@ -1923,6 +2768,8 @@ function teardownFirebaseSubscriptions() {
   if (noticeUnsub) { noticeUnsub(); noticeUnsub = null; }
   if (prospectUnsub) { prospectUnsub(); prospectUnsub = null; }
   if (operatorSessionUnsub) { operatorSessionUnsub(); operatorSessionUnsub = null; }
+  if (appSettingsUnsub) { appSettingsUnsub(); appSettingsUnsub = null; }
+  if (broadcastUnsub) { broadcastUnsub(); broadcastUnsub = null; }
   firebaseSubscriptionsStarted = false;
 }
 
@@ -1967,6 +2814,7 @@ function getFirestoreDb() {
 function startFirebaseSubscriptions() {
   if (firebaseSubscriptionsStarted) return;
   firebaseSubscriptionsStarted = true;
+  subscribeAppSettings();
   subscribeAvailableJobs();
   subscribeCompletedJobs();
   setTimeout(function() {
@@ -2248,7 +3096,7 @@ async function repairProspectTierGap() {
       const current = computeProspectPoints(job.fare);
       const gap = current - legacy;
       const who = resolveOperator(job.completedBy || "");
-      if (gap > 0 && who && PROSPECT_ORDER.indexOf(who) !== -1) {
+      if (gap > 0 && who && getProspectOrder().indexOf(who) !== -1) {
         await addProspectPoints(who, gap);
       }
       await doc.ref.update({
@@ -2267,9 +3115,19 @@ function setTeamView(view) {
   teamView = view;
   document.getElementById("teamNoticeBtn").classList.toggle("selected", view === "notice");
   document.getElementById("teamProspectBtn").classList.toggle("selected", view === "prospect");
+  document.getElementById("teamAdminBtn").classList.toggle("selected", view === "admin");
   document.getElementById("teamNoticePanel").style.display = view === "notice" ? "flex" : "none";
   document.getElementById("teamProspectPanel").style.display = view === "prospect" ? "block" : "none";
-  if (view !== "notice") {
+  document.getElementById("teamAdminPanel").style.display = view === "admin" ? "flex" : "none";
+  if (view === "admin") {
+    loadOperatorRoster().then(function() {
+      return loadOperatorPins();
+    }).then(function() {
+      updateAdminPanelVisibility();
+    });
+    const input = document.getElementById("noticeInput");
+    if (input) input.blur();
+  } else if (view !== "notice") {
     const input = document.getElementById("noticeInput");
     if (input) input.blur();
   } else {
@@ -2575,6 +3433,7 @@ function buildJobDetailListHtml(job, docId, source) {
 
   const isActive = job.status === "available" || job.status === "accepted";
   if (source === "previous" && job.status === "completed") {
+    html += jdLineHtml("Completed At", formatCompletedTimeOnly(job), "green");
     html += jdLineHtml("Completed By", (job.completedBy || "—").toUpperCase(), "blue");
     const fareLabel = formatFareDisplay(job.fare);
     if (fareLabel) html += jdLineHtml("Fare", fareLabel.toUpperCase(), "gold");
@@ -2595,22 +3454,27 @@ function buildJobDetailListHtml(job, docId, source) {
 function subscribeProspectScores() {
   if (prospectUnsub) prospectUnsub();
   prospectUnsub = db.collection("settings").doc("prospectTracker").onSnapshot(function(doc) {
+    if (doc.exists && doc.data().prospectOperators && doc.data().prospectOperators.length) {
+      prospectOperatorList = doc.data().prospectOperators.map(titleCaseOperatorName).filter(Boolean);
+    }
     const scores = {};
-    PROSPECT_ORDER.forEach(function(n) { scores[n] = 0; });
+    getProspectOrder().forEach(function(n) { scores[n] = 0; });
     if (doc.exists && doc.data().scores) {
-      PROSPECT_ORDER.forEach(function(n) {
+      getProspectOrder().forEach(function(n) {
         scores[n] = parseInt(doc.data().scores[n], 10) || 0;
       });
     }
     prospectScores = scores;
     renderProspectTable();
+    if (isAdminUnlocked()) renderAdminProspectSetup();
   });
 }
 
 function renderProspectTable() {
   const body = document.getElementById("prospectTableBody");
   if (!body) return;
-  body.innerHTML = PROSPECT_ORDER.map(function(name) {
+  const order = getProspectOrder();
+  body.innerHTML = order.map(function(name) {
     const pts = prospectScores[name] || 0;
     if (prospectEditMode) {
       return "<tr><td>" + escapeHtml(name) + '</td><td class="pointsCell"><input type="tel" inputmode="numeric" data-op="' + escapeHtml(name) + '" value="' + pts + '"></td></tr>';
@@ -2653,14 +3517,15 @@ async function saveProspectScores() {
 async function addProspectPoints(operatorName, points) {
   if (!firebaseReady || !points) return;
   const canonical = resolveOperator(operatorName);
-  if (!canonical || PROSPECT_ORDER.indexOf(canonical) === -1) return;
+  if (!canonical || getProspectOrder().indexOf(canonical) === -1) return;
   const ref = db.collection("settings").doc("prospectTracker");
   await db.runTransaction(async function(tx) {
     const doc = await tx.get(ref);
     const scores = {};
-    PROSPECT_ORDER.forEach(function(n) { scores[n] = 0; });
+    const order = getProspectOrder();
+    order.forEach(function(n) { scores[n] = 0; });
     if (doc.exists && doc.data().scores) {
-      PROSPECT_ORDER.forEach(function(n) { scores[n] = parseInt(doc.data().scores[n], 10) || 0; });
+      order.forEach(function(n) { scores[n] = parseInt(doc.data().scores[n], 10) || 0; });
     }
     scores[canonical] = (scores[canonical] || 0) + points;
     tx.set(ref, { scores: scores, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
@@ -2740,11 +3605,18 @@ function matchesAvailableView(job, view) {
   return isCurrentBookingJob(job);
 }
 
-function tryMarkGroupDispatchReady(docId) {
+function notifyGroupDispatchReady(job) {
+  if (!job || !job.docId || groupDispatchAlertedIds.has(job.docId)) return;
+  groupDispatchAlertedIds.add(job.docId);
+  showGroupDispatchAlert(job);
+}
+
+function tryMarkGroupDispatchReady(docId, notify) {
   if (groupReadyMarkedIds.has(docId) || !firebaseReady || !db) return;
   const job = findJobById(docId);
   if (!job || job.groupDispatchReady || !isGroupDispatchQueueJob(job)) return;
   groupReadyMarkedIds.add(docId);
+  if (notify) notifyGroupDispatchReady(job);
   db.collection("jobs").doc(docId).update({
     groupDispatchReady: true,
     groupDispatchReadyAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -2774,9 +3646,16 @@ function getJobDispatchedMs(job) {
   return Date.now();
 }
 
+function getAcceptWindowMs(job) {
+  const t = String(job.time || "").trim().toLowerCase();
+  if (t === "quick") return acceptWindowQuickMs;
+  if (t === "ready now") return acceptWindowReadyMs;
+  return acceptWindowReadyMs;
+}
+
 function getAcceptWindowRemainingMs(job) {
-  if (!isQuickOrReadyJob(job)) return ACCEPT_WINDOW_MS;
-  return Math.max(0, ACCEPT_WINDOW_MS - (Date.now() - getJobDispatchedMs(job)));
+  if (!isQuickOrReadyJob(job)) return getAcceptWindowMs(job);
+  return Math.max(0, getAcceptWindowMs(job) - (Date.now() - getJobDispatchedMs(job)));
 }
 
 function canAcceptJob(job) {
@@ -2802,10 +3681,11 @@ function formatCountdownMs(ms) {
 
 function jobCountdownHtml(job) {
   const dispatchMs = getJobDispatchedMs(job);
+  const windowMs = getAcceptWindowMs(job);
   const remain = getAcceptWindowRemainingMs(job);
-  return '<div class="jcHeadActs" onclick="event.stopPropagation()">' +
+  return '<div class="jcHeadActs jcHeadCountdown" onclick="event.stopPropagation()">' +
     '<div class="jcHeadBoxLbl">ACCEPT IN</div>' +
-    '<div class="jcCountdown" data-dispatch-ms="' + dispatchMs + '" data-doc-id="' + job.docId + '">' +
+    '<div class="jcCountdown" data-dispatch-ms="' + dispatchMs + '" data-accept-ms="' + windowMs + '" data-doc-id="' + job.docId + '">' +
     formatCountdownMs(remain) + '</div></div>';
 }
 
@@ -2865,33 +3745,48 @@ function bindJobListSwipes(container) {
 }
 
 function ensureCountdownTicker() {
-  if (countdownTickTimer) return;
-  countdownTickTimer = setInterval(function() {
+  const tick = function() {
+    const nodes = document.querySelectorAll(".jcCountdown[data-dispatch-ms]");
+    if (!nodes.length) {
+      if (countdownTickTimer) {
+        clearInterval(countdownTickTimer);
+        countdownTickTimer = null;
+      }
+      return;
+    }
     let needsRerender = false;
-    document.querySelectorAll(".jcCountdown[data-dispatch-ms]").forEach(function(el) {
+    nodes.forEach(function(el) {
       const dispatchMs = parseInt(el.getAttribute("data-dispatch-ms"), 10);
-      const remain = Math.max(0, ACCEPT_WINDOW_MS - (Date.now() - dispatchMs));
+      const windowMs = parseInt(el.getAttribute("data-accept-ms"), 10) || acceptWindowReadyMs;
+      const remain = Math.max(0, windowMs - (Date.now() - dispatchMs));
       el.textContent = formatCountdownMs(remain);
       if (remain === 0) {
-        needsRerender = true;
-        const docId = el.getAttribute("data-doc-id");
-        if (docId) tryMarkGroupDispatchReady(docId);
+        if (el.getAttribute("data-expired") !== "1") {
+          el.setAttribute("data-expired", "1");
+          needsRerender = true;
+          const docId = el.getAttribute("data-doc-id");
+          if (docId) tryMarkGroupDispatchReady(docId, true);
+        }
+      } else {
+        el.removeAttribute("data-expired");
       }
     });
     if (needsRerender) scheduleRenderAvailable();
-  }, 1000);
+  };
+  if (countdownTickTimer) return;
+  tick();
+  countdownTickTimer = setInterval(tick, 1000);
 }
 
 function updateAvailableBadges() {
-  const currentCount = availableJobs.filter(function(j) {
-    return j.status === "available" && isCurrentBookingJob(j);
-  }).length;
-  const futureCount = availableJobs.filter(function(j) {
-    return j.status === "available" && isFutureJob(j);
-  }).length;
-  const groupCount = availableJobs.filter(function(j) {
-    return isGroupDispatchQueueJob(j) && isCurrentJob(j);
-  }).length;
+  let currentCount = 0;
+  let futureCount = 0;
+  let groupCount = 0;
+  availableJobs.forEach(function(j) {
+    if (j.status === "available" && isCurrentBookingJob(j)) currentCount++;
+    if (j.status === "available" && isFutureJob(j)) futureCount++;
+    if (isGroupDispatchQueueJob(j) && isCurrentJob(j)) groupCount++;
+  });
   const navBadge = document.getElementById("availableBadge");
   if (navBadge) {
     navBadge.textContent = currentCount + groupCount;
@@ -3119,13 +4014,10 @@ async function saveCustomerRecord(job) {
   }
 }
 
-function renderOperatorFilterRow() {
-  const row = document.getElementById("operatorFilterRow");
-  if (!row) return;
-  row.innerHTML = teamOperators.map(function(name, i) {
-    const sel = name === selectedFilterOperator ? " selected" : "";
-    return '<button type="button" class="filterOpBtn' + sel + '" onclick="setFilterOperator(' + i + ')">' + escapeHtml(name) + '</button>';
-  }).join("");
+function renderOperatorFilterRow() {}
+
+function getFilterOperatorInput() {
+  return (document.getElementById("filterOperatorName").value || "").trim();
 }
 
 function docsToJobs(docs) {
@@ -3281,36 +4173,26 @@ function toggleFilterPanel() {
   document.getElementById("filterPanel").classList.toggle("open");
 }
 
-function setFilterOperator(index) {
-  selectedFilterOperator = teamOperators[index];
-  renderOperatorFilterRow();
-  maybeAutoFilter();
-}
-
 function setFilterType(type) {
   selectedFilterType = type;
   document.getElementById("filterDispatched").classList.toggle("selected", type === "dispatched");
   document.getElementById("filterCompleted").classList.toggle("selected", type === "completed");
-  maybeAutoFilter();
 }
 
-function maybeAutoFilter() {
-  if (selectedFilterOperator && selectedFilterType) applyPreviousFilter();
-}
-
-function applyPreviousFilterClient(op) {
-  const key = op.trim().toLowerCase();
+function applyPreviousFilterClient(opKey, displayName) {
+  const key = opKey.trim().toLowerCase();
   const source = historyJobs.length ? historyJobs : completedJobs;
   filterResultJobs = source.filter(function(j) {
     if (selectedFilterType === "completed") {
-      return j.status === "completed" && (j.completedBy || "").trim().toLowerCase() === key;
+      return j.status === "completed" &&
+        (j.completedBy || "").trim().toLowerCase().indexOf(key) !== -1;
     }
-    return (j.operator || "").trim().toLowerCase() === key &&
+    return (j.operator || "").trim().toLowerCase().indexOf(key) !== -1 &&
       j.status !== "available" && j.status !== "accepted";
   });
   filterResultJobs = sortPreviousJobs(filterResultJobs);
   document.getElementById("previousListHint").textContent =
-    "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + op;
+    "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + (displayName || opKey);
   scheduleRenderPrevious();
 }
 
@@ -3327,9 +4209,10 @@ function runCustomerLookup() {
   selectedFilterOperator = "";
   selectedFilterType = "";
   stopFilterSubscription();
-  document.querySelectorAll(".filterOpBtn").forEach(function(b) { b.classList.remove("selected"); });
   document.getElementById("filterDispatched").classList.remove("selected");
   document.getElementById("filterCompleted").classList.remove("selected");
+  const opFilterEl = document.getElementById("filterOperatorName");
+  if (opFilterEl) opFilterEl.value = "";
 
   function applyCustomerFilter(sourceJobs) {
     filterResultJobs = sourceJobs.filter(function(j) {
@@ -3367,14 +4250,34 @@ function runCustomerLookup() {
 
 function applyPreviousFilter() {
   if (!requireOperator("search previous jobs")) return;
-  if (!selectedFilterOperator) { alert("Select an operator"); return; }
+  const raw = getFilterOperatorInput();
+  if (!raw) { alert("Enter operator name"); return; }
   if (!selectedFilterType) { alert("Select Dispatched or Completed"); return; }
 
   customerLookupActive = false;
   previousFilterActive = true;
   stopFilterSubscription();
 
-  const op = selectedFilterOperator;
+  const canonical = resolveOperator(raw);
+  selectedFilterOperator = canonical || raw;
+  const op = canonical || raw;
+  const displayName = canonical || raw;
+
+  if (!canonical) {
+    if (!historyJobs.length) {
+      db.collection("jobs").orderBy("dispatchedAt", "desc").limit(150).get().then(function(snap) {
+        historyJobs = docsToJobs(snap.docs);
+        applyPreviousFilterClient(raw, displayName);
+      }).catch(function(err) {
+        console.error(err);
+        applyPreviousFilterClient(raw, displayName);
+      });
+    } else {
+      applyPreviousFilterClient(raw, displayName);
+    }
+    return;
+  }
+
   let query;
   if (selectedFilterType === "completed") {
     query = db.collection("jobs")
@@ -3398,17 +4301,17 @@ function applyPreviousFilter() {
     }
     filterResultJobs = sortPreviousJobs(jobs);
     document.getElementById("previousListHint").textContent =
-      "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + op;
+      "Showing " + filterResultJobs.length + " " + selectedFilterType + " job(s) for " + displayName;
     scheduleRenderPrevious();
   }, function(err) {
     console.error("Filter index may be needed:", err);
     if (!historyJobs.length) {
       db.collection("jobs").orderBy("dispatchedAt", "desc").limit(150).get().then(function(snap) {
         historyJobs = docsToJobs(snap.docs);
-        applyPreviousFilterClient(op);
+        applyPreviousFilterClient(raw, displayName);
       });
     } else {
-      applyPreviousFilterClient(op);
+      applyPreviousFilterClient(raw, displayName);
     }
   });
 }
@@ -3424,14 +4327,15 @@ function clearPreviousFilter() {
   customerLookupActive = false;
   filterResultJobs = [];
   stopFilterSubscription();
-  document.querySelectorAll(".filterOpBtn").forEach(function(b) { b.classList.remove("selected"); });
   document.getElementById("filterDispatched").classList.remove("selected");
   document.getElementById("filterCompleted").classList.remove("selected");
   const nameEl = document.getElementById("customerLookupName");
   const phoneEl = document.getElementById("customerLookupPhone");
+  const opFilterEl = document.getElementById("filterOperatorName");
   if (nameEl) nameEl.value = "";
   if (phoneEl) phoneEl.value = "";
-  document.getElementById("previousListHint").textContent = "Tap to view or reload into New Booking";
+  if (opFilterEl) opFilterEl.value = "";
+  document.getElementById("previousListHint").textContent = "Most recent completed at top · tap to view or reload";
   scheduleRenderPrevious();
 }
 
@@ -3484,6 +4388,19 @@ function formatDispatchedTimeOnly(job) {
   else if (job.dispatchedAt.seconds) d = new Date(job.dispatchedAt.seconds * 1000);
   else return "—";
   return d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true }).toUpperCase();
+}
+
+function formatCompletedTimeOnly(job) {
+  const ts = job.completedAt;
+  if (!ts) return "—";
+  let d;
+  if (ts.toDate) d = ts.toDate();
+  else if (ts.seconds) d = new Date(ts.seconds * 1000);
+  else return "—";
+  const now = new Date();
+  const timeStr = d.toLocaleTimeString("en-AU", { hour: "numeric", minute: "2-digit", hour12: true }).toUpperCase();
+  if (d.toDateString() === now.toDateString()) return timeStr;
+  return d.toLocaleDateString("en-AU", { day: "numeric", month: "short" }).toUpperCase() + " " + timeStr;
 }
 
 function getJobScheduleHeader(job) {
@@ -3540,8 +4457,8 @@ function jobCardHeaderGridHtml(job, docId, source, opts) {
     }
   } else if (docId && source === "available" && isQuickOrReadyJob(job) && job.status === "available") {
     if (isGroupDispatchQueueJob(job)) {
-      rightHtml = '<div class="jcHeadActs"><div class="jcHeadBoxLbl">GROUP</div>' +
-        '<div class="jcCountdown" style="font-size:11px">DISPATCH</div></div>';
+      rightHtml = '<div class="jcHeadActs jcHeadCountdown"><div class="jcHeadBoxLbl">GROUP READY</div>' +
+        '<div class="jcCountdown" style="font-size:clamp(14px,4vw,18px);color:#fb923c">DISPATCH</div></div>';
     } else {
       rightHtml = jobCountdownHtml(job);
     }
@@ -3586,9 +4503,13 @@ function jobCardFooterHtml(job, source, options) {
   const dispatchBy = (job.operator || "—").toUpperCase();
   const docId = options.docId || job.docId || "";
   const isActive = job.status === "available" || job.status === "accepted";
+  let col1Lbl = "🕐 DISPATCHED";
+  let col1Val = dispatched;
   let col3Html;
 
   if (source === "previous" && job.status === "completed") {
+    col1Lbl = "✓ COMPLETED";
+    col1Val = formatCompletedTimeOnly(job);
     col3Html = '<div class="jcFootCol"><div class="jcFootLbl">✓ COMPLETED BY</div><div class="jcFootVal blue">' +
       escapeHtml((job.completedBy || "—").toUpperCase()) + '</div></div>';
   } else if (source === "previous" && job.status === "cancelled") {
@@ -3602,7 +4523,7 @@ function jobCardFooterHtml(job, source, options) {
   }
 
   return '<div class="jcFooter">' +
-    '<div class="jcFootCol"><div class="jcFootLbl">🕐 DISPATCHED</div><div class="jcFootVal blue">' + escapeHtml(dispatched) + '</div></div>' +
+    '<div class="jcFootCol"><div class="jcFootLbl">' + col1Lbl + '</div><div class="jcFootVal blue">' + escapeHtml(col1Val) + '</div></div>' +
     '<div class="jcFootCol"><div class="jcFootLbl">👤 DISPATCHED BY</div><div class="jcFootVal blue">' + escapeHtml(dispatchBy) + '</div></div>' +
     col3Html +
     '</div>';
@@ -3665,7 +4586,12 @@ function jobCardHeaderHtml(job, docId, source) {
 
 function buildJobCardHtml(job, docId, source, actionsHtml, extraHtml) {
   const isAccepted = job.status === "accepted";
-  const cardClass = "jobCard jobCardSwipe" + (source === "available" && isAccepted ? " jobCardAccepted" : "");
+  let cardClass = "jobCard jobCardSwipe";
+  if (source === "available" && isAccepted) cardClass += " jobCardAccepted";
+  else if (source === "available" && isGroupDispatchQueueJob(job)) cardClass += " jobCardGroup";
+  else if (source === "available" && isQuickOrReadyJob(job) && job.status === "available" && getAcceptWindowRemainingMs(job) > 0) {
+    cardClass += " jobCardCountdown";
+  } else if (isFutureJob(job)) cardClass += " jobCardFuture";
   return '<div class="' + cardClass + '" data-doc-id="' + docId + '" onclick="openJobModal(\'' + docId + '\',\'' + source + '\')">' +
     jobCardHeaderHtml(job, docId, source) +
     jobCardPersonHtml(job, source) +
@@ -3696,10 +4622,16 @@ function openPinModal(action, docId) {
     title.textContent = "Enter PIN to Edit Job";
     btn.textContent = "Continue";
     btn.style.background = "#2563eb";
+  } else if (action === "admin") {
+    title.textContent = "Enter Master PIN for Admin";
+    btn.textContent = "Unlock";
+    btn.style.background = "#d4af37";
+    btn.style.color = "#1a1200";
   } else {
     title.textContent = "Enter PIN to Edit Points";
     btn.textContent = "Continue";
     btn.style.background = "#2563eb";
+    btn.style.color = "";
   }
   document.getElementById("pinInput").value = "";
   document.getElementById("pinModal").classList.add("open");
@@ -3730,7 +4662,7 @@ function promptProspectEdit() {
 }
 
 function confirmPinAction() {
-  if (document.getElementById("pinInput").value !== DELETE_PIN) {
+  if (document.getElementById("pinInput").value !== getMasterPin()) {
     alert("Wrong PIN");
     return;
   }
@@ -3746,6 +4678,10 @@ function confirmPinAction() {
   } else if (pinAction === "prospect") {
     closePinModal();
     enableProspectEdit();
+  } else if (pinAction === "admin") {
+    closePinModal();
+    setAdminUnlocked(true);
+    showToast("Admin area unlocked");
   }
 }
 
@@ -3798,7 +4734,7 @@ async function confirmCancelJob() {
 }
 
 async function confirmDeleteJob() {
-  if (document.getElementById("pinInput").value !== DELETE_PIN) {
+  if (document.getElementById("pinInput").value !== getMasterPin()) {
     alert("Wrong PIN");
     return;
   }
@@ -3931,8 +4867,8 @@ function subscribeAvailableJobs() {
             const after = Object.assign({ docId: change.doc.id }, change.doc.data());
             const prev = prevMap[after.docId];
             if (after.status === "available" && after.groupDispatchReady &&
-                (!prev || !prev.groupDispatchReady) && after.sessionId !== sessionId && !pushTokenSaved) {
-              showGroupDispatchAlert(after);
+                (!prev || !prev.groupDispatchReady)) {
+              notifyGroupDispatchReady(after);
             }
           }
         });
@@ -3983,6 +4919,16 @@ function subscribeAvailableJobsFallback() {
     });
 }
 
+function jobListRenderSig(jobs) {
+  return jobs.map(function(j) {
+    return [
+      j.docId, j.status, j.groupDispatchReady, j.groupDispatched, j.acceptedBy || "",
+      j.fare || "", j.edited ? "1" : "0", j.pickup || "", j.drop || "", j.name || "",
+      j.time || "", j.phone || "", j.vehicle || ""
+    ].join(":");
+  }).join("|");
+}
+
 function renderAvailableList() {
   const el = document.getElementById("availableList");
   const jobs = availableJobs.filter(function(job) {
@@ -3996,14 +4942,25 @@ function renderAvailableList() {
     return (a.sortKey || 0) - (b.sortKey || 0);
   });
   if (!jobs.length) {
+    el.dataset.renderSig = "";
     const emptyLabels = { current: "current", future: "later", group: "group dispatch" };
     const label = emptyLabels[availableView] || "current";
     el.innerHTML = '<div class="emptyState"><div class="icon">🚖</div>No ' + label + ' bookings<br><span style="font-size:11px;font-weight:700">' +
       (availableView === "group"
         ? "Quick & Ready jobs move here when accept time ends"
         : "Same-day jobs here · Next-day jobs under Later") + '</span></div>';
+    if (countdownTickTimer) {
+      clearInterval(countdownTickTimer);
+      countdownTickTimer = null;
+    }
     return;
   }
+  const sig = availableView + "|" + jobListRenderSig(jobs);
+  if (el.dataset.renderSig === sig) {
+    ensureCountdownTicker();
+    return;
+  }
+  el.dataset.renderSig = sig;
   el.innerHTML = jobs.map(function(job) {
     return buildJobCardHtml(job, job.docId, "available", buildAvailableActionsHtml(job), "");
   }).join("");
@@ -4016,9 +4973,13 @@ function renderPreviousList() {
   const jobs = getPreviousJobsToRender();
   previousJobs = jobs;
   if (!jobs.length) {
+    el.dataset.renderSig = "";
     el.innerHTML = '<div class="emptyState"><div class="icon">📋</div>No jobs found</div>';
     return;
   }
+  const sig = jobListRenderSig(jobs);
+  if (el.dataset.renderSig === sig) return;
+  el.dataset.renderSig = sig;
   el.innerHTML = jobs.map(function(job) {
     return buildJobCardHtml(job, job.docId, "previous", "", "");
   }).join("");
@@ -4264,6 +5225,20 @@ async function recallJob(docId) {
   }
 }
 
+function focusFareInput() {
+  const fareEl = document.getElementById("fareInput");
+  if (!fareEl) return;
+  fareEl.removeAttribute("readonly");
+  focusModalInput(fareEl, false);
+}
+
+function openFareModalReady() {
+  const fareEl = document.getElementById("fareInput");
+  if (fareEl) fareEl.removeAttribute("readonly");
+  const nameEl = document.getElementById("completedByNameInput");
+  if (nameEl && nameEl.style.display !== "none") nameEl.removeAttribute("readonly");
+}
+
 function resetFareModal() {
   document.getElementById("fareModalTitle").textContent = "Enter Fare";
   document.getElementById("fareModalHint").textContent = "Trip fare to complete this job";
@@ -4288,6 +5263,7 @@ async function completeJob(docId) {
   const fareEl = document.getElementById("fareInput");
   fareEl.value = job && job.price ? String(job.price).replace(/[^0-9.]/g, "") : "";
   document.getElementById("fareModal").classList.add("open");
+  openFareModalReady();
   focusModalInput(fareEl, true);
 }
 
@@ -4336,12 +5312,15 @@ function showGroupCompleteModal(docId) {
   const fareEl = document.getElementById("fareInput");
   fareEl.value = job && job.price ? String(job.price).replace(/[^0-9.]/g, "") : "";
   document.getElementById("fareModal").classList.add("open");
+  openFareModalReady();
   focusModalInput(nameEl, false);
 }
 
 function completeGroupJob(docId) {
   if (!requireOperator("complete jobs")) return;
-  resetFareModal();
+  pendingFreeDispatchDocId = null;
+  pendingCompleteDocId = null;
+  document.getElementById("completedByRow").style.display = "none";
   showGroupCompleteModal(docId);
 }
 
@@ -4546,17 +5525,18 @@ function alertNewJobArrival() {
   }
 }
 
-async function openJobFromNotification(docId, playAlert) {
+async function openJobFromNotification(docId, playAlert, pushType) {
   if (!docId) return;
+  pushType = pushType || "";
   if (!getCurrentOperator()) {
     sessionStorage.setItem("pendingOpenJob", docId);
+    sessionStorage.setItem("pendingOpenJobType", pushType);
     sessionStorage.setItem("pendingOpenJobAlert", playAlert ? "1" : "0");
     return;
   }
   sessionStorage.removeItem("pendingOpenJob");
+  sessionStorage.removeItem("pendingOpenJobType");
   sessionStorage.removeItem("pendingOpenJobAlert");
-  const tabBtn = document.querySelector('[data-tab="tabAvailable"]');
-  if (tabBtn) switchTab("tabAvailable", tabBtn);
 
   let job = findJobById(docId);
   if (!job && firebaseReady && db) {
@@ -4567,36 +5547,87 @@ async function openJobFromNotification(docId, playAlert) {
       console.warn("Job fetch failed", e);
     }
   }
-  if (job && isGroupDispatchQueueJob(job)) setAvailableView("group");
-  else if (job && isFutureJob(job)) setAvailableView("future");
-  else setAvailableView("current");
 
-  const source = job && job.status === "completed" ? "completed" : "available";
-  let opened = await openJobModalAsync(docId, source);
+  if (job && (job.status === "completed" || job.status === "cancelled")) {
+    const prevTab = document.querySelector('[data-tab="tabPrevious"]');
+    if (prevTab) switchTab("tabPrevious", prevTab);
+    let opened = await openJobModalAsync(docId, "previous");
+    if (!opened) {
+      for (let i = 0; i < 25; i++) {
+        await new Promise(function(r) { setTimeout(r, 60); });
+        opened = await openJobModalAsync(docId, "previous");
+        if (opened) break;
+      }
+    }
+    if (playAlert) alertNewJobArrival();
+    return;
+  }
+
+  const availTab = document.querySelector('[data-tab="tabAvailable"]');
+  if (availTab) switchTab("tabAvailable", availTab);
+
+  if (pushType === "group_dispatch" || (job && isGroupDispatchQueueJob(job))) {
+    setAvailableView("group");
+  } else if (job && isFutureJob(job)) {
+    setAvailableView("future");
+  } else {
+    setAvailableView("current");
+  }
+
+  let opened = await openJobModalAsync(docId, "available");
   if (!opened) {
     for (let i = 0; i < 25; i++) {
       await new Promise(function(r) { setTimeout(r, 60); });
-      opened = await openJobModalAsync(docId, source);
+      opened = await openJobModalAsync(docId, "available");
       if (opened) break;
     }
   }
   if (playAlert) alertNewJobArrival();
 }
 
-function queueOpenJobFromPush(docId, playAlert) {
+function routePushNotification(pushType, docId, playAlert) {
+  pushType = pushType || "";
+  if (pushType === "team_chat") {
+    openTeamChatFromPush();
+    return;
+  }
+  if (pushType === "test_push") {
+    if (playAlert) alertNewJobArrival();
+    showToast("Test push received");
+    return;
+  }
+  if (docId) openJobFromNotification(docId, !!playAlert, pushType);
+}
+
+function queueOpenJobFromPush(docId, playAlert, pushType) {
+  pushType = pushType || "";
+  if (pushType === "team_chat") {
+    let tries = 0;
+    function attemptChat() {
+      if (getCurrentOperator()) {
+        openTeamChatFromPush();
+        return;
+      }
+      sessionStorage.setItem("pendingPushTab", "team");
+      if (tries++ < 80) setTimeout(attemptChat, 50);
+    }
+    attemptChat();
+    return;
+  }
   let tries = 0;
   function attempt() {
     if (firebaseReady && getCurrentOperator()) {
-      openJobFromNotification(docId, playAlert);
+      openJobFromNotification(docId, playAlert, pushType);
       return;
     }
     if (firebaseReady && !getCurrentOperator()) {
       sessionStorage.setItem("pendingOpenJob", docId);
+      sessionStorage.setItem("pendingOpenJobType", pushType);
       sessionStorage.setItem("pendingOpenJobAlert", playAlert ? "1" : "0");
       return;
     }
     if (tries++ < 80) setTimeout(attempt, 50);
-    else openJobFromNotification(docId, playAlert);
+    else openJobFromNotification(docId, playAlert, pushType);
   }
   attempt();
 }
@@ -4613,42 +5644,43 @@ function openTeamChatFromPush() {
 
 function handlePushNavigation(msg) {
   if (!msg) return;
-  if (msg.type === "openPush") {
-    if (msg.pushType === "team_chat" || msg.tab === "team") {
-      openTeamChatFromPush();
-      return;
-    }
-    if (msg.docId) queueOpenJobFromPush(msg.docId, false);
-    return;
-  }
-  if (msg.type === "openJob" && msg.docId) {
-    if (msg.pushType === "team_chat") {
-      openTeamChatFromPush();
-      return;
-    }
-    queueOpenJobFromPush(msg.docId, false);
+  const pushType = msg.pushType || (msg.tab === "team" ? "team_chat" : "");
+  const docId = msg.docId || "";
+  if (msg.type === "openPush" || msg.type === "openJob") {
+    routePushNotification(pushType, docId, false);
   }
 }
 
 function processPendingOpenJob() {
+  const pendingTab = sessionStorage.getItem("pendingPushTab");
+  if (pendingTab === "team" && getCurrentOperator()) {
+    sessionStorage.removeItem("pendingPushTab");
+    openTeamChatFromPush();
+    return;
+  }
   const docId = sessionStorage.getItem("pendingOpenJob");
   if (!docId || !getCurrentOperator()) return;
+  const pushType = sessionStorage.getItem("pendingOpenJobType") || "";
   const playAlert = sessionStorage.getItem("pendingOpenJobAlert") === "1" && !pushTokenSaved;
-  queueOpenJobFromPush(docId, playAlert);
+  sessionStorage.removeItem("pendingOpenJob");
+  sessionStorage.removeItem("pendingOpenJobType");
+  sessionStorage.removeItem("pendingOpenJobAlert");
+  routePushNotification(pushType, docId, playAlert);
 }
 
 function handleNotificationDeepLink() {
   const params = new URLSearchParams(window.location.search);
   const tab = params.get("tab");
-  if (tab === "team") {
+  const pushType = params.get("type") || "";
+  if (tab === "team" || pushType === "team_chat") {
     history.replaceState({}, "", window.location.pathname);
-    setTimeout(openTeamChatFromPush, 300);
+    setTimeout(function() { queueOpenJobFromPush("", false, "team_chat"); }, 300);
     return;
   }
   const docId = params.get("job");
   if (!docId) return;
   history.replaceState({}, "", window.location.pathname);
-  queueOpenJobFromPush(docId, false);
+  queueOpenJobFromPush(docId, false, pushType);
 }
 
 function extractSuburbFromAddress(address) {
@@ -5291,6 +6323,9 @@ window.addEventListener("DOMContentLoaded", function() {
   });
   document.getElementById("fareInput").addEventListener("keydown", function(e) {
     if (e.key === "Enter") confirmCompleteJob();
+  });
+  document.getElementById("opLoginName").addEventListener("keydown", function(e) {
+    if (e.key === "Enter") document.getElementById("opLoginPin").focus();
   });
   document.getElementById("opLoginPin").addEventListener("keydown", function(e) {
     if (e.key === "Enter") confirmOperatorLogin();
