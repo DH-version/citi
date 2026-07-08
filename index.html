@@ -317,14 +317,16 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 }
 .teamToggle{display:flex;gap:6px;margin-bottom:10px;width:100%}
 .teamToggle button{flex:1;margin:0;font-size:10px;padding:10px 4px;line-height:1.2;min-width:0}
-#tabTeam .teamAdminLayout{
-  display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden;
+#tabTeam #teamAdminPanel.teamAdminLayout{
+  display:flex;flex-direction:column;flex:1;min-height:0;
+  overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
 #teamAdminPanel{
-  flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  flex:1;min-height:0;
   border:1px solid var(--border);border-radius:var(--radius-sm);
-  padding:10px;background:rgba(7,11,18,.55);
+  padding:10px;padding-bottom:24px;background:rgba(7,11,18,.55);
 }
+#adminContent{display:block}
 .adminLocked{
   text-align:center;padding:36px 16px;color:var(--text-muted);
 }
@@ -548,12 +550,26 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .jdCancelRow{padding:10px 12px;border-bottom:1px solid #333;text-align:center}
 .jdList .jcPerson,.jdList .jcRoute,.jdList .jcFooter,.jdList .jcHead{border-left:none;border-right:none}
 .qbField{font-size:17px;padding:13px;margin-bottom:8px}
-.jobList{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:4px;padding:2px 2px 14px}
+.jobList{display:flex;flex-direction:column;gap:9px;margin-top:4px;padding:2px 2px 14px}
 .jobList .jobCard{
-  content-visibility:auto;contain-intrinsic-size:auto 220px;
-  width:75%;max-width:75%;
+  content-visibility:auto;contain-intrinsic-size:auto 165px;
+  width:100%;max-width:100%;
 }
-.jobList .emptyState{width:75%;max-width:75%}
+.jobList .jobCard .jcHead{min-height:59px}
+.jobList .jobCard .jcHeadJob{padding:8px 6px}
+.jobList .jobCard .jcHeadSched{padding:4px 6px;gap:2px}
+.jobList .jobCard .jcPerson{min-height:48px}
+.jobList .jobCard .jcAvatar{flex:0 0 42px}
+.jobList .jobCard .jcPersonInfo{padding:4px 0}
+.jobList .jobCard .jcAddrRow{min-height:40px}
+.jobList .jobCard .jcAddrBox{padding:6px 8px}
+.jobList .jobCard .jcAddrLbl{padding:3px 5px}
+.jobList .jobCard .jcMapsBtn{min-width:48px;height:32px}
+.jobList .jobCard .jcFootCol{padding:7px 5px}
+.jobList .jobCard .jcVehicle{padding:6px 8px}
+.jobList .jobCard .jcExtra{padding:4px 8px}
+.jobList .jobCard .jobActions button{padding:12px 8px!important}
+.jobList .jobCard .jcHeadActs.jcHeadCountdown{padding:7px 6px;min-width:96px}
 
 /* —— Job card (dispatch theme) —— */
 .jobCard{
@@ -1369,11 +1385,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 
   <div id="teamAdminPanel" class="teamAdminLayout" style="display:none">
     <div class="listHeader">Admin · Operators &amp; app settings</div>
-    <div id="adminLocked" class="adminLocked">
-      <p>Master PIN required for admin access</p>
-      <button class="btnPrimary" onclick="promptAdminUnlock()">Unlock Admin Area</button>
-    </div>
-    <div id="adminContent" style="display:none">
+    <div id="adminContent">
       <div class="adminSection">
         <div class="adminSectionTitle">Operator Accounts</div>
         <div id="adminOpCount" class="adminCount"></div>
@@ -1912,17 +1924,12 @@ function setAdminUnlocked(unlocked) {
 }
 
 function updateAdminPanelVisibility() {
-  const unlocked = isAdminUnlocked();
-  const lockedEl = document.getElementById("adminLocked");
   const contentEl = document.getElementById("adminContent");
-  if (lockedEl) lockedEl.style.display = unlocked ? "none" : "block";
-  if (contentEl) contentEl.style.display = unlocked ? "block" : "none";
-  if (unlocked) {
-    renderAdminOperatorList();
-    renderAdminProspectSetup();
-    syncAdminAcceptWindowInputs();
-    syncAdminBroadcastInputs();
-  }
+  if (contentEl) contentEl.style.display = "block";
+  renderAdminOperatorList();
+  renderAdminProspectSetup();
+  syncAdminAcceptWindowInputs();
+  syncAdminBroadcastInputs();
 }
 
 function syncAdminAcceptWindowInputs() {
