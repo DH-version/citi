@@ -548,8 +548,12 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
 .jdCancelRow{padding:10px 12px;border-bottom:1px solid #333;text-align:center}
 .jdList .jcPerson,.jdList .jcRoute,.jdList .jcFooter,.jdList .jcHead{border-left:none;border-right:none}
 .qbField{font-size:17px;padding:13px;margin-bottom:8px}
-.jobList{display:flex;flex-direction:column;gap:12px;margin-top:4px;padding:2px 2px 14px}
-.jobList .jobCard{content-visibility:auto;contain-intrinsic-size:auto 220px}
+.jobList{display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:4px;padding:2px 2px 14px}
+.jobList .jobCard{
+  content-visibility:auto;contain-intrinsic-size:auto 220px;
+  width:75%;max-width:75%;
+}
+.jobList .emptyState{width:75%;max-width:75%}
 
 /* —— Job card (dispatch theme) —— */
 .jobCard{
