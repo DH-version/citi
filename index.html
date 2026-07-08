@@ -327,6 +327,51 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   padding:10px;padding-bottom:24px;background:rgba(7,11,18,.55);
 }
 #adminContent{display:none}
+body.awaitingLogin .appHeader,
+body.awaitingLogin .syncWrap,
+body.awaitingLogin .tabPanel,
+body.awaitingLogin .bottomNav,
+body.awaitingLogin .alertToast,
+body.awaitingLogin .opToast,
+html.awaitingLogin .appHeader,
+html.awaitingLogin .syncWrap,
+html.awaitingLogin .tabPanel,
+html.awaitingLogin .bottomNav,
+html.awaitingLogin .alertToast,
+html.awaitingLogin .opToast{
+  visibility:hidden;pointer-events:none;
+}
+body.awaitingLogin #operatorLoginModal.open,
+html.awaitingLogin #operatorLoginModal{
+  display:flex!important;z-index:500;
+  align-items:center;justify-content:center;padding:16px;
+  background-color:#0a1018;
+  background-image:
+    linear-gradient(180deg,rgba(7,11,18,.34) 0%,rgba(10,16,24,.4) 50%,rgba(7,11,18,.48) 100%),
+    var(--city-bg,url("./bg-night.png"));
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+.adminAccordion{display:flex;flex-direction:column;gap:8px}
+.adminAccordionItem{
+  background:var(--bg-card);border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);overflow:hidden;
+}
+.adminAccordionHead{
+  width:100%;display:flex;justify-content:space-between;align-items:center;
+  gap:10px;padding:12px 14px;margin:0!important;
+  background:var(--bg-elevated)!important;border:none!important;
+  box-shadow:none!important;border-radius:0!important;
+  font-size:12px;font-weight:800;color:var(--gold);text-align:left;cursor:pointer;
+}
+.adminAccordionChevron{
+  flex:0 0 auto;font-size:16px;color:var(--text-muted);line-height:1;
+  transition:transform .15s ease;
+}
+.adminAccordionItem.open .adminAccordionChevron{transform:rotate(90deg);color:var(--gold)}
+.adminAccordionBody{display:none;padding:0 12px 12px}
+.adminAccordionItem.open .adminAccordionBody{display:block}
 .adminLocked{
   text-align:center;padding:36px 16px;color:var(--text-muted);
 }
@@ -401,7 +446,14 @@ button:active:not(:disabled){transform:scale(.98);filter:brightness(.95)}
   background:var(--bg-elevated);color:var(--text);border:1px solid var(--border-strong);
   border-radius:var(--radius-sm);box-sizing:border-box;resize:vertical;margin-bottom:8px;
 }
-.adminToggleRow{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12px;font-weight:600}
+.adminPassForm{display:flex;flex-direction:column;gap:8px}
+.adminPassForm input{
+  width:100%;padding:12px;font-size:16px;font-weight:600;
+  background:var(--bg-elevated);color:var(--text);border:1px solid var(--border-strong);
+  border-radius:var(--radius-sm);box-sizing:border-box;
+}
+.adminPassFieldWrap{position:relative}
+.adminPassFieldWrap .phoneSuggestList{z-index:30}
 #tabTeam.active{
   display:flex;flex-direction:column;
   height:calc(100dvh - 62px - env(safe-area-inset-top) - 12px);
@@ -1165,6 +1217,23 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .opToast.error{background:rgba(127,29,29,.95);border-color:rgba(248,113,113,.3)}
 .opToast.show{display:block;animation:toastIn .2s ease}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.updateBanner{
+  display:none;position:fixed;top:max(8px,env(safe-area-inset-top));left:8px;right:8px;
+  max-width:414px;margin:0 auto;z-index:650;
+  align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 12px;
+  background:linear-gradient(180deg,#1e3a5f 0%,#152238 100%);
+  border:1px solid rgba(212,175,55,.45);border-radius:var(--radius-sm);
+  box-shadow:var(--shadow);
+}
+.updateBanner.show{display:flex;animation:popIn .28s cubic-bezier(.22,1,.36,1)}
+.updateBannerText{font-size:12px;font-weight:700;color:var(--text);line-height:1.35;flex:1}
+.updateBannerBtn{
+  flex-shrink:0;margin:0!important;padding:8px 14px!important;
+  font-size:12px!important;font-weight:800!important;
+  background:linear-gradient(180deg,var(--gold) 0%,#b8941f 100%)!important;
+  color:#0f172a!important;border:none!important;border-radius:999px!important;
+}
 .editModeBanner{
   display:none;background:var(--gold-soft);color:var(--gold);font-weight:700;
   font-size:12px;text-align:center;padding:10px 8px;
@@ -1178,6 +1247,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   background:#222!important;color:#fff!important;border:1px solid #555!important;
 }
 </style>
+<script>
+try{if(!sessionStorage.getItem("operatorPinSession"))document.documentElement.classList.add("awaitingLogin")}catch(e){}
+</script>
 </head>
 <body>
 
@@ -1192,6 +1264,10 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <p id="alertText">Tap to view</p>
 </div>
 <div id="opToast" class="opToast"></div>
+<div id="updateBanner" class="updateBanner" role="status" aria-live="polite">
+  <span class="updateBannerText">New app version ready — tap to load latest changes</span>
+  <button type="button" class="updateBannerBtn" onclick="applyAppUpdate()">Update</button>
+</div>
 
 <!-- TAB 1: NEW BOOKING -->
 <div id="tabNew" class="tabPanel active">
@@ -1354,7 +1430,7 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   <div class="teamToggle availToggle">
     <button id="teamNoticeBtn" class="filterTypeBtn selected" onclick="setTeamView('notice')">Team Chat</button>
     <button id="teamProspectBtn" class="filterTypeBtn" onclick="setTeamView('prospect')">Prospect Tracker</button>
-    <button id="teamAdminBtn" class="filterTypeBtn" onclick="setTeamView('admin')">Admin Area</button>
+    <button id="teamAdminBtn" class="filterTypeBtn" onclick="setTeamView('admin')">Management</button>
   </div>
 
   <div id="teamNoticePanel" class="teamNoticeLayout">
@@ -1384,9 +1460,9 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   </div>
 
   <div id="teamAdminPanel" class="teamAdminLayout" style="display:none">
-    <div class="listHeader">Admin · Operators &amp; app settings</div>
+    <div class="listHeader">Management · Operators &amp; app settings</div>
     <div id="adminLocked" class="adminLocked">
-      <p>Enter master PIN to access admin tools</p>
+      <p>Enter master PIN to access management tools</p>
       <button class="btnPrimary" onclick="promptAdminUnlock()">Enter PIN</button>
     </div>
     <div id="adminContent">
@@ -1401,73 +1477,128 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
         </div>
         <p class="adminHint">Remove operator deletes their PIN. Reset PIN clears it so they set a new one at next login.</p>
       </div>
-      <div class="adminSection">
-        <div class="adminSectionTitle">1 · Force Sign-Out All Devices</div>
-        <p class="adminHint">Logs every operator out on every phone immediately.</p>
-        <button type="button" class="btnAdminDanger adminToolBtn" onclick="adminForceSignOutAll()">Sign Out Everyone</button>
-      </div>
-      <div class="adminSection">
-        <div class="adminSectionTitle">2 · Broadcast Team Message</div>
-        <textarea id="adminBroadcastText" class="adminTextarea" placeholder="Pinned message shown on next login (e.g. road closure, policy update)"></textarea>
-        <div class="adminToggleRow">
-          <input id="adminBroadcastActive" type="checkbox" checked>
-          <label for="adminBroadcastActive">Show on operator login</label>
+      <div class="adminAccordion">
+        <div class="adminAccordionItem">
+          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
+            <span>1 · Force Sign-Out All Devices</span><span class="adminAccordionChevron">›</span>
+          </button>
+          <div class="adminAccordionBody">
+            <p class="adminHint">Logs every operator out on every phone immediately.</p>
+            <button type="button" class="btnAdminDanger adminToolBtn" onclick="adminForceSignOutAll()">Sign Out Everyone</button>
+          </div>
         </div>
-        <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveBroadcast()">Save Broadcast</button>
-        <button type="button" class="btnSecondary adminToolBtn" onclick="adminClearBroadcast()">Clear Broadcast</button>
-      </div>
-      <div class="adminSection">
-        <div class="adminSectionTitle">3 · Accept Window Times</div>
-        <div class="adminRow2">
-          <label>Quick (min)</label>
-          <input id="adminQuickMins" type="tel" inputmode="numeric" placeholder="1">
+        <div class="adminAccordionItem">
+          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
+            <span>2 · New Passenger Registration</span><span class="adminAccordionChevron">›</span>
+          </button>
+          <div class="adminAccordionBody">
+            <p class="adminHint">Save passenger details for quick lookup when booking. Type a first name to find someone already registered.</p>
+            <div class="adminPassForm">
+              <div class="adminPassFieldWrap">
+                <input id="adminPassName" type="text" placeholder="Passenger name" autocomplete="off" autocapitalize="words">
+                <div id="adminPassNameList" class="phoneSuggestList"></div>
+              </div>
+              <input id="adminPassPhone" type="tel" inputmode="numeric" placeholder="Phone number" autocomplete="off">
+              <input id="adminPassPickup" type="text" placeholder="Pickup address" autocomplete="off">
+              <textarea id="adminPassNotes" class="adminTextarea" placeholder="Notes (driver instructions, preferences…)" rows="3"></textarea>
+              <input type="hidden" id="adminPassDocId" value="">
+              <button type="button" class="btnPrimary adminToolBtn" onclick="adminSavePassenger()">Save Passenger</button>
+              <button type="button" class="btnAdminDanger adminToolBtn" id="adminPassDeleteBtn" onclick="adminDeletePassenger()" style="display:none">Delete Passenger</button>
+              <p id="adminPassStatus" class="adminHint"></p>
+            </div>
+          </div>
         </div>
-        <div class="adminRow2">
-          <label>Ready Now (min)</label>
-          <input id="adminReadyMins" type="tel" inputmode="numeric" placeholder="2">
+        <div class="adminAccordionItem">
+          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
+            <span>3 · Broadcast Team Message</span><span class="adminAccordionChevron">›</span>
+          </button>
+          <div class="adminAccordionBody">
+            <textarea id="adminBroadcastText" class="adminTextarea" placeholder="Pinned message shown on next login (e.g. road closure, policy update)"></textarea>
+            <div class="adminToggleRow">
+              <input id="adminBroadcastActive" type="checkbox" checked>
+              <label for="adminBroadcastActive">Show on operator login</label>
+            </div>
+            <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveBroadcast()">Save Broadcast</button>
+            <button type="button" class="btnSecondary adminToolBtn" onclick="adminClearBroadcast()">Clear Broadcast</button>
+          </div>
         </div>
-        <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveAcceptWindows()">Save Countdown Times</button>
-      </div>
-      <div class="adminSection">
-        <div class="adminSectionTitle">4 · Job Cleanup</div>
-        <div class="adminRow2">
-          <label>Older than (days)</label>
-          <input id="adminCleanupDays" type="tel" inputmode="numeric" value="30">
+        <div class="adminAccordionItem">
+          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
+            <span>4 · Accept Window Times</span><span class="adminAccordionChevron">›</span>
+          </button>
+          <div class="adminAccordionBody">
+            <div class="adminRow2">
+              <label>Quick (min)</label>
+              <input id="adminQuickMins" type="tel" inputmode="numeric" placeholder="1">
+            </div>
+            <div class="adminRow2">
+              <label>Ready Now (min)</label>
+              <input id="adminReadyMins" type="tel" inputmode="numeric" placeholder="2">
+            </div>
+            <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveAcceptWindows()">Save Countdown Times</button>
+          </div>
         </div>
-        <div class="adminToggleRow"><input id="adminCleanupCancelled" type="checkbox" checked><label for="adminCleanupCancelled">Delete cancelled jobs</label></div>
-        <div class="adminToggleRow"><input id="adminCleanupCompleted" type="checkbox"><label for="adminCleanupCompleted">Delete completed jobs</label></div>
-        <button type="button" class="btnAdminDanger adminToolBtn" onclick="adminJobCleanup()">Run Cleanup</button>
-        <p id="adminCleanupResult" class="adminHint"></p>
-      </div>
-      <div class="adminSection">
-        <div class="adminSectionTitle">5 · Push Notification Test</div>
-        <p class="adminHint">Sends a test alert to all registered devices. Deploy admin push function first.</p>
-        <button type="button" class="btnPrimary adminToolBtn" onclick="adminSendTestPush()">Send Test Push to All</button>
-      </div>
-      <div class="adminSection">
-        <div class="adminSectionTitle">6 · Operator Activity (Today)</div>
-        <button type="button" class="btnSecondary adminToolBtn" onclick="loadAdminActivityLog()">Refresh Activity</button>
-        <div id="adminActivityLog" class="adminActivityLog"><div class="adminHint" style="padding:10px">Tap refresh to load today&apos;s activity</div></div>
-      </div>
-      <div class="adminSection">
-        <div class="adminSectionTitle">7 · Prospect Tracker Operators</div>
-        <p class="adminHint">Choose who appears on the Prospect Tracker points table.</p>
-        <div id="adminProspectList" class="adminCheckList"></div>
-        <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveProspectOperators()">Save Prospect List</button>
-      </div>
-      <div class="adminSection">
-        <div class="adminSectionTitle">8 · Master PIN Change</div>
-        <div class="adminRow2">
-          <input id="adminCurrentPin" type="tel" inputmode="numeric" maxlength="4" placeholder="Current PIN">
+        <div class="adminAccordionItem">
+          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
+            <span>5 · Job Cleanup</span><span class="adminAccordionChevron">›</span>
+          </button>
+          <div class="adminAccordionBody">
+            <div class="adminRow2">
+              <label>Older than (days)</label>
+              <input id="adminCleanupDays" type="tel" inputmode="numeric" value="30">
+            </div>
+            <div class="adminToggleRow"><input id="adminCleanupCancelled" type="checkbox" checked><label for="adminCleanupCancelled">Delete cancelled jobs</label></div>
+            <div class="adminToggleRow"><input id="adminCleanupCompleted" type="checkbox"><label for="adminCleanupCompleted">Delete completed jobs</label></div>
+            <button type="button" class="btnAdminDanger adminToolBtn" onclick="adminJobCleanup()">Run Cleanup</button>
+            <p id="adminCleanupResult" class="adminHint"></p>
+          </div>
         </div>
-        <div class="adminRow2">
-          <input id="adminNewPin" type="tel" inputmode="numeric" maxlength="4" placeholder="New 4-digit PIN">
+        <div class="adminAccordionItem">
+          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
+            <span>6 · Push Notification Test</span><span class="adminAccordionChevron">›</span>
+          </button>
+          <div class="adminAccordionBody">
+            <p class="adminHint">Sends a test alert to all registered devices. Deploy admin push function first.</p>
+            <button type="button" class="btnPrimary adminToolBtn" onclick="adminSendTestPush()">Send Test Push to All</button>
+          </div>
         </div>
-        <div class="adminRow2">
-          <input id="adminNewPinConfirm" type="tel" inputmode="numeric" maxlength="4" placeholder="Confirm new PIN">
+        <div class="adminAccordionItem">
+          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
+            <span>7 · Operator Activity (Today)</span><span class="adminAccordionChevron">›</span>
+          </button>
+          <div class="adminAccordionBody">
+            <button type="button" class="btnSecondary adminToolBtn" onclick="loadAdminActivityLog()">Refresh Activity</button>
+            <div id="adminActivityLog" class="adminActivityLog"><div class="adminHint" style="padding:10px">Tap refresh to load today&apos;s activity</div></div>
+          </div>
         </div>
-        <button type="button" class="btnPrimary adminToolBtn" onclick="adminChangeMasterPin()">Change Master PIN</button>
-        <p class="adminHint">Used for admin area, delete, edit, cancel, and prospect edit.</p>
+        <div class="adminAccordionItem">
+          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
+            <span>8 · Prospect Tracker Operators</span><span class="adminAccordionChevron">›</span>
+          </button>
+          <div class="adminAccordionBody">
+            <p class="adminHint">Choose who appears on the Prospect Tracker points table.</p>
+            <div id="adminProspectList" class="adminCheckList"></div>
+            <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveProspectOperators()">Save Prospect List</button>
+          </div>
+        </div>
+        <div class="adminAccordionItem">
+          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
+            <span>9 · Master PIN Change</span><span class="adminAccordionChevron">›</span>
+          </button>
+          <div class="adminAccordionBody">
+            <div class="adminRow2">
+              <input id="adminCurrentPin" type="tel" inputmode="numeric" maxlength="4" placeholder="Current PIN">
+            </div>
+            <div class="adminRow2">
+              <input id="adminNewPin" type="tel" inputmode="numeric" maxlength="4" placeholder="New 4-digit PIN">
+            </div>
+            <div class="adminRow2">
+              <input id="adminNewPinConfirm" type="tel" inputmode="numeric" maxlength="4" placeholder="Confirm new PIN">
+            </div>
+            <button type="button" class="btnPrimary adminToolBtn" onclick="adminChangeMasterPin()">Change Master PIN</button>
+            <p class="adminHint">Used for management, delete, edit, cancel, and prospect edit.</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -1762,6 +1893,93 @@ function showToast(msg, isError) {
   }, isError ? 3500 : 2500);
 }
 
+const DUPLICATE_DISPATCH_WINDOW_MS = 15 * 60 * 1000;
+const LATER_REMINDER_LEAD_MS = 25 * 60 * 1000;
+const LATER_REMINDER_WINDOW_MS = 4 * 60 * 1000;
+let laterReminderShownIds = {};
+
+function normalizePickupKey(pickup) {
+  return String(pickup || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function findDuplicateDispatch(phone, pickup, excludeDocId) {
+  const phoneKey = normalizePhone(phone);
+  const pickupKey = normalizePickupKey(pickup);
+  if (phoneKey.length < 8 || !pickupKey) return null;
+  let match = null;
+  availableJobs.forEach(function(job) {
+    if (excludeDocId && job.docId === excludeDocId) return;
+    if (job.status !== "available" && job.status !== "accepted") return;
+    if (normalizePhone(job.phone) !== phoneKey) return;
+    if (normalizePickupKey(job.pickup) !== pickupKey) return;
+    match = job;
+  });
+  if (match) return match;
+  const cutoff = Date.now() - DUPLICATE_DISPATCH_WINDOW_MS;
+  completedJobs.forEach(function(job) {
+    if (match) return;
+    if (normalizePhone(job.phone) !== phoneKey) return;
+    if (normalizePickupKey(job.pickup) !== pickupKey) return;
+    const closed = getJobClosedTime(job) || getJobDispatchedMs(job);
+    if (closed >= cutoff) match = job;
+  });
+  return match;
+}
+
+function confirmDuplicateDispatch(phone, pickup, excludeDocId) {
+  const dup = findDuplicateDispatch(phone, pickup, excludeDocId);
+  if (!dup) return true;
+  const label = "JOB-" + dup.id + (dup.name ? " · " + dup.name : "");
+  const status = dup.status === "accepted" ? " (already accepted)" : "";
+  return confirm(
+    "Possible duplicate booking\n\nSame phone and pickup as " + label + status +
+    ".\n\nDispatch anyway?"
+  );
+}
+
+function isScheduledPickupJob(job) {
+  if (!job || !job.date || !job.timeInput) return false;
+  const t = String(job.time || "").trim().toLowerCase();
+  if (t === "quick" || t === "ready now") return false;
+  return getJobPickupSortMs(job) > Date.now() + 5 * 60 * 1000;
+}
+
+function laterReminderAlertText(job) {
+  const time = getJobTimeLabel(job);
+  const pickup = extractSuburbFromAddress(job.pickup) || job.pickup || "Pickup";
+  const name = (job.name || "").trim();
+  let text = "PICKUP SOON · JOB-" + job.id + " · " + time + " · " + String(pickup).toUpperCase();
+  if (name && name.toLowerCase() !== "customer") text = titleCase(name) + " · " + text;
+  return text;
+}
+
+function showLaterReminderAlert(job) {
+  alertNewJobArrival();
+  const toast = document.getElementById("alertToast");
+  document.getElementById("alertText").textContent = laterReminderAlertText(job);
+  toast.classList.add("show");
+  toast.dataset.docId = job.docId;
+  toast.dataset.openView = isFutureJob(job) ? "future" : "current";
+  if (alertTimeout) clearTimeout(alertTimeout);
+  alertTimeout = setTimeout(dismissAlert, 12000);
+}
+
+function scanLaterBookingReminders() {
+  if (!getCurrentOperator()) return;
+  const now = Date.now();
+  availableJobs.forEach(function(job) {
+    if (!isScheduledPickupJob(job)) return;
+    if (job.status !== "available" && job.status !== "accepted") return;
+    if (laterReminderShownIds[job.docId]) return;
+    const pickupMs = getJobPickupSortMs(job);
+    const diff = pickupMs - now;
+    if (diff < LATER_REMINDER_LEAD_MS - LATER_REMINDER_WINDOW_MS ||
+        diff > LATER_REMINDER_LEAD_MS + LATER_REMINDER_WINDOW_MS) return;
+    laterReminderShownIds[job.docId] = true;
+    showLaterReminderAlert(job);
+  });
+}
+
 function setCancelReason(text) {
   document.getElementById("cancelReasonInput").value = text;
   focusModalInput(document.getElementById("cancelReasonInput"));
@@ -1938,6 +2156,7 @@ function updateAdminPanelVisibility() {
     renderAdminProspectSetup();
     syncAdminAcceptWindowInputs();
     syncAdminBroadcastInputs();
+    bindAdminPassengerForm();
   }
 }
 
@@ -2041,6 +2260,171 @@ async function adminForceSignOutAll() {
     showToast("All devices signed out");
   } catch (e) {
     showToast("Sign-out failed: " + e.message, true);
+  }
+}
+
+let adminPassengerFormBound = false;
+
+function resolveCustomerDocId(phone, name) {
+  const p = normalizePhone(phone || "");
+  if (p.length >= 8) return p;
+  const n = (name || "").trim();
+  if (n && n.toLowerCase() !== "customer") {
+    return "name:" + n.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  }
+  return "";
+}
+
+function buildCustomerPayload(data) {
+  const name = (data.name || "").trim();
+  return {
+    phone: normalizePhone(data.phone || ""),
+    name: name ? titleCase(name) : "",
+    pickup: (data.pickup || "").trim(),
+    drop: (data.drop || "").trim(),
+    notes: (data.notes || "").trim(),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+}
+
+function setAdminPassengerStatus(msg, isError) {
+  const el = document.getElementById("adminPassStatus");
+  if (!el) return;
+  el.textContent = msg || "";
+  el.style.color = isError ? "#f87171" : "";
+}
+
+function updateAdminPassengerDeleteBtn(docId) {
+  const btn = document.getElementById("adminPassDeleteBtn");
+  if (btn) btn.style.display = docId ? "block" : "none";
+}
+
+function applyAdminPassengerData(c) {
+  if (!c) return;
+  const nameEl = document.getElementById("adminPassName");
+  const phoneEl = document.getElementById("adminPassPhone");
+  const pickupEl = document.getElementById("adminPassPickup");
+  const notesEl = document.getElementById("adminPassNotes");
+  const docIdEl = document.getElementById("adminPassDocId");
+  if (nameEl) nameEl.value = c.name || "";
+  if (phoneEl) phoneEl.value = formatPhoneDisplay(c.phone || "");
+  if (pickupEl) pickupEl.value = c.pickup || "";
+  if (notesEl) notesEl.value = c.notes || "";
+  const docId = resolveCustomerDocId(c.phone, c.name);
+  if (docIdEl) {
+    docIdEl.value = docId;
+    docIdEl.dataset.loadedName = (c.name || "").trim();
+  }
+  updateAdminPassengerDeleteBtn(docId);
+  setAdminPassengerStatus(docId ? "Loaded saved passenger — edit and save, or delete." : "");
+}
+
+function clearAdminPassengerForm() {
+  ["adminPassName", "adminPassPhone", "adminPassPickup", "adminPassNotes"].forEach(function(id) {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+  const docIdEl = document.getElementById("adminPassDocId");
+  if (docIdEl) {
+    docIdEl.value = "";
+    delete docIdEl.dataset.loadedName;
+  }
+  updateAdminPassengerDeleteBtn("");
+  setAdminPassengerStatus("");
+  const list = document.getElementById("adminPassNameList");
+  if (list) {
+    list.classList.remove("active");
+    list.innerHTML = "";
+  }
+}
+
+function bindAdminPassengerForm() {
+  if (adminPassengerFormBound) return;
+  const nameInput = document.getElementById("adminPassName");
+  const nameList = document.getElementById("adminPassNameList");
+  const phoneInput = document.getElementById("adminPassPhone");
+  if (!nameInput || !nameList) return;
+  adminPassengerFormBound = true;
+  nameInput.addEventListener("input", function() {
+    const docIdEl = document.getElementById("adminPassDocId");
+    const loaded = docIdEl && docIdEl.dataset.loadedName;
+    if (loaded && nameInput.value.trim().toLowerCase() !== loaded.toLowerCase()) {
+      if (docIdEl) {
+        docIdEl.value = "";
+        delete docIdEl.dataset.loadedName;
+      }
+      updateAdminPassengerDeleteBtn("");
+    }
+    searchNameSuggestions(nameInput.value, nameList, applyAdminPassengerData);
+  });
+  nameInput.addEventListener("blur", function() {
+    setTimeout(function() { nameList.classList.remove("active"); }, 200);
+  });
+  if (phoneInput) {
+    phoneInput.addEventListener("blur", async function() {
+      if (!firebaseReady) return;
+      const phone = normalizePhone(phoneInput.value);
+      if (phone.length < 8) return;
+      try {
+        const doc = await db.collection("customers").doc(phone).get();
+        if (doc.exists) applyAdminPassengerData(Object.assign({ phone: phone }, doc.data()));
+      } catch (e) { console.warn("admin passenger phone lookup", e); }
+    });
+  }
+}
+
+async function adminSavePassenger() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const name = (document.getElementById("adminPassName").value || "").trim();
+  const phone = document.getElementById("adminPassPhone").value || "";
+  const pickup = (document.getElementById("adminPassPickup").value || "").trim();
+  const notes = (document.getElementById("adminPassNotes").value || "").trim();
+  if (!name) {
+    setAdminPassengerStatus("Enter a passenger name", true);
+    return;
+  }
+  const docId = resolveCustomerDocId(phone, name);
+  if (!docId) {
+    setAdminPassengerStatus("Enter a valid phone number (8+ digits) or a name", true);
+    return;
+  }
+  try {
+    await db.collection("customers").doc(docId).set(buildCustomerPayload({
+      name: name, phone: phone, pickup: pickup, notes: notes
+    }), { merge: true });
+    const docIdEl = document.getElementById("adminPassDocId");
+    if (docIdEl) {
+      docIdEl.value = docId;
+      docIdEl.dataset.loadedName = name;
+    }
+    updateAdminPassengerDeleteBtn(docId);
+    setAdminPassengerStatus("Passenger saved — appears when booking by name.");
+    showToast("Passenger saved");
+  } catch (e) {
+    setAdminPassengerStatus("Save failed: " + e.message, true);
+    showToast("Save failed", true);
+  }
+}
+
+async function adminDeletePassenger() {
+  if (!isAdminUnlocked() || !firebaseReady || !db) return;
+  const docIdEl = document.getElementById("adminPassDocId");
+  let docId = docIdEl ? docIdEl.value : "";
+  const name = (document.getElementById("adminPassName").value || "").trim();
+  const phone = document.getElementById("adminPassPhone").value || "";
+  if (!docId) docId = resolveCustomerDocId(phone, name);
+  if (!docId) {
+    setAdminPassengerStatus("No saved passenger to delete", true);
+    return;
+  }
+  if (!confirm("Delete " + (name || "this passenger") + " from the system?")) return;
+  try {
+    await db.collection("customers").doc(docId).delete();
+    clearAdminPassengerForm();
+    showToast("Passenger deleted");
+  } catch (e) {
+    setAdminPassengerStatus("Delete failed: " + e.message, true);
+    showToast("Delete failed", true);
   }
 }
 
@@ -2272,8 +2656,28 @@ async function adminChangeMasterPin() {
   }
 }
 
+function toggleAdminTool(btn) {
+  const item = btn && btn.closest ? btn.closest(".adminAccordionItem") : null;
+  if (!item) return;
+  item.classList.toggle("open");
+}
+
+function setLoginGateActive(active) {
+  document.documentElement.classList.toggle("awaitingLogin", !!active);
+  document.body.classList.toggle("awaitingLogin", !!active);
+}
+
+function initLoginGate() {
+  if (getOperatorPinSession()) {
+    setLoginGateActive(false);
+    return;
+  }
+  setLoginGateActive(true);
+  showOperatorLoginModal();
+}
+
 function promptAdminUnlock() {
-  if (!requireOperator("access admin area")) return;
+  if (!requireOperator("access management")) return;
   openPinModal("admin", null);
 }
 
@@ -2511,6 +2915,7 @@ async function loadOperatorPins() {
 function showOperatorLoginModal(hint) {
   const modal = document.getElementById("operatorLoginModal");
   if (!modal) return;
+  if (!getOperatorPinSession() && !getCurrentOperator()) setLoginGateActive(true);
   showOperatorPinConfirm(false);
   loadSavedLoginFields();
   const hintEl = document.getElementById("operatorLoginHint");
@@ -2531,6 +2936,7 @@ function showOperatorLoginModal(hint) {
 function hideOperatorLoginModal() {
   const modal = document.getElementById("operatorLoginModal");
   if (modal) modal.classList.remove("open");
+  if (getCurrentOperator() || getOperatorPinSession()) setLoginGateActive(false);
 }
 
 function showOperatorPinConfirm(show) {
@@ -2586,7 +2992,7 @@ async function confirmOperatorLogin() {
   }
   const canonical = resolveOperator(document.getElementById("opLoginName").value);
   if (!canonical) {
-    alert("Name not on roster — ask admin to add you in Admin Area");
+    alert("Name not on roster — ask admin to add you in Management");
     return;
   }
   const pin = document.getElementById("opLoginPin").value.trim();
@@ -2637,6 +3043,7 @@ function completeOperatorSignIn(canonical, silent) {
   saveOperatorPinSession(canonical);
   saveOperatorLocally(canonical);
   watchOperatorSession(canonical);
+  setLoginGateActive(false);
   if (firebaseReady) claimOperatorSession(canonical, silent);
   hideOperatorLoginModal();
   checkBroadcastAlert();
@@ -2651,6 +3058,7 @@ function bindOperatorFieldEvents() {
       phoneEl: phoneEl,
       pickupEl: document.getElementById("pickup"),
       dropEl: document.getElementById("drop"),
+      notesEl: document.getElementById("jobNotes"),
       hintEl: document.getElementById("phoneHint")
     };
   }
@@ -2770,6 +3178,7 @@ function signOutOperator(forced, otherDeviceId, reason) {
   }
   releaseOperatorSession(op);
   switchTab("tabNew", document.querySelector('[data-tab="tabNew"]'));
+  setLoginGateActive(true);
   showOperatorLoginModal();
 }
 
@@ -2913,6 +3322,7 @@ function startFirebaseSubscriptions() {
     subscribeProspectScores();
     subscribeNoticeBoard();
   }, 1200);
+  setInterval(scanLaterBookingReminders, 60000);
 }
 
 function markFirebaseConnected() {
@@ -2990,12 +3400,60 @@ async function ensureServiceWorker() {
   if (!("serviceWorker" in navigator)) return null;
   try {
     pushSwRegistration = await navigator.serviceWorker.register("sw.js", { scope: "./" });
+    watchServiceWorkerUpdates(pushSwRegistration);
     await navigator.serviceWorker.ready;
     return pushSwRegistration;
   } catch (err) {
     console.warn("Service worker registration failed:", err);
     return null;
   }
+}
+
+let swUpdateBannerShown = false;
+let swHadControllerOnLoad = false;
+
+function showUpdateBanner() {
+  if (swUpdateBannerShown) return;
+  swUpdateBannerShown = true;
+  const el = document.getElementById("updateBanner");
+  if (el) el.classList.add("show");
+}
+
+function applyAppUpdate() {
+  window.location.reload();
+}
+
+function watchServiceWorkerUpdates(reg) {
+  if (!reg || reg._gpnUpdateWatch) return;
+  reg._gpnUpdateWatch = true;
+  if (reg.waiting && navigator.serviceWorker.controller) showUpdateBanner();
+  reg.addEventListener("updatefound", function() {
+    const worker = reg.installing;
+    if (!worker) return;
+    worker.addEventListener("statechange", function() {
+      if (worker.state === "installed" && navigator.serviceWorker.controller) {
+        showUpdateBanner();
+      }
+    });
+  });
+}
+
+function initServiceWorkerUpdates() {
+  if (!("serviceWorker" in navigator)) return;
+  swHadControllerOnLoad = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener("controllerchange", function() {
+    if (swHadControllerOnLoad) showUpdateBanner();
+    swHadControllerOnLoad = true;
+  });
+  ensureServiceWorker();
+  setInterval(function() {
+    if (pushSwRegistration) pushSwRegistration.update().catch(function() {});
+  }, 30 * 60 * 1000);
+  document.addEventListener("visibilitychange", function() {
+    if (document.visibilityState === "visible" && pushSwRegistration) {
+      pushSwRegistration.update().catch(function() {});
+    }
+  });
 }
 
 async function refreshPushTokenIfNeeded(operatorName) {
@@ -3920,7 +4378,8 @@ function subscribeCustomers() {
         phone: isNameKey ? (data.phone || "") : d.id,
         name: data.name || "",
         pickup: data.pickup || "",
-        drop: data.drop || ""
+        drop: data.drop || "",
+        notes: data.notes || ""
       };
     });
   }, function(err) { console.error(err); });
@@ -3938,6 +4397,9 @@ function clearAppliedCustomerFields(fieldMap) {
   if (fieldMap.dropEl && fieldMap.dropEl.value.trim() === applied.drop) {
     fieldMap.dropEl.value = "";
   }
+  if (fieldMap.notesEl && fieldMap.notesEl.value.trim() === applied.notes) {
+    fieldMap.notesEl.value = "";
+  }
   if (fieldMap.hintEl) fieldMap.hintEl.classList.remove("show");
   fieldMap.appliedCustomer = null;
 }
@@ -3948,12 +4410,14 @@ function applyCustomerData(c, fields) {
   if (fields.phoneEl) fields.phoneEl.value = formatPhoneDisplay(c.phone);
   if (fields.pickupEl && c.pickup) fields.pickupEl.value = c.pickup;
   if (fields.dropEl && c.drop) fields.dropEl.value = c.drop;
+  if (fields.notesEl && c.notes) fields.notesEl.value = c.notes;
   if (fields.hintEl) fields.hintEl.classList.add("show");
   fields.appliedCustomer = {
     name: (c.name || "").trim(),
     phone: formatPhoneDisplay(c.phone || ""),
     pickup: (c.pickup || "").trim(),
-    drop: (c.drop || "").trim()
+    drop: (c.drop || "").trim(),
+    notes: (c.notes || "").trim()
   };
 }
 
@@ -3981,7 +4445,7 @@ function searchNameSuggestions(query, listEl, onPick) {
     return;
   }
   listEl.innerHTML = top.map(function(c, i) {
-    const sub = formatPhoneDisplay(c.phone) || c.pickup || "Saved customer";
+    const sub = formatPhoneDisplay(c.phone) || c.pickup || c.notes || "Saved passenger";
     return '<div class="phoneSuggestItem" data-idx="' + i + '"><strong>' + escapeHtml(c.name) + '</strong><span>' + escapeHtml(sub) + '</span></div>';
   }).join("");
   listEl.querySelectorAll(".phoneSuggestItem").forEach(function(item) {
@@ -4082,28 +4546,9 @@ async function lookupCustomerByPhone() {
 
 async function saveCustomerRecord(job) {
   if (!firebaseReady) return;
-  const phone = normalizePhone(job.phone || "");
-  const name = (job.name || "").trim();
-  if (phone.length >= 8) {
-    await db.collection("customers").doc(phone).set({
-      phone: phone,
-      name: name || "",
-      pickup: job.pickup || "",
-      drop: job.drop || "",
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    return;
-  }
-  if (name && name.toLowerCase() !== "customer") {
-    const nameKey = "name:" + name.toLowerCase().replace(/[^a-z0-9]+/g, "_");
-    await db.collection("customers").doc(nameKey).set({
-      name: titleCase(name),
-      phone: job.phone || "",
-      pickup: job.pickup || "",
-      drop: job.drop || "",
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-  }
+  const docId = resolveCustomerDocId(job.phone, job.name);
+  if (!docId) return;
+  await db.collection("customers").doc(docId).set(buildCustomerPayload(job), { merge: true });
 }
 
 function renderOperatorFilterRow() {}
@@ -4715,7 +5160,7 @@ function openPinModal(action, docId) {
     btn.textContent = "Continue";
     btn.style.background = "#2563eb";
   } else if (action === "admin") {
-    title.textContent = "Enter Master PIN for Admin";
+    title.textContent = "Enter Master PIN for Management";
     btn.textContent = "Unlock";
     btn.style.background = "#d4af37";
     btn.style.color = "#1a1200";
@@ -4773,7 +5218,7 @@ function confirmPinAction() {
   } else if (pinAction === "admin") {
     closePinModal();
     setAdminUnlocked(true);
-    showToast("Admin area unlocked");
+    showToast("Management unlocked");
   }
 }
 
@@ -4946,6 +5391,7 @@ function subscribeAvailableJobs() {
       scheduleRenderAvailable();
       updateAvailableBadges();
       scanGroupDispatchReadyJobs();
+      scanLaterBookingReminders();
 
       if (jobsListenerReady) {
         changes.forEach(function(change) {
@@ -5002,6 +5448,7 @@ function subscribeAvailableJobsFallback() {
       scheduleRenderAvailable();
       updateAvailableBadges();
       scanGroupDispatchReadyJobs();
+      scanLaterBookingReminders();
       jobsListenerReady = true;
     }, function(err) {
       console.error("Available jobs fallback failed:", err);
@@ -5936,6 +6383,13 @@ async function dispatch() {
       return;
     }
 
+    const phone = document.getElementById("phone").value;
+    const pickup = document.getElementById("pickup").value;
+    if (!confirmDuplicateDispatch(phone, pickup, editingDocId)) {
+      btn.disabled = false;
+      return;
+    }
+
     const jobId = await getNextJobId();
     const job = collectJobData(jobId, "available");
     const message = buildDispatchMessage(job);
@@ -5989,6 +6443,7 @@ function openQuickBooking() {
       phoneEl: document.getElementById("qbPhone"),
       pickupEl: document.getElementById("qbPickup"),
       dropEl: document.getElementById("qbDrop"),
+      notesEl: document.getElementById("qbNotes"),
       hintEl: null
     };
   }
@@ -6074,6 +6529,9 @@ async function dispatchQuick() {
   if (!firebaseReady) { alert("Firebase not connected"); return; }
   if (!requireOperator("dispatch")) return;
   if (!validateQuickDispatch()) return;
+  const phone = document.getElementById("qbPhone").value;
+  const pickup = document.getElementById("qbPickup").value;
+  if (!confirmDuplicateDispatch(phone, pickup, null)) return;
   try {
     const jobId = await getNextJobId();
     const job = collectQuickJobData(jobId);
@@ -6392,11 +6850,14 @@ function sendFollowUp() {
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.addEventListener("message", function(event) {
-    handlePushNavigation(event.data);
+    const data = event.data || {};
+    if (data.type === "appUpdateReady" && swHadControllerOnLoad) showUpdateBanner();
+    else handlePushNavigation(data);
   });
 }
 
 window.addEventListener("DOMContentLoaded", function() {
+  initLoginGate();
   initOperatorField();
   ensureCityBackgroundPanels();
   updateCityBackground();
@@ -6406,7 +6867,7 @@ window.addEventListener("DOMContentLoaded", function() {
   }, { once: true });
 
   if ("serviceWorker" in navigator) {
-    ensureServiceWorker();
+    initServiceWorkerUpdates();
   }
   handleNotificationDeepLink();
   document.addEventListener("visibilitychange", function() {
