@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="color-scheme" content="dark">
+<style>html,body{background:#070b12;color:#f1f5f9}</style>
 <base href="/citi/">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
@@ -12,6 +14,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preload" href="./bg-night.png" as="image">
 <title>Geelong Premium Network</title>
 <style>
 :root{
@@ -39,6 +42,7 @@
   --city-bg:url("./bg-night.png");
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+html{background:#070b12}
 
 body{
   font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Roboto,Arial,sans-serif;
@@ -338,13 +342,16 @@ html.awaitingLogin .syncWrap,
 html.awaitingLogin .tabPanel,
 html.awaitingLogin .bottomNav,
 html.awaitingLogin .alertToast,
-html.awaitingLogin .opToast{
-  visibility:hidden;pointer-events:none;
+html.awaitingLogin .opToast,
+html.awaitingLogin #updateBanner{
+  visibility:hidden;pointer-events:none;display:none!important;
 }
-body.awaitingLogin #operatorLoginModal.open,
-html.awaitingLogin #operatorLoginModal{
+body.awaitingLogin #operatorLoginModal.loginScreen,
+html.awaitingLogin #operatorLoginModal.loginScreen{
   display:flex!important;z-index:500;
-  align-items:center;justify-content:center;padding:16px;
+  flex-direction:column;align-items:center;justify-content:flex-start;
+  position:fixed;inset:0;min-height:100dvh;
+  padding:max(20px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));
   background-color:#0a1018;
   background-image:
     linear-gradient(180deg,rgba(7,11,18,.34) 0%,rgba(10,16,24,.4) 50%,rgba(7,11,18,.48) 100%),
@@ -1070,8 +1077,11 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .filterPanel input::placeholder{color:var(--text-dim);font-weight:500}
 .operatorStatus.ready{color:var(--green-bright);font-weight:600}
 .phoneHint{color:var(--green-bright)}
-#operatorLoginModal.open{
-  align-items:center;justify-content:center;padding:16px;
+#operatorLoginModal.loginScreen.open{
+  display:flex!important;
+  flex-direction:column;align-items:center;justify-content:flex-start;
+  position:fixed;inset:0;min-height:100dvh;z-index:500;
+  padding:max(20px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));
   background-color:#0a1018;
   background-image:
     linear-gradient(180deg,rgba(7,11,18,.34) 0%,rgba(10,16,24,.4) 50%,rgba(7,11,18,.48) 100%),
@@ -1079,6 +1089,39 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   background-size:cover;
   background-position:center;
   background-repeat:no-repeat;
+}
+.loginScreenLayout{
+  display:flex;flex-direction:column;align-items:center;justify-content:space-between;
+  width:100%;max-width:380px;min-height:100%;flex:1;
+}
+.loginScreenHeader{
+  flex:0 0 auto;text-align:center;width:100%;padding:4px 8px 12px;
+}
+.loginScreenBrand{
+  font-size:21px;font-weight:700;color:#f8fafc;line-height:1.3;
+  letter-spacing:.01em;text-shadow:0 2px 16px rgba(0,0,0,.45);
+}
+.loginScreenTagline{
+  margin-top:8px;font-size:11px;font-weight:700;color:var(--gold);
+  letter-spacing:.22em;text-transform:uppercase;
+}
+.loginScreenMain{
+  flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:8px 0;
+}
+.loginScreenFooter{
+  flex:0 0 auto;width:100%;text-align:center;padding:14px 8px 2px;
+  border-top:1px solid rgba(148,163,184,.14);
+}
+.loginFooterPowered{
+  display:block;font-size:11px;font-weight:500;color:rgba(148,163,184,.92);
+  letter-spacing:.05em;
+}
+.loginFooterPowered strong{
+  color:rgba(212,175,55,.95);font-weight:700;letter-spacing:.08em;
+}
+.loginFooterRights{
+  display:block;margin-top:5px;font-size:10px;font-weight:500;
+  color:rgba(100,116,139,.8);letter-spacing:.07em;text-transform:uppercase;
 }
 .loginWoodPanel{
   width:100%;max-width:300px;padding:22px 20px 20px;border-radius:14px;position:relative;overflow:hidden;
@@ -1248,10 +1291,38 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 }
 </style>
 <script>
-try{if(!sessionStorage.getItem("operatorPinSession"))document.documentElement.classList.add("awaitingLogin")}catch(e){}
+try{if(!sessionStorage.getItem("operatorPinSession")){document.documentElement.classList.add("awaitingLogin");document.documentElement.style.background="#070b12"}}catch(e){}
 </script>
 </head>
 <body>
+
+<!-- Login first in DOM for fast first paint -->
+<div id="operatorLoginModal" class="modalOverlay loginScreen">
+  <div class="loginScreenLayout">
+    <header class="loginScreenHeader">
+      <div class="loginScreenBrand">Geelong Premium Network</div>
+      <div class="loginScreenTagline">Dispatch System</div>
+    </header>
+    <div class="loginScreenMain">
+      <div class="loginWoodPanel">
+        <h3 class="loginWoodTitle">User Login</h3>
+        <input id="opLoginName" class="loginWoodInput" type="text" placeholder="Name" autocomplete="off" autocapitalize="words" enterkeyhint="next">
+        <input id="opLoginPin" class="loginWoodInput loginWoodInputPin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="PIN" autocomplete="off" enterkeyhint="done">
+        <input id="opLoginPinConfirm" class="loginWoodInput loginWoodInputPin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Confirm PIN" autocomplete="off" enterkeyhint="done" style="display:none">
+        <div class="loginSaveRow">
+          <input id="opSaveLogin" type="checkbox">
+          <label for="opSaveLogin">Saved Login Info</label>
+        </div>
+        <button id="operatorLoginBtn" type="button" class="loginWoodBtn" onclick="confirmOperatorLogin()">Login</button>
+        <p id="operatorLoginHint" class="loginWoodHint" style="display:none"></p>
+      </div>
+    </div>
+    <footer class="loginScreenFooter">
+      <span class="loginFooterPowered">Powered by <strong>DH</strong></span>
+      <span class="loginFooterRights">All rights reserved</span>
+    </footer>
+  </div>
+</div>
 
 <header class="appHeader">
   <div class="appBrand">Geelong Premium Network</div>
@@ -1601,22 +1672,6 @@ try{if(!sessionStorage.getItem("operatorPinSession"))document.documentElement.cl
         </div>
       </div>
     </div>
-  </div>
-</div>
-
-<!-- OPERATOR LOGIN MODAL -->
-<div id="operatorLoginModal" class="modalOverlay">
-  <div class="loginWoodPanel">
-    <h3 class="loginWoodTitle">User Login</h3>
-    <input id="opLoginName" class="loginWoodInput" type="text" placeholder="Name" autocomplete="off" autocapitalize="words" enterkeyhint="next">
-    <input id="opLoginPin" class="loginWoodInput loginWoodInputPin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="PIN" autocomplete="off" enterkeyhint="done">
-    <input id="opLoginPinConfirm" class="loginWoodInput loginWoodInputPin" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="Confirm PIN" autocomplete="off" enterkeyhint="done" style="display:none">
-    <div class="loginSaveRow">
-      <input id="opSaveLogin" type="checkbox">
-      <label for="opSaveLogin">Saved Login Info</label>
-    </div>
-    <button id="operatorLoginBtn" type="button" class="loginWoodBtn" onclick="confirmOperatorLogin()">Login</button>
-    <p id="operatorLoginHint" class="loginWoodHint" style="display:none"></p>
   </div>
 </div>
 
