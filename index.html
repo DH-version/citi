@@ -347,17 +347,18 @@ html.awaitingLogin #updateBanner{
   visibility:hidden;pointer-events:none;display:none!important;
 }
 body.awaitingLogin #operatorLoginModal.loginScreen,
-html.awaitingLogin #operatorLoginModal.loginScreen{
+html.awaitingLogin #operatorLoginModal.loginScreen,
+#operatorLoginModal.loginScreen.open{
   display:flex!important;z-index:500;
   flex-direction:column;align-items:center;justify-content:flex-start;
   position:fixed;inset:0;min-height:100dvh;
   padding:max(20px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));
-  background-color:#0a1018;
+  background-color:#070b12;
   background-image:
-    linear-gradient(180deg,rgba(7,11,18,.34) 0%,rgba(10,16,24,.4) 50%,rgba(7,11,18,.48) 100%),
+    linear-gradient(180deg,rgba(7,11,18,.06) 0%,rgba(7,11,18,.12) 45%,rgba(7,11,18,.2) 100%),
     var(--city-bg,url("./bg-night.png"));
   background-size:cover;
-  background-position:center;
+  background-position:center center;
   background-repeat:no-repeat;
 }
 .adminAccordion{display:flex;flex-direction:column;gap:8px}
@@ -1077,19 +1078,6 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
 .filterPanel input::placeholder{color:var(--text-dim);font-weight:500}
 .operatorStatus.ready{color:var(--green-bright);font-weight:600}
 .phoneHint{color:var(--green-bright)}
-#operatorLoginModal.loginScreen.open{
-  display:flex!important;
-  flex-direction:column;align-items:center;justify-content:flex-start;
-  position:fixed;inset:0;min-height:100dvh;z-index:500;
-  padding:max(20px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));
-  background-color:#0a1018;
-  background-image:
-    linear-gradient(180deg,rgba(7,11,18,.34) 0%,rgba(10,16,24,.4) 50%,rgba(7,11,18,.48) 100%),
-    var(--city-bg,url("./bg-night.png"));
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-}
 .loginScreenLayout{
   display:flex;flex-direction:column;align-items:center;justify-content:space-between;
   width:100%;max-width:380px;min-height:100%;flex:1;
@@ -1098,52 +1086,60 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   flex:0 0 auto;text-align:center;width:100%;padding:4px 8px 12px;
 }
 .loginScreenBrand{
-  font-size:21px;font-weight:700;color:#f8fafc;line-height:1.3;
-  letter-spacing:.01em;text-shadow:0 2px 16px rgba(0,0,0,.45);
+  font-size:21px;font-weight:700;color:#fff;line-height:1.3;
+  letter-spacing:.01em;
+  text-shadow:0 2px 24px rgba(0,0,0,.85),0 1px 3px rgba(0,0,0,.6);
 }
 .loginScreenTagline{
   margin-top:8px;font-size:11px;font-weight:700;color:var(--gold);
   letter-spacing:.22em;text-transform:uppercase;
+  text-shadow:0 2px 16px rgba(0,0,0,.75);
 }
 .loginScreenMain{
   flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:8px 0;
 }
 .loginScreenFooter{
   flex:0 0 auto;width:100%;text-align:center;padding:14px 8px 2px;
-  border-top:1px solid rgba(148,163,184,.14);
+  border-top:1px solid rgba(255,255,255,.12);
 }
 .loginFooterPowered{
-  display:block;font-size:11px;font-weight:500;color:rgba(148,163,184,.92);
-  letter-spacing:.05em;
+  display:block;font-size:11px;font-weight:500;color:rgba(226,232,240,.88);
+  letter-spacing:.05em;text-shadow:0 1px 8px rgba(0,0,0,.65);
 }
 .loginFooterPowered strong{
-  color:rgba(212,175,55,.95);font-weight:700;letter-spacing:.08em;
+  color:rgba(212,175,55,.98);font-weight:700;letter-spacing:.08em;
 }
 .loginFooterRights{
   display:block;margin-top:5px;font-size:10px;font-weight:500;
-  color:rgba(100,116,139,.8);letter-spacing:.07em;text-transform:uppercase;
+  color:rgba(203,213,225,.75);letter-spacing:.07em;text-transform:uppercase;
+  text-shadow:0 1px 8px rgba(0,0,0,.55);
 }
 .loginWoodPanel{
-  width:100%;max-width:300px;padding:22px 20px 20px;border-radius:14px;position:relative;overflow:hidden;
-  background:
-    linear-gradient(180deg,rgba(59,130,246,.22) 0%,transparent 35%),
-    linear-gradient(165deg,#1e3a5f 0%,#152238 50%,#0f172a 100%);
-  border:1px solid rgba(96,165,250,.45);
-  box-shadow:0 0 28px rgba(59,130,246,.18),0 12px 40px rgba(0,0,0,.65),inset 0 1px 0 rgba(147,197,253,.12);
+  width:100%;max-width:300px;padding:22px 20px 20px;border-radius:16px;position:relative;overflow:hidden;
+  background:rgba(10,16,28,.32);
+  -webkit-backdrop-filter:blur(16px) saturate(1.2);
+  backdrop-filter:blur(16px) saturate(1.2);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 12px 48px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.16);
 }
+.loginWoodPanel::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(160deg,rgba(255,255,255,.1) 0%,transparent 42%,rgba(59,130,246,.07) 100%);
+}
+.loginWoodPanel > *{position:relative;z-index:1}
 .loginWoodPanel::after{
-  content:"";position:absolute;left:0;right:0;top:0;height:3px;
-  background:linear-gradient(90deg,transparent,rgba(96,165,250,.65),transparent);pointer-events:none;
+  content:"";position:absolute;left:0;right:0;top:0;height:2px;z-index:2;
+  background:linear-gradient(90deg,transparent,rgba(212,175,55,.55),rgba(147,197,253,.5),transparent);pointer-events:none;
 }
 .loginWoodTitle{
   text-align:center;color:#fff;font-size:18px;font-weight:700;margin-bottom:18px;
-  text-shadow:0 1px 4px rgba(0,0,0,.5);letter-spacing:.3px;
+  text-shadow:0 2px 12px rgba(0,0,0,.65);letter-spacing:.3px;
 }
 .loginWoodInput{
   width:100%;padding:12px 14px;margin:0 0 10px;
-  background:#f8fafc;color:#0f172a;font-weight:600;font-size:16px;
-  border:1px solid rgba(148,163,184,.5);border-radius:8px;box-sizing:border-box;
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.08);
+  background:rgba(255,255,255,.94);color:#0f172a;font-weight:600;font-size:16px;
+  border:1px solid rgba(255,255,255,.35);border-radius:8px;box-sizing:border-box;
+  box-shadow:0 2px 8px rgba(0,0,0,.18);
 }
 .loginWoodInput:focus{
   border-color:var(--blue);
@@ -1158,14 +1154,15 @@ body.appLocked .bottomNav .navTab:not([data-tab="tabNew"]){opacity:.35;pointer-e
   width:14px;height:14px;margin:0;accent-color:var(--blue);flex-shrink:0;
 }
 .loginSaveRow label{
-  font-size:11px;color:rgba(226,232,240,.92);font-weight:600;cursor:pointer;user-select:none;
+  font-size:11px;color:rgba(241,245,249,.95);font-weight:600;cursor:pointer;user-select:none;
+  text-shadow:0 1px 6px rgba(0,0,0,.5);
 }
 .loginWoodBtn{
   width:100%;padding:13px 12px;margin:0;
-  background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%);
+  background:linear-gradient(180deg,rgba(37,99,235,.92) 0%,rgba(29,78,216,.95) 100%);
   color:#fff;font-size:15px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;
-  border:1px solid rgba(147,197,253,.45);border-radius:9px;
-  box-shadow:0 4px 14px rgba(37,99,235,.35),inset 0 1px 0 rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.28);border-radius:9px;
+  box-shadow:0 4px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.2);
 }
 .loginWoodBtn:active{transform:scale(.98)}
 .loginWoodHint{
