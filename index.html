@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="color-scheme" content="dark">
-<style>html,body{background:#070b12;color:#f1f5f9}</style>
+<style>html,body{background:#070b12!important;color:#f1f5f9;margin:0;min-height:100dvh}html.awaitingLogin,html.awaitingLogin body{overflow:hidden}html.awaitingLogin #operatorLoginModal.loginScreen{display:flex!important;position:fixed;inset:0;z-index:9999;background:#070b12;flex-direction:column;align-items:center;justify-content:flex-start;min-height:100dvh;padding:max(20px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}</style>
 <base href="/citi/">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#070b12">
@@ -462,39 +462,7 @@ html.awaitingLogin #operatorLoginModal.loginScreen,
 }
 .adminPassFieldWrap{position:relative}
 .adminPassFieldWrap .phoneSuggestList{z-index:30}
-.adminCoForm{display:flex;flex-direction:column;gap:8px}
-.adminCoForm input,.adminCoForm textarea{
-  width:100%;padding:12px;font-size:15px;font-weight:600;
-  background:var(--bg-elevated);color:var(--text);border:1px solid var(--border-strong);
-  border-radius:var(--radius-sm);box-sizing:border-box;
-}
-.adminCoForm textarea{min-height:64px;resize:vertical}
-.adminCoSection{font-size:10px;font-weight:800;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin:6px 0 2px}
-.invoicePayChips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-.invoicePayChips button{
-  flex:1;min-width:30%;padding:10px 8px!important;margin:0!important;
-  font-size:10px!important;font-weight:800!important;
-  background:var(--bg-card)!important;color:var(--text)!important;
-  border:1px solid var(--border-strong)!important;border-radius:var(--radius-xs)!important;
-}
-.invoicePayChips button.selected{
-  background:linear-gradient(180deg,#e8c547 0%,#c9a227 100%)!important;
-  color:#1a1200!important;border-color:var(--gold)!important;
-}
-.invoiceFieldRow{margin-bottom:8px}
-.invoiceFieldRow label{display:block;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
-.invoiceFieldRow input{
-  width:100%;padding:11px 12px;font-size:16px;font-weight:700;
-  background:var(--bg-elevated);color:var(--text);border:1px solid var(--border-strong);
-  border-radius:var(--radius-sm);box-sizing:border-box;
-}
-.invoiceSummary{
-  background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.28);
-  border-radius:var(--radius-sm);padding:10px 12px;margin:10px 0;font-size:13px;font-weight:700;
-}
-.invoiceSummaryLine{display:flex;justify-content:space-between;gap:8px;margin:4px 0}
-.invoiceSummaryLine.total{color:var(--gold);font-size:15px;margin-top:6px;padding-top:6px;border-top:1px solid rgba(212,175,55,.25)}
-#invoiceModal .modalSheet{max-height:92vh}
+#tabTeam.active{
   display:flex;flex-direction:column;
   height:calc(100dvh - 62px - env(safe-area-inset-top) - 12px);
   max-height:calc(100dvh - 62px - env(safe-area-inset-top) - 12px);
@@ -1353,6 +1321,17 @@ try{if(!sessionStorage.getItem("operatorPinSession")){document.documentElement.c
   </div>
 </div>
 
+<script>
+try{
+  if(!sessionStorage.getItem("operatorPinSession")){
+    document.documentElement.classList.add("awaitingLogin");
+    document.body.classList.add("awaitingLogin");
+    var _lg=document.getElementById("operatorLoginModal");
+    if(_lg)_lg.classList.add("open");
+  }
+}catch(e){}
+</script>
+
 <header class="appHeader">
   <div class="appBrand">Geelong Premium Network</div>
   <div class="appTagline">Dispatch</div>
@@ -1699,31 +1678,6 @@ try{if(!sessionStorage.getItem("operatorPinSession")){document.documentElement.c
             <p class="adminHint">Used for management, delete, edit, cancel, and prospect edit.</p>
           </div>
         </div>
-        <div class="adminAccordionItem">
-          <button type="button" class="adminAccordionHead" onclick="toggleAdminTool(this)">
-            <span>10 · Company &amp; Tax Invoice</span><span class="adminAccordionChevron">›</span>
-          </button>
-          <div class="adminAccordionBody">
-            <p class="adminHint">Company details appear on tax invoices. Save once — all operators use these settings.</p>
-            <div class="adminCoForm">
-              <div class="adminCoSection">Company</div>
-              <input id="adminCoName" type="text" value="" placeholder="Company / legal business name" autocomplete="off">
-              <input id="adminCoAbn" type="text" value="" placeholder="ABN" autocomplete="off" inputmode="numeric">
-              <input id="adminCoPhone" type="tel" value="" placeholder="Phone number" autocomplete="off">
-              <input id="adminCoEmail" type="email" value="" placeholder="Email address" autocomplete="off">
-              <textarea id="adminCoAddress" placeholder="Business address" rows="2"></textarea>
-              <div class="adminCoSection">Bank details</div>
-              <input id="adminCoBankName" type="text" value="" placeholder="Bank name" autocomplete="off">
-              <input id="adminCoBsb" type="tel" value="" placeholder="BSB" autocomplete="off" inputmode="numeric">
-              <input id="adminCoAccount" type="tel" value="" placeholder="Account number" autocomplete="off" inputmode="numeric">
-              <div class="adminCoSection">Invoice defaults</div>
-              <input id="adminCoPrefix" type="text" value="" placeholder="Invoice prefix (e.g. INV- or GCC-)" autocomplete="off">
-              <input id="adminCoGstNote" type="text" value="" placeholder="GST note (e.g. All fares GST inclusive)" autocomplete="off">
-              <button type="button" class="btnPrimary adminToolBtn" onclick="adminSaveCompanyInvoice()">Save Company Details</button>
-              <p id="adminCoStatus" class="adminHint"></p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -1776,32 +1730,6 @@ try{if(!sessionStorage.getItem("operatorPinSession")){document.documentElement.c
     <div class="pinActions">
       <button id="fareConfirmBtn" class="btnSuccess" onclick="confirmCompleteJob()">Complete Job</button>
       <button class="btnSecondary" onclick="closeFareModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<!-- TAX INVOICE MODAL -->
-<div id="invoiceModal" class="modalOverlay" onclick="if(event.target===this)closeInvoiceModal()">
-  <div class="modalSheet pinModalSheet pinModalRounded pinModalScroll">
-    <h3 class="modalTitleGold">Tax Invoice</h3>
-    <p id="invoiceModalJob" class="modalSubtitle" style="margin-bottom:8px">JOB-0000</p>
-    <div class="invoicePayChips" id="invoicePayChips">
-      <button type="button" class="selected" onclick="setInvoicePaymentType('fully_paid', this)">Fully Paid</button>
-      <button type="button" onclick="setInvoicePaymentType('deposit', this)">Deposit + Balance</button>
-      <button type="button" onclick="setInvoicePaymentType('payable', this)">Amount Payable</button>
-    </div>
-    <div class="invoiceFieldRow">
-      <label>Total fare (GST inclusive)</label>
-      <input id="invoiceTotalFare" type="tel" inputmode="decimal" placeholder="0.00" autocomplete="off">
-    </div>
-    <div class="invoiceFieldRow" id="invoiceDepositRow" style="display:none">
-      <label>Deposit paid</label>
-      <input id="invoiceDeposit" type="tel" inputmode="decimal" placeholder="0.00" autocomplete="off" oninput="updateInvoiceSummary()">
-    </div>
-    <div id="invoiceSummary" class="invoiceSummary"></div>
-    <div class="pinActions">
-      <button type="button" class="btnPrimary" style="flex:1" onclick="generateTaxInvoicePdf()">Download PDF</button>
-      <button type="button" class="btnSecondary" style="flex:1" onclick="closeInvoiceModal()">Skip</button>
     </div>
   </div>
 </div>
@@ -1976,10 +1904,6 @@ let acceptWindowReadyMs = DEFAULT_ACCEPT_WINDOW_READY_MS;
 let masterPin = DEFAULT_MASTER_PIN;
 let prospectOperatorList = [];
 let broadcastSettings = null;
-let companyInvoiceSettings = null;
-let companyInvoiceUnsub = null;
-let pendingInvoiceJob = null;
-let invoicePaymentType = "fully_paid";
 let signedInAtMs = 0;
 let appSettingsUnsub = null;
 let broadcastUnsub = null;
@@ -2295,7 +2219,6 @@ function updateAdminPanelVisibility() {
     renderAdminProspectSetup();
     syncAdminAcceptWindowInputs();
     syncAdminBroadcastInputs();
-    syncAdminCompanyInvoiceInputs();
     bindAdminPassengerForm();
   }
 }
@@ -2356,11 +2279,6 @@ function subscribeAppSettings() {
     }
     if (isAdminUnlocked()) syncAdminBroadcastInputs();
   });
-  if (companyInvoiceUnsub) companyInvoiceUnsub();
-  companyInvoiceUnsub = db.collection("settings").doc("companyInvoice").onSnapshot(function(doc) {
-    applyCompanyInvoiceSettings(doc.exists ? doc.data() : {});
-    if (isAdminUnlocked()) syncAdminCompanyInvoiceInputs();
-  }, function(err) { console.warn("companyInvoice sync failed", err); });
 }
 
 function checkBroadcastAlert() {
@@ -2801,346 +2719,6 @@ async function adminChangeMasterPin() {
   }
 }
 
-function defaultCompanyInvoiceSettings() {
-  return {
-    companyName: "", abn: "", phone: "", email: "", address: "",
-    bankName: "", bsb: "", accountNumber: "",
-    invoicePrefix: "INV-", gstNote: "All fares GST inclusive"
-  };
-}
-
-function applyCompanyInvoiceSettings(data) {
-  const d = data || {};
-  companyInvoiceSettings = {
-    companyName: d.companyName || "",
-    abn: d.abn || "",
-    phone: d.phone || "",
-    email: d.email || "",
-    address: d.address || "",
-    bankName: d.bankName || "",
-    bsb: d.bsb || "",
-    accountNumber: d.accountNumber || "",
-    invoicePrefix: d.invoicePrefix || "INV-",
-    gstNote: d.gstNote || "All fares GST inclusive"
-  };
-}
-
-function syncAdminCompanyInvoiceInputs() {
-  const s = companyInvoiceSettings || defaultCompanyInvoiceSettings();
-  const set = function(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.value = val || "";
-  };
-  set("adminCoName", s.companyName);
-  set("adminCoAbn", s.abn);
-  set("adminCoPhone", s.phone);
-  set("adminCoEmail", s.email);
-  set("adminCoAddress", s.address);
-  set("adminCoBankName", s.bankName);
-  set("adminCoBsb", s.bsb);
-  set("adminCoAccount", s.accountNumber);
-  set("adminCoPrefix", s.invoicePrefix);
-  set("adminCoGstNote", s.gstNote);
-}
-
-function setAdminCoStatus(msg, isError) {
-  const el = document.getElementById("adminCoStatus");
-  if (!el) return;
-  el.textContent = msg || "";
-  el.style.color = isError ? "#f87171" : "";
-}
-
-async function adminSaveCompanyInvoice() {
-  if (!isAdminUnlocked() || !firebaseReady || !db) return;
-  const payload = {
-    companyName: (document.getElementById("adminCoName").value || "").trim(),
-    abn: (document.getElementById("adminCoAbn").value || "").trim(),
-    phone: (document.getElementById("adminCoPhone").value || "").trim(),
-    email: (document.getElementById("adminCoEmail").value || "").trim(),
-    address: (document.getElementById("adminCoAddress").value || "").trim(),
-    bankName: (document.getElementById("adminCoBankName").value || "").trim(),
-    bsb: (document.getElementById("adminCoBsb").value || "").trim(),
-    accountNumber: (document.getElementById("adminCoAccount").value || "").trim(),
-    invoicePrefix: (document.getElementById("adminCoPrefix").value || "").trim() || "INV-",
-    gstNote: (document.getElementById("adminCoGstNote").value || "").trim() || "All fares GST inclusive",
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    updatedBy: getCurrentOperator() || ""
-  };
-  try {
-    await db.collection("settings").doc("companyInvoice").set(payload, { merge: true });
-    applyCompanyInvoiceSettings(payload);
-    setAdminCoStatus("Company details saved.");
-    showToast("Company details saved");
-  } catch (e) {
-    setAdminCoStatus("Save failed: " + e.message, true);
-    showToast("Save failed", true);
-  }
-}
-
-function parseMoneyInput(val) {
-  const n = parseFloat(String(val || "").replace(/[^0-9.]/g, ""));
-  return isNaN(n) ? 0 : Math.round(n * 100) / 100;
-}
-
-function formatMoneyAud(n) {
-  return "$" + (Math.round(n * 100) / 100).toFixed(2);
-}
-
-function getInvoicePaymentBreakdown(total, deposit, paymentType) {
-  total = Math.max(0, total);
-  deposit = Math.max(0, deposit);
-  if (paymentType === "fully_paid") {
-    return { total: total, deposit: total, balance: 0, statusLabel: "PAID IN FULL" };
-  }
-  if (paymentType === "deposit") {
-    deposit = Math.min(deposit, total);
-    return { total: total, deposit: deposit, balance: Math.max(0, total - deposit), statusLabel: "DEPOSIT PAID — BALANCE DUE" };
-  }
-  return { total: total, deposit: 0, balance: total, statusLabel: "AMOUNT PAYABLE" };
-}
-
-function updateInvoiceSummary() {
-  const el = document.getElementById("invoiceSummary");
-  if (!el) return;
-  const total = parseMoneyInput(document.getElementById("invoiceTotalFare").value);
-  const deposit = parseMoneyInput(document.getElementById("invoiceDeposit").value);
-  const br = getInvoicePaymentBreakdown(total, deposit, invoicePaymentType);
-  const gst = total / 11;
-  let html = '<div class="invoiceSummaryLine"><span>GST (1/11)</span><span>' + formatMoneyAud(gst) + '</span></div>';
-  if (invoicePaymentType === "deposit") {
-    html += '<div class="invoiceSummaryLine"><span>Deposit paid</span><span>' + formatMoneyAud(br.deposit) + '</span></div>';
-    html += '<div class="invoiceSummaryLine total"><span>Balance due</span><span>' + formatMoneyAud(br.balance) + '</span></div>';
-  } else if (invoicePaymentType === "payable") {
-    html += '<div class="invoiceSummaryLine total"><span>Amount payable</span><span>' + formatMoneyAud(br.balance) + '</span></div>';
-  } else {
-    html += '<div class="invoiceSummaryLine total"><span>Paid in full</span><span>' + formatMoneyAud(br.total) + '</span></div>';
-  }
-  el.innerHTML = html;
-}
-
-function setInvoicePaymentType(type, btn) {
-  invoicePaymentType = type;
-  document.querySelectorAll("#invoicePayChips button").forEach(function(b) {
-    b.classList.toggle("selected", b === btn);
-  });
-  const depRow = document.getElementById("invoiceDepositRow");
-  if (depRow) depRow.style.display = type === "deposit" ? "block" : "none";
-  updateInvoiceSummary();
-}
-
-function closeInvoiceModal() {
-  document.getElementById("invoiceModal").classList.remove("open");
-  pendingInvoiceJob = null;
-}
-
-async function openInvoiceModalForJob(job) {
-  if (!job) return;
-  pendingInvoiceJob = job;
-  invoicePaymentType = "fully_paid";
-  document.getElementById("invoiceModalJob").textContent = "JOB-" + job.id + " · " + (job.name || "Customer");
-  document.getElementById("invoiceTotalFare").value = job.fare ? String(job.fare) : (job.price || "");
-  const dep = parseMoneyInput(job.depositAmount);
-  document.getElementById("invoiceDeposit").value = dep > 0 ? String(dep) : "";
-  document.querySelectorAll("#invoicePayChips button").forEach(function(b, i) {
-    b.classList.toggle("selected", i === 0);
-  });
-  document.getElementById("invoiceDepositRow").style.display = "none";
-  if (dep > 0 && (job.payment || []).includes("Deposit")) {
-    setInvoicePaymentType("deposit", document.querySelectorAll("#invoicePayChips button")[1]);
-  }
-  updateInvoiceSummary();
-  document.getElementById("invoiceModal").classList.add("open");
-}
-
-async function openInvoiceModal(docId) {
-  let job = findJobById(docId);
-  if (!job && firebaseReady && db) {
-    try {
-      const doc = await db.collection("jobs").doc(docId).get();
-      if (doc.exists) job = Object.assign({ docId: doc.id }, doc.data());
-    } catch (e) { console.warn(e); }
-  }
-  if (!job || !job.fare) {
-    alert("Complete the job with a fare before generating an invoice");
-    return;
-  }
-  openInvoiceModalForJob(job);
-}
-
-function ensureJsPdf() {
-  if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
-  return new Promise(function(resolve, reject) {
-    const s = document.createElement("script");
-    s.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-    s.onload = function() { resolve(window.jspdf.jsPDF); };
-    s.onerror = function() { reject(new Error("Could not load PDF library")); };
-    document.head.appendChild(s);
-  });
-}
-
-function formatInvoiceDate(job) {
-  const ts = job.completedAt || job.dispatchedAt;
-  let d = new Date();
-  if (ts) {
-    if (ts.toDate) d = ts.toDate();
-    else if (ts.seconds) d = new Date(ts.seconds * 1000);
-  }
-  return d.toLocaleDateString("en-AU", { day: "2-digit", month: "2-digit", year: "numeric" });
-}
-
-function formatTripDateTime(job) {
-  if (job.date && job.timeInput) {
-    let t = job.timeInput;
-    if (job.ampm && job.ampm !== "None") t += " " + job.ampm;
-    return formatDateDisplay(job.date) + " · " + t;
-  }
-  return (job.time || "ASAP") + " · " + formatInvoiceDate(job);
-}
-
-async function generateTaxInvoicePdf() {
-  if (!pendingInvoiceJob) return;
-  const co = companyInvoiceSettings || defaultCompanyInvoiceSettings();
-  if (!co.companyName || !co.abn) {
-    alert("Set company name and ABN in Management → Company & Tax Invoice first");
-    return;
-  }
-  const total = parseMoneyInput(document.getElementById("invoiceTotalFare").value);
-  if (total <= 0) {
-    alert("Enter the total fare");
-    return;
-  }
-  const deposit = parseMoneyInput(document.getElementById("invoiceDeposit").value);
-  const pay = getInvoicePaymentBreakdown(total, deposit, invoicePaymentType);
-  const job = pendingInvoiceJob;
-  const prefix = co.invoicePrefix || "INV-";
-  const invNum = prefix + job.id;
-  try {
-    const jsPDF = await ensureJsPdf();
-    const doc = new jsPDF({ unit: "mm", format: "a4" });
-    const gold = [212, 175, 55];
-    const dark = [26, 26, 26];
-    const pageW = 210;
-    let y = 0;
-
-    doc.setFillColor(gold[0], gold[1], gold[2]);
-    doc.rect(0, 0, pageW, 38, "F");
-    doc.setTextColor(dark[0], dark[1], dark[2]);
-    doc.setFontSize(10);
-    doc.text("TAX INVOICE", 14, 12);
-    doc.setFontSize(18);
-    doc.setFont(undefined, "bold");
-    doc.text(co.companyName.slice(0, 42), 14, 22);
-    doc.setFontSize(9);
-    doc.setFont(undefined, "normal");
-    doc.text("Premium Taxi & Dispatch Services", 14, 28);
-
-    y = 48;
-    doc.setTextColor(40, 40, 40);
-    doc.setFontSize(22);
-    doc.setFont(undefined, "bold");
-    doc.text("INVOICE", 14, y);
-    doc.setFontSize(10);
-    doc.setFont(undefined, "normal");
-    doc.text("Invoice #: " + invNum, pageW - 14, y, { align: "right" });
-    y += 6;
-    doc.text("Date: " + formatInvoiceDate(job), pageW - 14, y, { align: "right" });
-    y += 10;
-
-    doc.setFont(undefined, "bold");
-    doc.text("Bill To", 14, y);
-    y += 5;
-    doc.setFont(undefined, "normal");
-    doc.text(job.name || "Customer", 14, y);
-    y += 5;
-    if (job.phone) { doc.text(formatPhoneDisplay(job.phone), 14, y); y += 5; }
-    if (job.pickup) { doc.text("Pickup: " + job.pickup, 14, y); y += 5; }
-    if (job.drop) { doc.text("Drop-off: " + job.drop, 14, y); y += 5; }
-    y += 4;
-
-    doc.setDrawColor(200, 200, 200);
-    doc.line(14, y, pageW - 14, y);
-    y += 8;
-    doc.setFont(undefined, "bold");
-    doc.text("Description", 14, y);
-    doc.text("Amount", pageW - 14, y, { align: "right" });
-    y += 3;
-    doc.line(14, y, pageW - 14, y);
-    y += 7;
-    doc.setFont(undefined, "normal");
-    const desc = "Taxi transport — " + formatTripDateTime(job) + (job.vehicle && job.vehicle !== "None" ? " · " + job.vehicle : "");
-    const descLines = doc.splitTextToSize(desc, 130);
-    doc.text(descLines, 14, y);
-    doc.text(formatMoneyAud(total), pageW - 14, y, { align: "right" });
-    y += descLines.length * 5 + 6;
-    doc.line(14, y, pageW - 14, y);
-    y += 8;
-
-    const gst = total / 11;
-    const subtotal = total - gst;
-    doc.text("Subtotal (ex GST)", 14, y);
-    doc.text(formatMoneyAud(subtotal), pageW - 14, y, { align: "right" });
-    y += 6;
-    doc.text("GST (10%)", 14, y);
-    doc.text(formatMoneyAud(gst), pageW - 14, y, { align: "right" });
-    y += 6;
-    doc.setFont(undefined, "bold");
-    doc.text("Total (GST inclusive)", 14, y);
-    doc.text(formatMoneyAud(total), pageW - 14, y, { align: "right" });
-    y += 10;
-    doc.setFont(undefined, "normal");
-
-    doc.setFillColor(252, 248, 235);
-    doc.rect(14, y, pageW - 28, 22, "F");
-    doc.setFont(undefined, "bold");
-    doc.text("Payment", 18, y + 7);
-    doc.setFont(undefined, "normal");
-    doc.setFontSize(9);
-    if (invoicePaymentType === "fully_paid") {
-      doc.text("Status: PAID IN FULL — " + formatMoneyAud(pay.total), 18, y + 13);
-    } else if (invoicePaymentType === "deposit") {
-      doc.text("Deposit paid: " + formatMoneyAud(pay.deposit) + "  ·  Balance due: " + formatMoneyAud(pay.balance), 18, y + 13);
-    } else {
-      doc.text("Amount payable: " + formatMoneyAud(pay.balance), 18, y + 13);
-    }
-    y += 28;
-    doc.setFontSize(10);
-
-    doc.setFont(undefined, "bold");
-    doc.text("Company details", 14, y);
-    y += 6;
-    doc.setFont(undefined, "normal");
-    doc.setFontSize(9);
-    if (co.abn) { doc.text("ABN: " + co.abn, 14, y); y += 5; }
-    if (co.phone) { doc.text("Phone: " + co.phone, 14, y); y += 5; }
-    if (co.email) { doc.text("Email: " + co.email, 14, y); y += 5; }
-    if (co.address) {
-      const addrLines = doc.splitTextToSize(co.address, 90);
-      doc.text(addrLines, 14, y);
-      y += addrLines.length * 5;
-    }
-    if (co.bsb || co.accountNumber) {
-      y += 3;
-      doc.setFont(undefined, "bold");
-      doc.text("Bank details", 14, y);
-      y += 5;
-      doc.setFont(undefined, "normal");
-      if (co.bankName) { doc.text(co.bankName, 14, y); y += 5; }
-      doc.text("BSB: " + (co.bsb || "—") + "   Account: " + (co.accountNumber || "—"), 14, y);
-      y += 5;
-    }
-    y += 6;
-    doc.setFontSize(8);
-    doc.setTextColor(100, 100, 100);
-    doc.text(co.gstNote || "All fares GST inclusive", 14, y);
-
-    doc.save(invNum.replace(/[^a-zA-Z0-9_-]/g, "") + ".pdf");
-    showToast("Invoice PDF downloaded");
-    closeInvoiceModal();
-  } catch (e) {
-    alert("PDF failed: " + e.message);
-  }
-}
-
 function toggleAdminTool(btn) {
   const item = btn && btn.closest ? btn.closest(".adminAccordionItem") : null;
   if (!item) return;
@@ -3459,8 +3037,6 @@ async function initOperatorAuth() {
       if (pt.exists && pt.data().prospectOperators && pt.data().prospectOperators.length) {
         prospectOperatorList = pt.data().prospectOperators.map(titleCaseOperatorName).filter(Boolean);
       }
-      const ci = await db.collection("settings").doc("companyInvoice").get();
-      if (ci.exists) applyCompanyInvoiceSettings(ci.data());
     } catch (e) { console.warn("loadAppSettings failed", e); }
   }
   await loadOperatorPins();
@@ -3757,7 +3333,6 @@ function teardownFirebaseSubscriptions() {
   if (operatorSessionUnsub) { operatorSessionUnsub(); operatorSessionUnsub = null; }
   if (appSettingsUnsub) { appSettingsUnsub(); appSettingsUnsub = null; }
   if (broadcastUnsub) { broadcastUnsub(); broadcastUnsub = null; }
-  if (companyInvoiceUnsub) { companyInvoiceUnsub(); companyInvoiceUnsub = null; }
   firebaseSubscriptionsStarted = false;
 }
 
@@ -6064,9 +5639,6 @@ async function openJobModalAsync(docId, source) {
     actions += '<button class="btnComplete" onclick="completeJob(\'' + docId + '\')">✓ COMPLETE</button>';
     actions += '<button class="btnRecall" onclick="recallJob(\'' + docId + '\')">RECALL</button>';
   }
-  if (job.status === "completed" && job.fare) {
-    actions += '<button class="btnPrimary" onclick="openInvoiceModal(\'' + docId + '\')">TAX INVOICE</button>';
-  }
   document.getElementById("modalJobActions").innerHTML = actions;
   document.getElementById("jobModal").classList.add("open");
   return true;
@@ -6461,10 +6033,6 @@ async function confirmCompleteJob() {
     closeFareModal();
     closeJobModal();
     showToast("Completed ✔ JOB-" + jobNum);
-    const completedJob = Object.assign({}, job || {}, {
-      docId: docId, id: jobNum, status: "completed", fare: fare, completedBy: completedBy
-    });
-    setTimeout(function() { openInvoiceModalForJob(completedJob); }, 400);
   } catch (err) {
     alert("Complete failed: " + err.message);
     subscribeAvailableJobs();
@@ -7393,8 +6961,6 @@ window.addEventListener("DOMContentLoaded", function() {
   document.getElementById("fareInput").addEventListener("keydown", function(e) {
     if (e.key === "Enter") confirmCompleteJob();
   });
-  const invFare = document.getElementById("invoiceTotalFare");
-  if (invFare) invFare.addEventListener("input", updateInvoiceSummary);
   document.getElementById("opLoginName").addEventListener("keydown", function(e) {
     if (e.key === "Enter") document.getElementById("opLoginPin").focus();
   });
